@@ -1,8 +1,9 @@
-// ---------------------------
-// MAZE DATA
-// ---------------------------
-// 0 = wall
-// 1 = path
+const tileSize = 50;
+const COLS = 16;
+const ROWS = 12;
+
+// 0 = path
+// 1 = wall
 // 2 = start
 // 3 = end
 
@@ -21,10 +22,6 @@ let maze = [
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 ];
 
-const tileSize = 50;
-const COLS = 16;
-const ROWS = 12;
-
 function setup() {
   createCanvas(800, 600);
 }
@@ -42,13 +39,13 @@ function drawMaze() {
       noStroke();
 
       if (tile === 1) {
-        fill(60, 60, 80); // wall
+        fill(23, 53, 71); // wall
       } else if (tile === 0) {
-        fill(200); // path
+        fill(121, 164, 166); // path
       } else if (tile === 2) {
-        fill(0, 255, 0); // start
+        fill(215, 240, 201); // start
       } else if (tile === 3) {
-        fill(255, 0, 0); // end
+        fill(35, 107, 112); // end
       }
 
       const offSetX = (width - COLS * tileSize) / 2;
@@ -57,4 +54,9 @@ function drawMaze() {
       rect(col * tileSize + offSetX, row * tileSize + offSetY, tileSize, tileSize);
     }
   }
+
+  fill(255);
+  textAlign(CENTER, TOP);
+  textFont("Monospace");
+  text("Make your way to school!", width / 2, 20);
 }
