@@ -2,6 +2,11 @@ const tileSize = 50;
 const COLS = 16;
 const ROWS = 12;
 
+let gameStarted = false;
+let firstLevelComplete = false;
+let secondLevelComplete = false;
+let thirdLevelComplete = false;
+
 // 0 = path
 // 1 = wall
 // 2 = start
@@ -9,16 +14,16 @@ const ROWS = 12;
 
 let maze = [
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-  [1,2,0,0,1,0,0,0,0,1,0,0,0,0,3,1],
-  [1,0,1,0,1,0,1,1,0,1,0,1,1,0,0,1],
-  [1,0,1,0,0,0,0,1,0,0,0,1,0,1,0,1],
-  [1,0,1,1,1,1,0,1,1,1,0,1,0,1,0,1],
-  [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,1],
-  [1,1,1,1,0,1,1,1,0,1,1,1,0,1,0,1],
-  [1,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1],
-  [1,0,1,1,1,1,0,1,1,1,0,1,1,1,0,1],
-  [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,1],
-  [1,0,1,1,0,1,1,1,0,1,1,1,0,1,0,1],
+  [1,0,0,0,1,1,0,1,0,0,0,0,1,1,3,1],
+  [1,0,1,1,0,0,0,0,0,1,1,0,1,0,0,1],
+  [1,0,0,1,0,1,1,1,0,0,0,0,1,0,1,1],
+  [1,1,0,0,0,1,1,1,0,1,1,0,0,0,1,1],
+  [1,1,1,1,0,1,0,0,0,1,1,0,1,1,1,1],
+  [1,0,0,0,0,1,0,1,0,1,0,0,0,0,0,1],
+  [1,0,1,1,1,1,0,1,0,1,0,1,1,1,0,1],
+  [1,0,1,0,0,0,0,1,0,0,0,0,0,1,0,1],
+  [1,0,0,0,1,0,1,1,1,0,1,1,0,0,0,1],
+  [1,2,1,1,1,0,0,0,0,0,1,1,1,0,1,1],
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 ];
 
@@ -28,7 +33,27 @@ function setup() {
 
 function draw() {
   background(220);
-  drawMaze();
+  if (gameStarted) {
+    drawMaze();
+  } else {
+    drawStartScreen();
+  }
+}
+
+function keyPressed() {
+  if (key === " ") {
+    gameStarted = true;
+}
+}
+
+function drawStartScreen() {
+  fill(121, 164, 166);
+  rect(0, 0, width, height);
+
+  fill(255);
+  textAlign(CENTER, CENTER);
+  textFont("Monospace");
+  text("Press SPACE to start", width / 2, 400);
 }
 
 function drawMaze() {
@@ -56,7 +81,15 @@ function drawMaze() {
   }
 
   fill(255);
-  textAlign(CENTER, TOP);
+  textAlign(LEFT, TOP);
   textFont("Monospace");
-  text("Make your way to school!", width / 2, 20);
+  textStyle("BOLD");
+  text("LEVEL 1: Make your way to school!", 50, 20);
+  drawSocialBar();
+}
+
+function drawSocialBar() {
+  textAlign(RIGHT, TOP);
+  text("Social Battery Bar", 550, 20);
+  rect(560, 15, 190, 20);
 }
