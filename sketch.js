@@ -13,27 +13,22 @@ let thirdLevelComplete = false;
 // 3 = end
 
 let maze = [
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-  [1,0,0,0,1,1,0,1,0,0,0,0,1,1,3,1],
-  [1,0,1,1,0,0,0,0,0,1,1,0,1,0,0,1],
-  [1,0,0,1,0,1,1,1,0,0,0,0,1,0,1,1],
-  [1,1,0,0,0,1,1,1,0,1,1,0,0,0,1,1],
-  [1,1,1,1,0,1,0,0,0,1,1,0,1,1,1,1],
-  [1,0,0,0,0,1,0,1,0,1,0,0,0,0,0,1],
-  [1,0,1,1,1,1,0,1,0,1,0,1,1,1,0,1],
-  [1,0,1,0,0,0,0,1,0,0,0,0,0,1,0,1],
-  [1,0,0,0,1,0,1,1,1,0,1,1,0,0,0,1],
-  [1,2,1,1,1,0,0,0,0,0,1,1,1,0,1,1],
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1, 3, 1],
+  [1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1],
+  [1, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1],
+  [1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1],
+  [1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1],
+  [1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1],
+  [1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1],
+  [1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1],
+  [1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1],
+  [1, 2, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
 
-let movers = [];
-  
 function setup() {
   createCanvas(800, 600);
-  movers.push(new Mover(1, 1));
-  movers.push(new Mover(5, 5));
-  movers.push(new Mover(10, 8));
 }
 
 function draw() {
@@ -48,60 +43,6 @@ function draw() {
 function keyPressed() {
   if (key === " ") {
     gameStarted = true;
-  }
-}
-class Mover {
-  constructor(col, row) {
-
-    this.x = col * tileSize + tileSize / 2;
-    this.y = row * tileSize + tileSize / 2;
-    this.speed = 2;
-    this.dir = { x: 0, y: 0};
-  }
-
-  update() {
-    if (!this.canMove())
-    if (!this.canMove(this.dir.x, this.dir.y)) {
-      this.chooseDirection();
-    }
-
-    this.x += this.dir.x * this.speed;
-    this.y += this.dir.y * this.speed;
-  }
-
-  chooseDirection() {
-    let dirs = [
-      { x: 1, y: 0 },
-      { x: -1, y: 0 },
-      { x: 0, y: 1 },
-      { x: 0, y: -1 }
-    ];
-
-    dirs = shuffle(dirs);
-
-    for (let d of dirs) {
-      if (this.canMove(d.x, d.y)) {
-        this.dir = d;
-        return;
-      }
-    }
-
-    this.dir = { x: 0, y: 0 };
-  }
-
-  canMove(dx, dy) {
-    let nextX = this.x + dx * this.speed;
-    let nextY = this.y + dy * this.speed;
-
-    let col = floor(nextX / tileSize);
-    let row = floor(nextY / tileSize);
-
-    return maze[row][col] === 0;
-  }
-
-  draw() {
-    fill(255, 100, 100);
-    ellipse(this.x, this.y, tileSize * 0.6);
   }
 }
 
@@ -139,21 +80,21 @@ function drawMaze() {
       const offSetX = (width - COLS * tileSize) / 2;
       const offSetY = (height - ROWS * tileSize) / 2;
 
-      rect(col * tileSize + offSetX, row * tileSize + offSetY, tileSize, tileSize);
+      rect(
+        col * tileSize + offSetX,
+        row * tileSize + offSetY,
+        tileSize,
+        tileSize,
+      );
     }
-  }
 
-  fill(255);
-  textAlign(LEFT, TOP);
-  textFont("Monospace");
-  textStyle("BOLD");
-  textSize(12);
-  text("LEVEL 1: Make your way to school!", 50, 20);
-  drawSocialBar();
-
-    for (let m of movers) {
-    m.update();
-    m.draw();
+    fill(255);
+    textAlign(LEFT, TOP);
+    textFont("Monospace");
+    textStyle("BOLD");
+    textSize(12);
+    text("LEVEL 1: Make your way to school!", 50, 20);
+    drawSocialBar();
   }
 }
 
