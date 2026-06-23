@@ -8,12 +8,12 @@ let firstLevelComplete = false;
 let secondLevelComplete = false;
 let thirdLevelComplete = false;
 let socialBattery = 100;
+let anxietyEffect = false;
 
 // 0 = path
 // 1 = wall
 // 2 = start
 // 3 = end
-
 let maze = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   [1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1, 3, 1],
@@ -86,23 +86,23 @@ class Player {
   }
 
   draw() {
-  let row = SPRITE.rows[this.facing];
-  let frameW = SPRITE.frameWidth;
-  let frameH = SPRITE.frameHeight;
+    let row = SPRITE.rows[this.facing];
+    let frameW = SPRITE.frameWidth;
+    let frameH = SPRITE.frameHeight;
 
-  // Advance animation frame only when moving
-  if (this.vx !== 0 || this.vy !== 0) {
-    this.frame = (this.frame + 1) % (SPRITE.numFrames * SPRITE.animSpeed);
-  }
-  let col = floor(this.frame / SPRITE.animSpeed);
+    // Advance animation frame only when moving
+    if (this.vx !== 0 || this.vy !== 0) {
+      this.frame = (this.frame + 1) % (SPRITE.numFrames * SPRITE.animSpeed);
+    }
+    let col = floor(this.frame / SPRITE.animSpeed);
 
-  let srcX = col * frameW;
-  let srcY = row * frameH;
-  let drawW = frameW * SPRITE.scale;
-  let drawH = frameH * SPRITE.scale;
+    let srcX = col * frameW;
+    let srcY = row * frameH;
+    let drawW = frameW * SPRITE.scale;
+    let drawH = frameH * SPRITE.scale;
 
-  imageMode(CENTER);
-  image(character, this.x, this.y, drawW, drawH, srcX, srcY, frameW, frameH);
+    imageMode(CENTER);
+    image(character, this.x, this.y, drawW, drawH, srcX, srcY, frameW, frameH);
   }
 }
 
@@ -282,6 +282,15 @@ function draw() {
 
   updateWallExpansion(offX, offY);
   drawMaze();
+
+  if (socialBattery > 70) {
+    player.speed = 2.5;
+  } else if (socialBattery > 30) {
+    player.speed = 1.5; 
+  } else {
+    player.speed = 1; 
+  }
+  
   player.update(offX, offY);
   player.draw();
   // Check if player reached the end tile
