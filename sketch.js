@@ -3,15 +3,12 @@ const COLS = 16;
 const ROWS = 12;
 
 let gameStarted = false;
+let gameOver = false;
 let firstLevelComplete = false;
 let secondLevelComplete = false;
 let thirdLevelComplete = false;
 let socialBattery = 100;
-let blobX = 400;
-let blobY = 300;
-let currentThought = "";
-let thoughtVisible = false;
-let lastThoughtTime = 0;
+
 
 // 0 = path
 // 1 = wall
@@ -33,19 +30,69 @@ let maze = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
 
+
+let player;
+
+class Player {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.speed = 2.5;
+    this.vx = 0;
+    this.vy = 0;
+  }
+
+  update(offX, offY) {
+    // Read WASD input
+    let inputX = 0;
+    let inputY = 0;
+    if (keyIsDown(65)) inputX = -1; // A
+    if (keyIsDown(68)) inputX =  1; // D
+    if (keyIsDown(87)) inputY = -1; // W
+    if (keyIsDown(83)) inputY =  1; // S
+
+    // Prefer one axis at a time (no diagonal)
+    if (inputX !== 0) { this.vx = inputX; this.vy = 0; }
+    else if (inputY !== 0) { this.vx = 0; this.vy = inputY; }
+    else { this.vx = 0; this.vy = 0; }
+
+    // Try to move, check the leading edge for wall collision
+    let radius = tileSize * 0.3;
+    let nextX = this.x + this.vx * this.speed;
+    let nextY = this.y + this.vy * this.speed;
+
+    let checkX = nextX + this.vx * radius;
+    let checkY = nextY + this.vy * radius;
+    let col = floor((checkX - offX) / tileSize);
+    let row = floor((checkY - offY) / tileSize);
+
+    if (row >= 0 && row < ROWS && col >= 0 && col < COLS) {
+      let tile = maze[row][col];
+      if (tile === 0 || tile === 2 || tile === 3) {
+        this.x = nextX;
+        this.y = nextY;
+      }
+    }
+  }
+
+  draw() {
+    fill(255, 100, 80);   // pick any colour you like
+    noStroke();
+    ellipse(this.x, this.y, tileSize * 0.7);
+  }
+}
+
 class Mover {
   constructor(x, y, speed = 1.5) {
     this.x = x;
     this.y = y;
     this.speed = speed;
 
-    // Start with a random direction
     this.vx = random([-1, 1, 0, 0]);
     this.vy = this.vx === 0 ? random([-1, 1]) : 0;
   }
 
   update(offX, offY) {
-    // Predict next position
     let nextX = this.x + this.vx * this.speed;
     let nextY = this.y + this.vy * this.speed;
 
@@ -54,24 +101,20 @@ class Mover {
     let checkX = nextX + this.vx * radius;
     let checkY = nextY + this.vy * radius;
 
-    // Convert pixel → tile index
     let col = floor((checkX - offX) / tileSize);
     let row = floor((checkY - offY) / tileSize);
 
-    // Check bounds
     if (row < 0 || row >= ROWS || col < 0 || col >= COLS) {
       this.pickNewDirection();
       return;
     }
 
-    // Check if next tile is walkable
     let tile = maze[row][col];
     if (tile === 0 || tile === 2 || tile === 3) {
       // Move normally
       this.x = nextX;
       this.y = nextY;
     } else {
-      // Hit a wall → choose new direction
       this.pickNewDirection();
     }
   }
@@ -89,8 +132,8 @@ class Mover {
   }
 
   draw() {
-    fill(255, 80, 80);
-    ellipse(this.x, this.y, tileSize * 0.5);
+    fill(1, 19, 33);
+    ellipse(this.x, this.y, tileSize * 0.8);
   }
 }
 
@@ -109,6 +152,17 @@ function setup() {
   const offX = (width - COLS * tileSize) / 2;
   const offY = (height - ROWS * tileSize) / 2;
 
+  outer:
+  for (let r = 0; r < ROWS; r++) {
+  for (let c = 0; c < COLS; c++) {
+    if (maze[r][c] === 2) {
+      let pos = tileCenter(c, r, offX, offY);
+      player = new Player(pos.x, pos.y);
+      break outer;
+    }
+  }
+}
+
   let c1 = tileCenter(1, 1, offX, offY);
   movers.push(new Mover(c1.x, c1.y));
 
@@ -119,19 +173,35 @@ function setup() {
   movers.push(new Mover(c2.x, c2.y));
 }
 
-
 function draw() {
   background(220);
-  if (gameStarted) {
-    drawMaze();
-  } else {
+
+  if (!gameStarted) {
     drawStartScreen();
+    return;
   }
+
+  if (gameOver) {
+    drawLoseScreen();
+    return;
+  }
+
+  const offX = (width - COLS * tileSize) / 2;
+  const offY = (height - ROWS * tileSize) / 2;
+
+  drawMaze();
+  player.update(offX, offY);
+  player.draw();
+  drawSocialBar();
 }
 
 function keyPressed() {
-  if (key === " ") {
+  if (key === " " && !gameStarted) {
     gameStarted = true;
+  }
+
+  if (key === "r" || key === "R") {
+    if (gameOver) restartGame();
   }
 }
 
@@ -206,6 +276,31 @@ function drawSocialBar() {
   rect(560, 15, socialBattery * 1.9, 20);
 }
 
+function drawLoseScreen() {
+  fill(0, 0, 0, 180);
+  rect(0, 0, width, height);
+
+  fill(255);
+  textAlign(CENTER, CENTER);
+  textFont("Monospace");
+  textSize(60);
+  text("You Burned Out", width / 2, height / 2 - 40);
+
+  textSize(20);
+  text("Your social battery hit 0", width / 2, height / 2 + 10);
+  text("Press R to restart", width / 2, height / 2 + 50);
+}
+
+function restartGame() {
+  socialBattery = 100;
+  gameOver = false;
+  thoughtVisible = false;
+  lastThoughtTime = 0;
+
+  // Reset player position if needed
+  blobX = 400;
+  blobY = 300;
+}
 
 
 
