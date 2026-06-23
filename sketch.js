@@ -397,7 +397,6 @@ function drawMaze() {
   textFont("Monospace");
   textSize(12);
   text("LVL 1: Make your way to school!", 50, 20);
-  drawSocialBar();
 
   const offX = offSetX;
   const offY = offSetY;
@@ -416,6 +415,7 @@ function drawMaze() {
 function drawSocialBar() {
   textAlign(RIGHT, TOP);
   fill(255);
+  textSize(12);
   text("Social Battery", 550, 20);
 
   fill(80);
