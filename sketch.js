@@ -312,8 +312,11 @@ function draw() {
 
 push();
 
-// camera follow (THIS is the key line)
-translate(-camX, -camY);
+let zoom = 1.5;
+
+translate(width / 2, height / 2);
+scale(zoom);
+translate(-player.x, -player.y);
 
 if (anxietyEffect) {
   translate(random(-1, 1), random(-1, 1));
@@ -322,14 +325,12 @@ if (anxietyEffect) {
 updateWallExpansion(0, 0);
 drawMaze();
 
-// movers
 for (let m of movers) {
-  m.update(0, 0);
+  m.update();
   m.draw();
 }
 
-// player
-player.update(0, 0);
+player.update();
 player.draw();
 
 pop();
