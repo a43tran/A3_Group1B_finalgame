@@ -376,7 +376,7 @@ function keyPressed() {
 }
 
 function drawStartScreen() {
-  fill(121, 164, 166);
+  fill(150, 153, 214);
   rect(0, 0, width, height);
 
   fill(255);
@@ -399,7 +399,7 @@ function drawMaze() {
       noStroke();
 
       if (tile === 1) {
-        fill(23, 53, 71); // wall
+        fill(36, 39, 97); // wall
         let expand = wallExpansion[row][col] * WALL_MAX_EXPAND;
         rect(
           col * tileSize - expand,
@@ -408,9 +408,9 @@ function drawMaze() {
           tileSize + expand * 2,
         );
       } else {
-        if (tile === 0) fill(121, 164, 166);
-        else if (tile === 2) fill(215, 240, 201);
-        else if (tile === 3) fill(35, 107, 112);
+        if (tile === 0) fill(116, 119, 181);
+        else if (tile === 2) fill(247, 176, 204);
+        else if (tile === 3) fill(179, 80, 119);
         rect(
           col * tileSize,
           row * tileSize,
@@ -421,14 +421,6 @@ function drawMaze() {
     }
   }
 
-  fill(255);
-  textAlign(LEFT, TOP);
-  textFont("Monospace");
-  textSize(12);
-  text("LVL 1: Make your way to school!", 50, 20);
-
-
-
   if (socialBattery <= 0) {
     socialBattery = 0;
     gameOver = true;
@@ -436,6 +428,16 @@ function drawMaze() {
 }
 
 function drawSocialBar() {
+
+  fill(5, 8, 65);
+  rect(0, 0, width, 60);
+
+  fill(255);
+  textAlign(LEFT, TOP);
+  textFont("Monospace");
+  textSize(12);
+  text("LVL 1: Make your way to school!", 50, 20);
+
   textAlign(RIGHT, TOP);
   fill(255);
   textSize(12);
