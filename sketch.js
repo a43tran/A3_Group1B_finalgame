@@ -1436,7 +1436,6 @@ function drawBadge() {
 
   noStroke();
 }
-}
 
 function updateBadge() {
   if (!badgeUnlocked && !potionBadgeUnlocked) return;
