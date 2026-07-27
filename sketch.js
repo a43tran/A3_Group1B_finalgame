@@ -96,6 +96,18 @@ let walking;
 // SOCIAL BATTERY
 let socialBattery = 100;
 
+
+// INGREDIENTS (LVL2)
+const ingredientTypes = [
+  "Pixie Dust",
+  "Fish Eyeball",
+  "Feather",
+  "Mushroom",
+  "Crystal"
+];
+let potionBadgeUnlocked = false;
+
+
 // FIREFLY BADGE
 let badgeUnlocked = false;
 let badgeX = 0;
@@ -154,6 +166,142 @@ const HIT_FLASH_DECAY = 8;
 const HITBOX_RADIUS = 12;
 const HITBOX_OFFSET_Y = 9;
 
+
+function updateBeakers() {
+  // Only run this mechanic in Level 2
+  if (maze !== maze2) return;
+
+  for (let beaker of beakers) {
+    if (beaker.state === "waiting") {
+      beaker.timer++;
+
+      // Wait before giving a warning
+      if (beaker.timer >= 90) {
+        beaker.state = "warning";
+        beaker.timer = 0;
+      }
+    }
+
+    else if (beaker.state === "warning") {
+      beaker.timer++;
+
+      // Circle shakes for about half a second
+      if (beaker.timer >= 30) {
+        beaker.state = "smashing";
+        beaker.timer = 0;
+        beaker.hasHitPlayer = false;
+      }
+    }
+
+    else if (beaker.state === "smashing") {
+      // Quickly move downward
+      beaker.y += 8;
+
+      if (beaker.y >= beaker.bottomY) {
+        beaker.y = beaker.bottomY;
+        beaker.state = "holding";
+        beaker.timer = 0;
+      }
+    }
+
+    else if (beaker.state === "holding") {
+      beaker.timer++;
+
+      // Stay down briefly
+      if (beaker.timer >= 25) {
+        beaker.state = "rising";
+      }
+    }
+
+    else if (beaker.state === "rising") {
+      // Slowly move back up
+      beaker.y -= 2.5;
+
+      if (beaker.y <= beaker.topY) {
+        beaker.y = beaker.topY;
+        beaker.state = "waiting";
+        beaker.timer = 0;
+        beaker.hasHitPlayer = false;
+      }
+    }
+  }
+}
+
+function drawBeakers() {
+  // Only draw in Level 2
+  if (maze !== maze2) return;
+
+  for (let beaker of beakers) {
+    let shakeX = 0;
+
+    // Shake before smashing
+    if (beaker.state === "warning") {
+      shakeX = sin(frameCount * 1.5) * 3;
+    }
+
+    // Line connecting beaker to ceiling
+    stroke(100);
+    strokeWeight(3);
+    line(beaker.x, beaker.topY - 40, beaker.x, beaker.y);
+
+    // Temporary circle representing the beaker
+    noStroke();
+
+    if (beaker.state === "warning") {
+      fill(255, 180, 60);
+    } else {
+      fill(100, 220, 255);
+    }
+
+    circle(
+      beaker.x + shakeX,
+      beaker.y,
+      beaker.radius * 2
+    );
+  }
+}
+
+function checkBeakerPlayerCollision() {
+  // Only check collisions in Level 2
+  if (maze !== maze2) return;
+
+  // Prevent repeated damage during invincibility
+  if (playerInvincible) return;
+
+  let playerFeetY = player.y + HITBOX_OFFSET_Y;
+
+  for (let beaker of beakers) {
+    // Only damage while smashing or while fully down
+    let dangerous =
+      beaker.state === "smashing" ||
+      beaker.state === "holding";
+
+    if (!dangerous || beaker.hasHitPlayer) continue;
+
+    let distanceToPlayer = dist(
+      player.x,
+      playerFeetY,
+      beaker.x,
+      beaker.y
+    );
+
+    if (distanceToPlayer < HITBOX_RADIUS + beaker.radius) {
+      socialBattery -= BEAKER_DAMAGE;
+      socialBattery = max(0, socialBattery);
+
+      beaker.hasHitPlayer = true;
+
+      // Reuse your existing damage effects
+      playerInvincible = true;
+      invincibleTimer = INVINCIBLE_FRAMES;
+
+      playerHitSound.play();
+      hitFlashAlpha = HIT_FLASH_MAX;
+    }
+  }
+}
+
+
 let lasers = [
   //top most laser
   { row: 2.3, col: 6.3, facing: "up", blinkRate: 80, on: true, timer: 0 },
@@ -204,6 +352,96 @@ let laserBeams = [
     blinkRate: 60,
     on: true,
     timer: 0,
+  },
+];
+
+// LEVEL 2 BEAKER OBSTACLES
+const BEAKER_DAMAGE = 10;
+
+let beakers = [
+
+  // 1. Near the start
+  {
+    x: 4 * tileSize + tileSize / 2,
+    topY: 20,
+    bottomY: 2 * tileSize + tileSize / 2,
+    y: 20,
+    radius: 18,
+    state: "waiting",
+    timer: 0,
+    hasHitPlayer: false,
+  },
+
+  // 2. Top-right corridor
+  {
+    x: 20 * tileSize + tileSize / 2,
+    topY: 20,
+    bottomY: 2 * tileSize + tileSize / 2,
+    y: 20,
+    radius: 18,
+    state: "waiting",
+    timer: 30,
+    hasHitPlayer: false,
+  },
+
+  // 3. Centre
+  {
+    x: 11 * tileSize + tileSize / 2,
+    topY: 140,
+    bottomY: 5 * tileSize + tileSize / 2,
+    y: 140,
+    radius: 18,
+    state: "waiting",
+    timer: 60,
+    hasHitPlayer: false,
+  },
+
+  // 4. Middle-right
+  {
+    x: 18 * tileSize + tileSize / 2,
+    topY: 180,
+    bottomY: 7 * tileSize + tileSize / 2,
+    y: 180,
+    radius: 18,
+    state: "waiting",
+    timer: 90,
+    hasHitPlayer: false,
+  },
+
+  // 5. Lower-left
+  {
+    x: 5 * tileSize + tileSize / 2,
+    topY: 280,
+    bottomY: 10 * tileSize + tileSize / 2,
+    y: 280,
+    radius: 18,
+    state: "waiting",
+    timer: 15,
+    hasHitPlayer: false,
+  },
+
+  // 6. Bottom-middle
+  {
+    x: 13 * tileSize + tileSize / 2,
+    topY: 320,
+    bottomY: 12 * tileSize + tileSize / 2,
+    y: 320,
+    radius: 18,
+    state: "waiting",
+    timer: 45,
+    hasHitPlayer: false,
+  },
+
+  // 7. Near the exit
+  {
+    x: 22 * tileSize + tileSize / 2,
+    topY: 320,
+    bottomY: 12 * tileSize + tileSize / 2,
+    y: 320,
+    radius: 18,
+    state: "waiting",
+    timer: 75,
+    hasHitPlayer: false,
   },
 ];
 
@@ -458,28 +696,50 @@ function draw() {
   updateWallExpansion();
   drawMaze();
 
+// LEVEL 1 HAZARDS
+if (maze === maze1) {
   updateLasers();
   drawLasers();
+}
 
-  player.update();
-  if (socialBattery > 0) {
+// LEVEL 2 HAZARDS
+if (maze === maze2) {
+  updateBeakers();
+  drawBeakers();
+}
+
+player.update();
+
+if (socialBattery > 0) {
   resolveWallPush();
 }
 
+// Laser beams only appear in Level 1
+if (maze === maze1) {
   updateLaserBeams();
   drawLaserBeams();
+}
 
-  updateFireflies();
-  drawCollectibles();
-  checkCollectibles();
-  player.draw();
+updateFireflies();
+drawCollectibles();
+checkCollectibles();
+player.draw();
 
-  //  This is in charge of checking whether the character is colliding with the laser, damaging their SB
+// LEVEL 1 DAMAGE
+if (maze === maze1) {
   checkLaserPlayerCollision();
+}
 
-  // updateinvincibility checks if the character is invisible, if it is, then the character takesno damage
+// LEVEL 2 DAMAGE
+if (maze === maze2) {
+  checkBeakerPlayerCollision();
+}
+// updateinvincibility checks if the character is invisible, if it is, then the character takesno damage
   //    1 second, otherwise they take damage and the counter is reset to 60 FRAMES (aka 1 second)
-  updateInvincibility();
+updateInvincibility();
+
+  
+
 
   pop();
 
@@ -511,6 +771,7 @@ function draw() {
   }
   drawSocialBar();
 }
+
 
 function keyPressed() {
   if (introDialogueActive && (key === " " || keyCode === ENTER)) {
@@ -808,8 +1069,111 @@ function setupCollectibles() {
     },
   ];
 }
+function setupFoodCollectibles() {
+  collectibles = [
+    // Near the Level 3 starting area
+    {
+      col: 21,
+      row: 2,
+      collected: false,
+      type: "food",
+    },
+
+    // Upper-right area
+    {
+      col: 17,
+      row: 3,
+      collected: false,
+      type: "food",
+    },
+
+    // Upper-middle area
+    {
+      col: 12,
+      row: 5,
+      collected: false,
+      type: "food",
+    },
+
+    // Centre-left area
+    {
+      col: 6,
+      row: 6,
+      collected: false,
+      type: "food",
+    },
+
+    // Centre area
+    {
+      col: 10,
+      row: 8,
+      collected: false,
+      type: "food",
+    },
+
+    // Lower-right area
+    {
+      col: 18,
+      row: 9,
+      collected: false,
+      type: "food",
+    },
+
+    // Lower-middle area
+    {
+      col: 7,
+      row: 10,
+      collected: false,
+      type: "food",
+    },
+
+    // Near the Level 3 exit
+    {
+      col: 4,
+      row: 12,
+      collected: false,
+      type: "food",
+    },
+  ];
+}
+
+
+function setupPotionIngredients() {
+  collectibles = [];
+
+  // Find all path tiles in maze2
+  let validTiles = [];
+
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      if (maze2[r][c] === 0) {
+        validTiles.push({ row: r, col: c });
+      }
+    }
+  }
+
+  // Randomly place 5 ingredients
+  for (let i = 0; i < 5; i++) {
+
+    let index = floor(random(validTiles.length));
+
+    let spot = validTiles[index];
+
+    validTiles.splice(index, 1);
+
+    collectibles.push({
+      row: spot.row,
+      col: spot.col,
+      collected: false,
+      type: ingredientTypes[i]
+    });
+  }
+}
 
 function updateFireflies() {
+  // Fireflies only exist in Level 1
+  if (maze !== maze1) return;
+
   for (let item of collectibles) {
     if (item.collected) continue;
 
@@ -817,7 +1181,6 @@ function updateFireflies() {
 
     if (item.frameTimer >= FIREFLY.animSpeed) {
       item.frameTimer = 0;
-
       item.frame = (item.frame + 1) % FIREFLY.numFrames;
     }
   }
@@ -832,53 +1195,123 @@ function drawCollectibles() {
     let x = item.col * tileSize + tileSize / 2;
     let y = item.row * tileSize + tileSize / 2;
 
-    let sx = item.frame * FIREFLY.frameWidth;
-    let sy = 0;
+    // LEVEL 1: Fireflies
+    if (maze === maze1) {
+      let sx = item.frame * FIREFLY.frameWidth;
+      let sy = 0;
 
-    let dw = FIREFLY.frameWidth * FIREFLY.scale;
-    let dh = FIREFLY.frameHeight * FIREFLY.scale;
+      let dw = FIREFLY.frameWidth * FIREFLY.scale;
+      let dh = FIREFLY.frameHeight * FIREFLY.scale;
 
-    image(
-      fireflySprite,
-      x,
-      y,
-      dw,
-      dh,
-      sx,
-      sy,
-      FIREFLY.frameWidth,
-      FIREFLY.frameHeight,
-    );
+      image(
+        fireflySprite,
+        x,
+        y,
+        dw,
+        dh,
+        sx,
+        sy,
+        FIREFLY.frameWidth,
+        FIREFLY.frameHeight
+      );
+    }
+
+    // LEVEL 2: POTION COLLECTIBLE 
+    else if (maze === maze2) {
+
+    push();
+
+   fill(200, 100, 255);
+    stroke(255);
+    strokeWeight(2);
+
+    circle(x, y, 15);
+
+    fill(255);
+    textAlign(CENTER, CENTER);
+    textSize(8);
+
+    text("P", x, y);
+
+    pop();
+}
+
+    // LEVEL 3: Temporary food circles
+    else if (maze === maze3) {
+      push();
+
+      // Outer glow
+      noStroke();
+      fill(255, 190, 70, 100);
+      circle(x, y, 24);
+
+      // Food circle
+      stroke(255);
+      strokeWeight(2);
+      fill(255, 120, 70);
+      circle(x, y, 14);
+
+      pop();
+    }
   }
 }
 
 function checkCollectibles() {
   for (let item of collectibles) {
+
     if (!item.collected) {
+
       let x = item.col * tileSize + tileSize / 2;
       let y = item.row * tileSize + tileSize / 2;
 
       let d = dist(player.x, player.y, x, y);
 
       if (d < 20) {
+
         item.collected = true;
         collectedCount++;
         collect.play();
 
-        if (collectedCount === collectibles.length && !badgeUnlocked) {
+        // LEVEL 1 BADGE
+        if (
+          maze === maze1 &&
+          collectedCount === collectibles.length &&
+          !badgeUnlocked
+        ) {
+
           badgeUnlocked = true;
+
+          socialBattery = min(100, socialBattery + 15);
 
           badgeX = width / 2;
           badgeY = height / 2 - 80;
 
           badgeScale = 1.3;
+          badgeMessageTimer = 180;
+        }
 
+        // LEVEL 2 BADGE
+        if (
+          maze === maze2 &&
+          collectedCount === 5 &&
+          !potionBadgeUnlocked
+        ) {
+
+          potionBadgeUnlocked = true;
+
+          socialBattery = min(100, socialBattery + 5);
+
+          badgeX = width / 2;
+          badgeY = height / 2 - 80;
+
+          badgeScale = 1.3;
           badgeMessageTimer = 180;
         }
       }
     }
   }
 }
+
 
 // DIALOGUE BOX (INTRO)
 function drawIntroDialogueBox() {
@@ -919,7 +1352,7 @@ function drawIntroDialogueBox() {
 
 // BADGE
 function drawBadge() {
-  if (!badgeUnlocked) return;
+  if (!badgeUnlocked && !potionBadgeUnlocked) return;
 
   imageMode(CENTER);
 
@@ -928,31 +1361,85 @@ function drawBadge() {
   image(fireflyBadge, badgeX, badgeY, badgeSize, badgeSize);
 
   if (badgeMessageTimer > 0) {
-    fill(255);
-    stroke(0);
-    strokeWeight(4);
+  fill(255);
+  stroke(0);
+  strokeWeight(4);
 
-    textAlign(CENTER);
+  textAlign(CENTER);
+
+  // Level 2 badge
+  if (potionBadgeUnlocked) {
 
     textSize(26);
-    text("Firefly Collector Badge Earned!", width / 2, height / 2 + 130);
+    text("Potion Master Badge Earned!", width / 2, height / 2 + 130);
 
     textSize(18);
+    text(
+      "You collected all 5 ingredients!",
+      width / 2,
+      height / 2 + 165
+    );
 
-    text("You collected all 11 fireflies!", width / 2, height / 2 + 165);
+    text(
+      "+5 Social Battery Boost",
+      width / 2,
+      height / 2 + 195
+    );
+  }
+
+  // Level 1 badge
+  else if (badgeUnlocked) {
+
+    textSize(26);
+    text(
+      "Firefly Collector Badge Earned!",
+      width / 2,
+      height / 2 + 130
+    );
+
+    textSize(18);
+    text(
+      "You collected all 11 fireflies!",
+      width / 2,
+      height / 2 + 165
+    );
 
     text(
       "Don't forget to make your way to school.",
       width / 2,
-      height / 2 + 195,
+      height / 2 + 195
+    );
+  }
+
+  noStroke();
+}
+
+  // LEVEL 2 BADGE
+  if (potionBadgeUnlocked) {
+
+    textSize(26);
+    text("Potion Master Badge Earned!", width / 2, height / 2 + 130);
+
+    textSize(18);
+    text(
+      "You collected all 5 ingredients!",
+      width / 2,
+      height / 2 + 165
     );
 
-    noStroke();
+    text(
+      "+5 Social Battery Boost",
+      width / 2,
+      height / 2 + 195
+    );
   }
+
+  noStroke();
+}
 }
 
 function updateBadge() {
-  if (!badgeUnlocked) return;
+  if (!badgeUnlocked && !potionBadgeUnlocked) return;
 
   if (badgeMessageTimer > 0) {
     badgeMessageTimer--;
@@ -1044,13 +1531,32 @@ function drawSocialBar() {
   textSize(15);
   text("LVL 1: Make your way to school!", 50, 24);
 
-  // Firefly Count
-  textSize(15);
+ // Collectible Count
+textSize(15);
+
+if (maze === maze1) {
   text(
     "Fireflies: " + collectedCount + " / " + collectibles.length,
     50,
-    height - 34,
+    height - 34
   );
+}
+
+else if (maze === maze2) {
+  text(
+    "Potion Ingredients: " + collectedCount + " / 5",
+    50,
+    height - 34
+  );
+}
+
+else if (maze === maze3) {
+  text(
+    "Food: " + collectedCount + " / " + collectibles.length,
+    50,
+    height - 34
+  );
+}
 
   // Social Battery Bar
   textAlign(RIGHT, TOP);
@@ -1386,14 +1892,28 @@ function loadSecondLevel() {
   }
 
   // Reset systems tied to the old maze
-  initWallExpansion();     // wallExpansion[][] is sized off ROWS/COLS, fine to reuse, but re-zero it
-  collectedCount = 0;
-  setupCollectibles();     // update the col/row values inside this for new firefly spots
-  badgeUnlocked = false;
+  initWallExpansion();
+collectedCount = 0;
+  setupPotionIngredients();
 
-  // Reposition/reconfigure lasers for the new layout too
-  // (edit the `lasers` and `laserBeams` arrays' row/col/pixel coords to match maze2)
+  badgeUnlocked = false;
+  potionBadgeUnlocked = false
+
+  // Reset Level 2 beakers
+  resetBeakers();
 }
+
+
+function resetBeakers() {
+  for (let i = 0; i < beakers.length; i++) {
+    beakers[i].y = beakers[i].topY;
+    beakers[i].state = "waiting";
+    beakers[i].timer = i * 45;
+    beakers[i].hasHitPlayer = false;
+  }
+}
+
+ 
 
 function loadThirdLevel() {
   maze = maze3;
@@ -1410,4 +1930,12 @@ function loadThirdLevel() {
       }
     }
   }
+  // Reset systems for Level 3
+initWallExpansion();
+
+collectedCount = 0;
+badgeUnlocked = false;
+
+// Level 3 uses food collectibles
+setupFoodCollectibles();
 }
