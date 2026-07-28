@@ -83,8 +83,8 @@ let ground;
 let home;
 let school;
 let banner;
-let laserOn;
-let laserOff;
+let goblins;
+let goblin;
 
 // SOUNDS
 let playerHitSound;
@@ -303,15 +303,16 @@ function checkBeakerPlayerCollision() {
 
 
 let lasers = [
-  //top most laser
+  // Top-most goblin
   { row: 2.3, col: 6.3, facing: "up", blinkRate: 80, on: true, timer: 0 },
-  //right most laser
+
+  // Right-most goblin
   { row: 5.3, col: 13.8, facing: "down", blinkRate: 100, on: true, timer: 0 },
 
-  //laser covering longest hallway
+  // Goblin covering longest hallway
   { row: 9.3, col: 18.2, facing: "up", blinkRate: 150, on: true, timer: 0 },
 
-  //LASER BLOCKING THE EXIT
+  // Goblin blocking the exit
   { row: 7.3, col: 23.2, facing: "up", blinkRate: 60, on: true, timer: 0 },
 ];
 
@@ -570,6 +571,14 @@ const SPRITE = {
   },
 };
 
+const GOBLIN = {
+  frameWidth: 70,   // Width of ONE goblin frame
+  frameHeight: 100,  // Height of ONE goblin frame
+  numFrames: 16,      // Number of frames across the row
+  animSpeed: 12,     // Animation speed
+  scale: 0.5,        // Size of goblin
+};
+
 // TUTORIAL PAGE
 let showTutorial = false;
 
@@ -602,8 +611,8 @@ function preload() {
   school = loadImage("assets/images/school.png");
   banner = loadImage("assets/images/HUD.png");
 
-  laserOn = loadImage("assets/images/laserOn.png");
-  laserOff = loadImage("assets/images/laserOff.png");
+  goblins = loadImage("assets/images/goblins.png");
+  goblin = loadImage("assets/images/goblin.png");
 
   playerHitSound = loadSound("assets/sounds/hit.mp3");
 
@@ -1634,33 +1643,35 @@ function drawLasers() {
     let cx = l.col * tileSize + tileSize / 2;
     let cy = l.row * tileSize + tileSize / 2;
 
-    // Rotation + offset so the sprite sits flush on the wall face
-    // pointing into the corridor, assuming the source image faces "down" by default.
-    let angle = 0;
-    let offX = 0,
-      offY = 0;
-    let edgeOffset = tileSize / 2 - 4; // pushes sprite to the wall's edge
+    // Animate through the goblin sprite sheet from left to right
+    let frame = floor(frameCount / GOBLIN.animSpeed) % GOBLIN.numFrames;
 
-    // "facing" parameter is set in the initilization of the lasers above
-    if (l.facing === "down") {
-      angle = 0;
-      offY = edgeOffset;
-    } else if (l.facing === "up") {
-      angle = PI;
-      offY = -edgeOffset;
-    } else if (l.facing === "right") {
-      angle = HALF_PI;
-      offX = edgeOffset;
-    } else if (l.facing === "left") {
-      angle = -HALF_PI;
-      offX = -edgeOffset;
-    }
+    // Get the current frame from the sprite sheet
+    let srcX = frame * GOBLIN.frameWidth;
+    let srcY = 0;
+
+    // Calculate the size of the displayed goblin
+    let drawW = GOBLIN.frameWidth * GOBLIN.scale;
+    let drawH = GOBLIN.frameHeight * GOBLIN.scale;
 
     push();
-    translate(cx + offX, cy + offY);
-    rotate(angle);
-    let img = l.on ? laserOn : laserOff;
-    image(img, 0, 0, tileSize * 0.8, tileSize * 0.5);
+
+    // Position goblin in the maze
+    translate(cx, cy);
+
+    // Draw the current animation frame
+    image(
+      goblins,
+      0,
+      0,
+      drawW,
+      drawH,
+      srcX,
+      srcY,
+      GOBLIN.frameWidth,
+      GOBLIN.frameHeight
+    );
+
     pop();
   }
 }
@@ -1793,9 +1804,9 @@ function drawTutorialOverlay() {
   imageMode(CENTER);
 
   // Box 1: Laser
-  let laserX = startX + boxW / 2;
-  let laserY = boxY + boxH / 2;
-  image(laserOn, laserX, laserY, boxW * 0.75, boxH * 0.75);
+  let goblinX = startX + boxW / 2;
+  let goblinY = boxY + boxH / 2;
+  image(goblin, goblinX, goblinY, boxW * 0.75, boxH * 0.75);
 
   // Box 2: Firefly
   let fireflyX = startX + (boxW + gap) + boxW / 2 - 5;
