@@ -116,6 +116,17 @@ let eyeballs;
 let krakenInk;
 let stardust;
 let bone;
+let dragonBlood;
+
+let apple;
+let watermelon;
+let chicken;
+let burger;
+let sandwich;
+let cookie;
+let corn;
+
+let fork;
 
 // SOUNDS
 let playerHitSound;
@@ -631,9 +642,9 @@ let laserBeams2 = [
 let laserBeams3 = [
   //top most laser
   {
-    x1: 140,
+    x1: 150,
     y1: 105, // beam start (pixel coordinates)
-    x2: 800,
+    x2: 1000,
     y2: 105, // beam end (pixel coordinates)
     blinkRate: 80, // HAS TO MATCH WITH LASERS ABOVE
     on: true,
@@ -1008,12 +1019,24 @@ function preload() {
 
   cafeTable = loadImage("assets/images/cafeTable.png");
   emptyCafeTable = loadImage("assets/images/emptyCafeTable.png");
+  floorlvl3 = loadImage("assets/images/floorlvl3.png");
 
   feather = loadImage("assets/images/feather.png");
   eyeballs = loadImage("assets/images/eyeballs.png");
   krakenInk = loadImage("assets/images/krakenInk.png");
   stardust = loadImage("assets/images/stardust.png");
   bone = loadImage("assets/images/bone.png");
+  dragonBlood = loadImage("assets/images/dragonBlood.png");
+  
+  apple = loadImage("assets/images/apple.png");
+  watermelon = loadImage("assets/images/watermelon.png");
+  chicken = loadImage("assets/images/drumstick.png");
+  burger = loadImage("assets/images/burger.png");
+  sandwich = loadImage("assets/images/pbjsandwich.png");
+  cookie = loadImage("assets/images/cookie.png");
+  corn = loadImage("assets/images/corn.png");
+
+  fork = loadImage("assets/images/fork.png");
 
   playerHitSound = loadSound("assets/sounds/hit.mp3");
 
@@ -1565,7 +1588,7 @@ function setupCollectibles() {
 }
 function setupFoodCollectibles() {
   collectibles = [
-    // Near the Level 3 starting area
+    // Near the Level 3 start
     {
       col: 21,
       row: 2,
@@ -1573,7 +1596,7 @@ function setupFoodCollectibles() {
       type: "food",
     },
 
-    // Upper-right area
+    // Upper-right section
     {
       col: 17,
       row: 3,
@@ -1581,7 +1604,7 @@ function setupFoodCollectibles() {
       type: "food",
     },
 
-    // Upper-middle area
+    // Upper-middle section
     {
       col: 12,
       row: 5,
@@ -1589,34 +1612,42 @@ function setupFoodCollectibles() {
       type: "food",
     },
 
-    // Centre-left area
+    // Upper-left section
     {
-      col: 6,
-      row: 6,
+      col: 5,
+      row: 5,
       collected: false,
       type: "food",
     },
 
-    // Centre area
+    // Centre-right section
     {
-      col: 10,
+      col: 18,
+      row: 7,
+      collected: false,
+      type: "food",
+    },
+
+    // Centre-left section
+    {
+      col: 4,
       row: 8,
       collected: false,
       type: "food",
     },
 
-    // Lower-right area
+    // Lower-middle section
     {
-      col: 18,
-      row: 9,
+      col: 11,
+      row: 10,
       collected: false,
       type: "food",
     },
 
-    // Lower-middle area
+    // Lower-right section
     {
-      col: 7,
-      row: 10,
+      col: 21,
+      row: 11,
       collected: false,
       type: "food",
     },
@@ -1771,12 +1802,11 @@ function checkCollectibles() {
         collectedCount++;
         collect.play();
 
-        // Every collectible in every level restores 5%
+        // Only heal and show the glow if the player isn't already at full health
+        if (socialBattery < 100) {
         socialBattery = min(100, socialBattery + 5);
-
-        // Trigger the green recovery glow
         healFlashAlpha = HEAL_FLASH_MAX;
-
+        }
         // LEVEL 1 BADGE
         if (
           maze === maze1 &&
@@ -2117,7 +2147,11 @@ else if (maze === maze2) {
 }
 
 else if (maze === maze3) {
-  //text("Goblins stopped: " + foodGame.defeated + " / " + FOOD_GAME_TARGET, 50, height - 34);
+  text(
+    "Food: " + collectedCount + " / " + collectibles.length,
+    50,
+    height - 34
+  );
 }
 
   // Social Battery Bar
