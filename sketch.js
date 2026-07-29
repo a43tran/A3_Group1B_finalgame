@@ -620,19 +620,19 @@ let laserBeams2 = [
     timer: 0,
   },
   {
-    x1: 120,
+    x1: 130,
     y1: 305,
-    x2: 500,
+    x2: 475,
     y2: 305,
     blinkRate: 150,
     on: true,
     timer: 0,
   },
   {
-    x1: 440,
-    y1: 485,
-    x2: 980,
-    y2: 485,
+    x1: 450,
+    y1: 500,
+    x2: 950,
+    y2: 500,
     blinkRate: 60,
     on: true,
     timer: 0,
@@ -644,17 +644,17 @@ let laserBeams3 = [
   {
     x1: 150,
     y1: 105, // beam start (pixel coordinates)
-    x2: 1000,
+    x2: 975,
     y2: 105, // beam end (pixel coordinates)
     blinkRate: 80, // HAS TO MATCH WITH LASERS ABOVE
     on: true,
     timer: 0,
   },
   {
-    x1: 575,
-    y1: 225,
-    x2: 680,
-    y2: 225,
+    x1: 85,
+    y1: 125,
+    x2: 280,
+    y2: 125,
     blinkRate: 100,
     on: true,
     timer: 0,
@@ -1601,19 +1601,7 @@ function setupCollectibles() {
     },
   ];
 }
-function setupFoodCollectibles() {
-  ollectibles = [
-    { col: 21, row: 2, collected: false, type: "apple" },
-    { col: 17, row: 3, collected: false, type: "watermelon" },
-    { col: 12, row: 5, collected: false, type: "burger" },
-    { col: 5, row: 5, collected: false, type: "sandwich" },
-    { col: 18, row: 7, collected: false, type: "cookie" },
-    { col: 4, row: 8, collected: false, type: "corn" },
-    { col: 11, row: 10, collected: false, type: "chicken" },
-    { col: 21, row: 11, collected: false, type: "apple" },
-    { col: 4, row: 12, collected: false, type: "burger" }
-  ];
-}
+
 
 
 function setupPotionIngredients() {
@@ -1722,10 +1710,9 @@ function drawCollectibles() {
   image(img, x, y, 32, 32);
 }
 
-// LEVEL 3: Food Images
+// LEVEL 3: Food images
 else if (maze === maze3) {
-
-  let img;
+  let img = null;
 
   switch (item.type) {
     case "apple":
@@ -1757,7 +1744,12 @@ else if (maze === maze3) {
       break;
   }
 
-  image(img, x, y, 34, 34);
+  // Only draw when a valid image was found
+  if (img) {
+    image(img, x, y);
+  } else {
+    console.log("Invalid Level 3 food type:", item.type);
+  }
 }
   }
 }
@@ -2044,7 +2036,14 @@ function drawMaze() {
       if (tile === 1) {
         let expand = wallExpansion[row][col] * WALL_MAX_EXPAND;
 
-        let wallImg = (maze === maze2) ? wallTiles[row][col] : wall;
+        let wallImg;
+        if (maze === maze2) {
+          wallImg = wallTiles[row][col];
+        } else if (maze === maze3) {
+          wallImg = wallTiles3[row][col];
+        } else {
+          wallImg = wall;
+        }
 
         image(
           wallImg,
@@ -2546,11 +2545,8 @@ function resetBeakers() {
 }
 
 function loadThirdLevel() {
-
   maze = maze3;
 
-  lasers = lasers3;
-  laserBeams = laserBeams3
   socialBattery = 100;
   gameOver = false;
 
@@ -2561,8 +2557,9 @@ function loadThirdLevel() {
   secondLevelComplete = false;
 
   character = characterlvl3;
-  
-  // Reposition player at the new start tile
+
+
+  // Spawn at the tile marked 2
   outer: for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
       if (maze[r][c] === 2) {
@@ -2572,18 +2569,17 @@ function loadThirdLevel() {
       }
     }
   }
-    // Reset systems for Level 3
+
   initWallExpansion();
 
   collectedCount = 0;
   badgeUnlocked = false;
-  // Load the Level 3 food items
+  potionBadgeUnlocked = false;
+
+  // Load Level 3 food
   setupFoodCollectibles();
 
 
-
-  // Start the Level 3 intro dialogue
   level3DialogueActive = true;
   level3DialogueIndex = 0;
-
 }
