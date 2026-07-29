@@ -91,13 +91,14 @@ let home;
 let school;
 let banner;
 
-let goblins;
-let goblin;
-let goblinslvl2;
-let goblinslvl3;
 
 let classroomdoor;
 let cafedoor;
+
+let desk;
+let desk1;
+let desk2;
+let desk3;
 
 let cobblestone;
 let crackedStone;
@@ -186,6 +187,15 @@ const level2Dialogue = [
   "Okay, that journey was a lot... but I made it.",
   "I can't be late for chemistry class! I need ingredients for the potions assignment.",
   "Let's get moving before the ingredients run out!",
+];
+
+// DIALOGUE (LEVEL 3 INTRO)
+let level3DialogueActive = false;
+let level3DialogueIndex = 0;
+const level3Dialogue = [
+  "Whew, the potions are done. Now to get to the exit.",
+  "This place looks trickier than the last one...",
+  "Okay Faith, one more stretch. You've got this!",
 ];
 
 // LASER DAMAGE
@@ -537,19 +547,125 @@ let lasers3 = [
 
 
 let laserBeams = [
-  { x1: 125, y1: 112, x2: 832, y2: 112, blinkRate: 80, on: true, timer: 0 },
-  { x1: 125, y1: 216, x2: 316, y2: 216, blinkRate: 150, on: true, timer: 0 },
-  { x1: 45, y1: 296, x2: 112, y2: 296, blinkRate: 100, on: true, timer: 0 },
-  { x1: 245, y1: 496, x2: 428, y2: 496, blinkRate: 60, on: true, timer: 0 },
+  //top most laser
+  {
+    x1: 85,
+    y1: 105, // beam start (pixel coordinates)
+    x2: 260,
+    y2: 105, // beam end (pixel coordinates)
+    blinkRate: 80, // HAS TO MATCH WITH LASERS ABOVE
+    on: true,
+    timer: 0,
+  },
+  {
+    x1: 575,
+    y1: 225,
+    x2: 680,
+    y2: 225,
+    blinkRate: 100,
+    on: true,
+    timer: 0,
+  },
+  {
+    x1: 320,
+    y1: 385,
+    x2: 740,
+    y2: 385,
+    blinkRate: 150,
+    on: true,
+    timer: 0,
+  },
+  {
+    x1: 844,
+    y1: 305,
+    x2: 940,
+    y2: 305,
+    blinkRate: 60,
+    on: true,
+    timer: 0,
+  },
 ];
 
 let laserBeams2 = [
-  // Each beam begins at its Level 2 goblin and follows the open corridor to the left.
-  { x1: 125, y1: 112, x2: 832, y2: 112, blinkRate: 80, on: true, timer: 0 },
-  { x1: 125, y1: 216, x2: 316, y2: 216, blinkRate: 150, on: true, timer: 0 },
-  { x1: 45, y1: 296, x2: 112, y2: 296, blinkRate: 100, on: true, timer: 0 },
-  { x1: 245, y1: 496, x2: 428, y2: 496, blinkRate: 60, on: true, timer: 0 },
+  //top most laser
+  {
+    x1: 125,
+    y1: 105, // beam start (pixel coordinates)
+    x2: 1010,
+    y2: 105, // beam end (pixel coordinates)
+    blinkRate: 80, // HAS TO MATCH WITH LASERS ABOVE
+    on: true,
+    timer: 0,
+  },
+  {
+    x1: 575,
+    y1: 225,
+    x2: 680,
+    y2: 225,
+    blinkRate: 100,
+    on: true,
+    timer: 0,
+  },
+  {
+    x1: 320,
+    y1: 385,
+    x2: 740,
+    y2: 385,
+    blinkRate: 150,
+    on: true,
+    timer: 0,
+  },
+  {
+    x1: 844,
+    y1: 305,
+    x2: 940,
+    y2: 305,
+    blinkRate: 60,
+    on: true,
+    timer: 0,
+  },
 ];
+
+let laserBeams3 = [
+  //top most laser
+  {
+    x1: 85,
+    y1: 105, // beam start (pixel coordinates)
+    x2: 260,
+    y2: 105, // beam end (pixel coordinates)
+    blinkRate: 80, // HAS TO MATCH WITH LASERS ABOVE
+    on: true,
+    timer: 0,
+  },
+  {
+    x1: 575,
+    y1: 225,
+    x2: 680,
+    y2: 225,
+    blinkRate: 100,
+    on: true,
+    timer: 0,
+  },
+  {
+    x1: 320,
+    y1: 385,
+    x2: 740,
+    y2: 385,
+    blinkRate: 150,
+    on: true,
+    timer: 0,
+  },
+  {
+    x1: 844,
+    y1: 305,
+    x2: 940,
+    y2: 305,
+    blinkRate: 60,
+    on: true,
+    timer: 0,
+  },
+];
+
 
 // PATHWAY TILE VARIATION (LEVEL 2)
 let pathTiles = []; // pathTiles[row][col] = image to use for that floor tile
@@ -563,6 +679,22 @@ function setupPathTiles() {
     for (let c = 0; c < COLS; c++) {
       let index = floor(random(stoneVariants.length));
       pathTiles[r][c] = stoneVariants[index];
+    }
+  }
+}
+
+// WALL TILE VARIATION (LEVEL 2)
+let wallTiles = []; // wallTiles[row][col] = image to use for that wall tile
+
+function setupWallTiles() {
+  let deskVariants = [desk, desk1, desk2, desk3];
+
+  wallTiles = [];
+  for (let r = 0; r < ROWS; r++) {
+    wallTiles[r] = [];
+    for (let c = 0; c < COLS; c++) {
+      let index = floor(random(deskVariants.length));
+      wallTiles[r][c] = deskVariants[index];
     }
   }
 }
@@ -858,11 +990,13 @@ function preload() {
 
   classroomdoor = loadImage("assets/images/classroomdoor.png");
   cafedoor = loadImage("assets/images/cafedoor.png");
+
+  flask = loadImage("assets/images/flask.png");
   
-  desk = loadImage("assets/images/desksMaterials.png");
-  desk1 = loadImage("assets/images/desksMaterials2.png");
-  desk2 = loadImage("assets/images/desksMaterials3.png");
-  desk3 = loadImage("assets/images/cafedoor.png");
+  desk = loadImage("assets/images/desk.png");
+  desk1 = loadImage("assets/images/desksMaterials.jpg");
+  desk2 = loadImage("assets/images/desksMaterials2.jpg");
+  desk3 = loadImage("assets/images/desksMaterials3.jpg");
 
   cobblestone = loadImage("assets/images/cobblestone.png");
   crackedStone = loadImage("assets/images/crackedStone.png");
@@ -874,10 +1008,10 @@ function preload() {
   emptyCafeTable = loadImage("assets/images/emptyCafeTable.png");
 
   feather = loadImage("assets/images/feather.png");
-eyeballs = loadImage("assets/images/eyeballs.png");
-krakenInk = loadImage("assets/images/krakenInk.png");
-stardust = loadImage("assets/images/stardust.png");
-bone = loadImage("assets/images/bone.png");
+  eyeballs = loadImage("assets/images/eyeballs.png");
+  krakenInk = loadImage("assets/images/krakenInk.png");
+  stardust = loadImage("assets/images/stardust.png");
+  bone = loadImage("assets/images/bone.png");
 
   playerHitSound = loadSound("assets/sounds/hit.mp3");
 
@@ -905,6 +1039,7 @@ function setup() {
   initWallExpansion();
   setupCollectibles();
   setupPathTiles();
+  setupWallTiles();
 }
 
 function updateCamera() {
@@ -930,10 +1065,7 @@ function draw() {
     return;
   }
 
-  if (maze === maze3) {
-    //drawFoodMinigame();
-    return;
-  }
+
 
   if (firstLevelComplete) {
     drawFirstLevelCompleteScreen();
@@ -980,6 +1112,8 @@ function draw() {
     drawLevel2DialogueBox();
     return;
   }
+
+ 
 
   updateCamera();
 
@@ -1098,6 +1232,14 @@ function keyPressed() {
     return;
   }
 
+  if (level3DialogueActive && (key === " " || keyCode === ENTER)) {
+    level3DialogueIndex++;
+    if (level3DialogueIndex >= level3Dialogue.length) {
+      level3DialogueActive = false;
+    }
+    return;
+  }
+
   if (key === " " && !gameStarted) {
     showTutorial = true;
 
@@ -1121,7 +1263,6 @@ function keyPressed() {
 }
 
 function mousePressed() {
-  if (maze === maze3 && !thirdLevelComplete && !gameOver && clickFoodGoblin()) return;
 
   if (introDialogueActive) {
     introDialogueIndex++;
@@ -1717,6 +1858,8 @@ function drawLevel2DialogueBox() {
   text("click or press SPACE to continue", boxX + boxW - 20, boxY + boxH - 12);
 }
 
+
+
 // BADGE
 function drawBadge() {
   if (!badgeUnlocked && !potionBadgeUnlocked) return;
@@ -1835,8 +1978,11 @@ function drawMaze() {
 
       if (tile === 1) {
         let expand = wallExpansion[row][col] * WALL_MAX_EXPAND;
+
+        let wallImg = (maze === maze2) ? wallTiles[row][col] : wall;
+
         image(
-          wall,
+          wallImg,
           col * tileSize - expand,
           row * tileSize - expand,
           tileSize + expand * 2,
@@ -1886,7 +2032,7 @@ function drawSocialBar() {
   textSize(15);
   let objective = "LVL 1: Make your way to school!";
   if (maze === maze2) objective = "LVL 2: Reach the cafe!";
-  if (maze === maze3) objective = "LVL 3: Stop the food fight!";
+  if (maze === maze3) objective = "LVL 3: Collect food and reach the exit!";
   text(objective, 50, 24);
 
  // Collectible Count
@@ -2331,9 +2477,16 @@ function resetBeakers() {
  
 
 function loadThirdLevel() {
+
   maze = maze3;
+
+  lasers = lasers3;
+  laserBeams = laserBeams3
   socialBattery = 100;
   gameOver = false;
+
+  lasers = lasers3;
+  laserBeams = laserBeams3;
 
 
   firstLevelComplete = false;
@@ -2341,9 +2494,7 @@ function loadThirdLevel() {
 
   character = characterlvl3;
 
-  goblins = goblinslvl3;
-
-  GOBLIN = GOBLIN_LVL3;
+  
   
   // Reposition player at the new start tile
   outer: for (let r = 0; r < ROWS; r++) {
@@ -2361,5 +2512,8 @@ function loadThirdLevel() {
   collectedCount = 0;
   badgeUnlocked = false;
 
+  // Start the Level 3 intro dialogue
+  level3DialogueActive = true;
+  level3DialogueIndex = 0;
 
 }
