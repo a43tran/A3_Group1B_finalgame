@@ -100,6 +100,12 @@ let mossStone;
 let paperStone;
 let paperStone2;
 
+let feather;
+let eyeballs;
+let krakenInk;
+let stardust;
+let bone;
+
 // SOUNDS
 let playerHitSound;
 let fail;
@@ -460,8 +466,8 @@ let lasers3 = [
   //2ND FROM TOP
 
   {
-    row: 5.3,
-    col: 13.8,
+    row: 5.9,
+    col: 4.3,
     facing: "down",
     direction: "right",
 
@@ -488,8 +494,8 @@ let lasers3 = [
   },
 
   {
-    row: 7.3,
-    col: 23.2,
+    row: 10.3,
+    col: 22.2,
     facing: "up",
     direction: "left",
 
@@ -895,6 +901,12 @@ function preload() {
   paperStone = loadImage("assets/images/paperStone.png");
   paperStone2 = loadImage("assets/images/paperStone2.png");
 
+  feather = loadImage("assets/images/feather.png");
+eyeballs = loadImage("assets/images/eyeballs.png");
+krakenInk = loadImage("assets/images/krakenInk.png");
+stardust = loadImage("assets/images/stardust.png");
+bone = loadImage("assets/images/bone.png");
+
   playerHitSound = loadSound("assets/sounds/hit.mp3");
 
   fail = loadSound("assets/sounds/fail.mp3");
@@ -947,6 +959,11 @@ function draw() {
 
   if (firstLevelComplete) {
     drawFirstLevelCompleteScreen();
+    return;
+  }
+
+    if (secondLevelComplete) {
+    drawSecondLevelCompleteScreen();
     return;
   }
 
@@ -1054,8 +1071,12 @@ updateInvincibility();
   let playerCol = floor(player.x / tileSize);
   let playerRow = floor(player.y / tileSize);
 
-  if (maze[playerRow][playerCol] === 3) {
-    firstLevelComplete = true;
+    if (maze[playerRow][playerCol] === 3) {
+    if (maze === maze1) {
+      firstLevelComplete = true;
+    } else if (maze === maze2) {
+      secondLevelComplete = true;
+    }
   }
   drawSocialBar();
 }
@@ -2013,6 +2034,24 @@ function restartGame() {
 // LEVEL 1 COMPLETE SCREEN
 function drawFirstLevelCompleteScreen() {
   image(levelOneComplete, 0, 0, width, height);
+}
+
+// LEVEL 2 COMPLETE SCREEN (placeholder)
+function drawSecondLevelCompleteScreen() {
+  background(20, 20, 40);
+
+  fill(255);
+  textAlign(CENTER, CENTER);
+  textFont("Monospace");
+
+  textSize(48);
+  textStyle(BOLD);
+  text("Level 2 Complete!", width / 2, height / 2 - 40);
+
+  textSize(20);
+  textStyle(NORMAL);
+  text("Great job brewing up all those potion ingredients.", width / 2, height / 2 + 20);
+  text("Press M to continue to Level 3", width / 2, height / 2 + 60);
 }
 
 // TUTORIAL OVERLAY
