@@ -187,6 +187,10 @@ let hitFlashAlpha = 0;
 const HIT_FLASH_MAX = 150;
 const HIT_FLASH_DECAY = 8;
 
+// GREEN HEALTH RECOVERY EDGE GLOW
+let healFlashAlpha = 0;
+const HEAL_FLASH_MAX = 120;
+const HEAL_FLASH_DECAY = 5;
 
 
 // PLAYER HITBOX
@@ -1631,11 +1635,6 @@ function checkCollectibles() {
           healFlashAlpha = HEAL_FLASH_MAX;
         }
 
-        // Every collectible in every level restores 5%
-        socialBattery = min(100, socialBattery + 5);
-
-        // Trigger the green recovery glow
-        healFlashAlpha = HEAL_FLASH_MAX;
 
         // LEVEL 1 BADGE
         if (
