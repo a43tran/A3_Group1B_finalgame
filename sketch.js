@@ -1,4 +1,4 @@
-// MAZE GRID
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      // MAZE GRID
 const tileSize = 40;
 const COLS = 25;
 const ROWS = 14;
@@ -70,6 +70,14 @@ let firstLevelComplete = false;
 let secondLevelComplete = false;
 let thirdLevelComplete = false;
 
+// LEVEL 3 FOOD DELIVERY
+let level3AllFoodCollected = false;
+let level3FoodDelivered = false;
+
+const LEVEL3_CAFETERIA_BAR_COL = 22;
+const LEVEL3_CAFETERIA_BAR_TOP_ROW = 4;
+const LEVEL3_CAFETERIA_BAR_BOTTOM_ROW = 7;
+
 // IMAGES
 let character;
 let characterlvl2;
@@ -79,8 +87,11 @@ let startScreen;
 let restartScreen;
 let levelOneComplete;
 let fireflySprite;
+
 let fireflyBadge;
 let potionbadge;
+let foodBadge;
+
 
 
 let forest;
@@ -155,7 +166,9 @@ const ingredientTypes = [
   "Stardust",
   "Bone"
 ];
-let potionBadgeUnlocked = false;
+let potionbadgeUnlocked = false;
+
+let foodBadgeUnlocked = false;
 
 
 // FIREFLY BADGE
@@ -216,6 +229,60 @@ const level3Dialogue = [
   "Whew, the potions are done. Now to get to the exit.",
   "This place looks trickier than the last one...",
   "Okay Faith, one more stretch. You've got this!",
+];
+
+// DIALOGUE (LEVEL 3 FOOD COLLECTED)
+let level3FoodCollectedDialogueActive = false;
+let level3FoodCollectedDialogueIndex = 0;
+const level3FoodCollectedDialogue = [
+  "Okay, that's all the food. Wait - the walk-in fridge just broke down!",
+  "Lunch service starts in ten minutes. I need to get this to the cafeteria bar before it spoils.",
+  "No time to waste, Faith. Move!",
+];
+
+// DIALOGUE (LEVEL 3 FOOD DELIVERED)
+let level3FoodDeliveredDialogueActive = false;
+let level3FoodDeliveredDialogueIndex = 0;
+const level3FoodDeliveredDialogue = [
+  "Phew, that was close. The food made it to the bar just in time.",
+  "Okay... breathe. Lunch service is saved.",
+];
+
+// LEVEL 3 GOBLIN WHACK-A-MOLE MINIGAME
+const LEVEL3_MINIGAME_GOBLIN_TARGET = 10;
+const LEVEL3_MINIGAME_MAX_GOBLINS = 3;
+const LEVEL3_MINIGAME_SPAWN_INTERVAL = 75;
+const LEVEL3_MINIGAME_THROW_INTERVAL = 90;
+const LEVEL3_MINIGAME_FOOD_SPEED = 4;
+const LEVEL3_MINIGAME_GOBLIN_HIT_RADIUS = 28;
+const LEVEL3_MINIGAME_FOOD_HIT_RADIUS = 15;
+const LEVEL3_MINIGAME_PLAYER_RADIUS = 34;
+const LEVEL3_MINIGAME_DAMAGE = 30;
+const LEVEL3_MINIGAME_POP_DURATION = 18;
+const LEVEL3_MINIGAME_GOBLIN_SCALE = 0.45;
+
+let level3CafeteriaMinigameActive = false;
+let level3CafeteriaMinigameComplete = false;
+let level3CafeteriaMinigameGoblins = [];
+let level3CafeteriaMinigameFood = [];
+let level3CafeteriaMinigameDefeated = 0;
+let level3CafeteriaMinigameSpawnTimer = 0;
+
+let level3CafeteriaMinigameDialogueActive = false;
+let level3CafeteriaMinigameDialogueIndex = 0;
+const level3CafeteriaMinigameDialogue = [
+  "That should keep the goblins away from lunch service.",
+  "Okay, Faith. Back to the exit!",
+];
+
+const level3CafeteriaMinigameFoodTypes = [
+  "apple",
+  "watermelon",
+  "chicken",
+  "burger",
+  "sandwich",
+  "cookie",
+  "corn",
 ];
 
 // LASER DAMAGE
@@ -1123,7 +1190,8 @@ function preload() {
   levelOneComplete = loadImage("assets/images/level1complete.png");
   fireflySprite = loadImage("assets/images/firefly.png");
   fireflyBadge = loadImage("assets/images/fireflybadge.png");
-  potionBadge = loadImage("assets/images/potionbadge.png");
+  potionbadge = loadImage("assets/images/potionbadge.png");
+  foodBadge = loadImage("assets/images/foodbadge.png");
 
   forest = loadImage("assets/images/forest.png");
   library = loadImage("assets/images/library.png");
@@ -1242,8 +1310,13 @@ function draw() {
     return;
   }
 
-    if (secondLevelComplete) {
+  if (secondLevelComplete) {
     drawSecondLevelCompleteScreen();
+    return;
+  }
+
+  if (thirdLevelComplete) {
+    drawThirdLevelCompleteScreen();
     return;
   }
 
@@ -1302,6 +1375,56 @@ function draw() {
     return;
   } 
 
+  if (level3FoodCollectedDialogueActive) {
+    updateCamera();
+    push();
+    let zoom = 3.5;
+    translate(width / 2, height / 2);
+    scale(zoom);
+    translate(-player.x, -player.y);
+
+    drawMaze();
+    drawFoodCounters();
+    drawGarbage();
+    player.draw();
+
+    pop();
+
+    drawSocialBar();
+    drawLevel3FoodCollectedDialogueBox();
+    return;
+  }
+
+  if (level3FoodDeliveredDialogueActive) {
+    updateCamera();
+    push();
+    let zoom = 3.5;
+    translate(width / 2, height / 2);
+    scale(zoom);
+    translate(-player.x, -player.y);
+
+    drawMaze();
+    drawFoodCounters();
+    drawGarbage();
+    player.draw();
+
+    pop();
+
+    drawSocialBar();
+    drawLevel3FoodDeliveredDialogueBox();
+    return;
+  }
+
+  if (level3CafeteriaMinigameDialogueActive) {
+    drawLevel3CafeteriaMinigameDialogueBox();
+    return;
+  }
+
+  if (level3CafeteriaMinigameActive) {
+    drawLevel3CafeteriaMinigame();
+    return;
+  }
+
   updateCamera();
 
   if (gameOver) {
@@ -1311,7 +1434,7 @@ function draw() {
 
   push();
 
-  let zoom = 3.5;
+  let zoom = 1;
 
   translate(width / 2, height / 2);
   scale(zoom);
@@ -1348,6 +1471,7 @@ if (maze === maze1 || maze === maze2 || maze === maze3) {
 updateFireflies();
 drawCollectibles();
 checkCollectibles();
+checkLevel3FoodDelivery();
 player.draw();
 
 if (maze === maze1 || maze === maze2 || maze === maze3) {
@@ -1398,6 +1522,8 @@ updateInvincibility();
     firstLevelComplete = true;
   } else if (maze === maze2) {
     secondLevelComplete = true;
+  } else if (maze === maze3 && level3FoodDelivered) {
+    thirdLevelComplete = true;
     }
   }
   drawSocialBar();
@@ -1428,6 +1554,33 @@ function keyPressed() {
     }
     return;
   }
+
+  if (level3FoodCollectedDialogueActive && (key === " " || keyCode === ENTER)) {
+    level3FoodCollectedDialogueIndex++;
+    if (level3FoodCollectedDialogueIndex >= level3FoodCollectedDialogue.length) {
+      level3FoodCollectedDialogueActive = false;
+    }
+    return;
+  }
+
+  if (level3FoodDeliveredDialogueActive && (key === " " || keyCode === ENTER)) {
+    level3FoodDeliveredDialogueIndex++;
+    if (level3FoodDeliveredDialogueIndex >= level3FoodDeliveredDialogue.length) {
+      level3FoodDeliveredDialogueActive = false;
+      startLevel3CafeteriaMinigame();
+    }
+    return;
+  }
+
+  if (level3CafeteriaMinigameDialogueActive && (key === " " || keyCode === ENTER)) {
+    level3CafeteriaMinigameDialogueIndex++;
+    if (level3CafeteriaMinigameDialogueIndex >= level3CafeteriaMinigameDialogue.length) {
+      level3CafeteriaMinigameDialogueActive = false;
+    }
+    return;
+  }
+
+  if (level3CafeteriaMinigameActive) return;
 
   if (key === " " && !gameStarted) {
     showTutorial = true;
@@ -1477,6 +1630,36 @@ function mousePressed() {
     return;
   }
 
+  if (level3FoodCollectedDialogueActive) {
+    level3FoodCollectedDialogueIndex++;
+    if (level3FoodCollectedDialogueIndex >= level3FoodCollectedDialogue.length) {
+      level3FoodCollectedDialogueActive = false;
+    }
+    return;
+  }
+
+  if (level3FoodDeliveredDialogueActive) {
+    level3FoodDeliveredDialogueIndex++;
+    if (level3FoodDeliveredDialogueIndex >= level3FoodDeliveredDialogue.length) {
+      level3FoodDeliveredDialogueActive = false;
+      startLevel3CafeteriaMinigame();
+    }
+    return;
+  }
+
+  if (level3CafeteriaMinigameDialogueActive) {
+    level3CafeteriaMinigameDialogueIndex++;
+    if (level3CafeteriaMinigameDialogueIndex >= level3CafeteriaMinigameDialogue.length) {
+      level3CafeteriaMinigameDialogueActive = false;
+    }
+    return;
+  }
+
+  if (level3CafeteriaMinigameActive) {
+    checkLevel3CafeteriaMinigameClick();
+    return;
+  }
+
   // Continue button
   if (showTutorial) {
     if (
@@ -1522,6 +1705,14 @@ function canMoveTo(x, y) {
 
     let tile = maze[row][col];
     if (tile !== 0 && tile !== 2 && tile !== 3) return false;
+
+    // Level 3's exit remains locked after collecting food until it is delivered.
+    if (
+      maze === maze3 &&
+      level3AllFoodCollected &&
+      !level3FoodDelivered &&
+      tile === 3
+    ) return false;
 
     // NEW: also block if this point falls inside a nearby wall's expanded footprint
     for (let dr = -1; dr <= 1; dr++) {
@@ -1933,9 +2124,9 @@ function checkCollectibles() {
         if (
           maze === maze2 &&
           collectedCount === collectibles.length &&
-          !potionBadgeUnlocked
+          !potionbadgeUnlocked
         ) {
-          potionBadgeUnlocked = true;
+          potionbadgeUnlocked = true;
 
           badgeX = width / 2;
           badgeY = height / 2 - 80;
@@ -1943,8 +2134,51 @@ function checkCollectibles() {
           badgeScale = 1.3;
           badgeMessageTimer = 180;
         }
+
+        if (
+          maze === maze3 &&
+          collectedCount === collectibles.length &&
+          !level3AllFoodCollected
+        ) {
+          level3AllFoodCollected = true;
+          level3FoodCollectedDialogueActive = true;
+          level3FoodCollectedDialogueIndex = 0;
+        }
+
+        // LEVEL 3 BADGE
+if (
+  maze === maze3 &&
+  collectedCount === collectibles.length &&
+  !foodBadgeUnlocked
+) {
+
+  foodBadgeUnlocked = true;
+
+  badgeX = width / 2;
+  badgeY = height / 2 - 80;
+
+  badgeScale = 1.3;
+  badgeMessageTimer = 50;
+}
       }
     }
+  }
+}
+
+function checkLevel3FoodDelivery() {
+  if (!level3AllFoodCollected || level3FoodDelivered) return;
+
+  let playerCol = floor(player.x / tileSize);
+  let playerRow = floor(player.y / tileSize);
+  let atCafeteriaBar =
+    playerCol === LEVEL3_CAFETERIA_BAR_COL &&
+    playerRow >= LEVEL3_CAFETERIA_BAR_TOP_ROW &&
+    playerRow <= LEVEL3_CAFETERIA_BAR_BOTTOM_ROW;
+
+  if (atCafeteriaBar) {
+    level3FoodDelivered = true;
+    level3FoodDeliveredDialogueActive = true;
+    level3FoodDeliveredDialogueIndex = 0;
   }
 }
 
@@ -2058,17 +2292,364 @@ function drawLevel3DialogueBox() {
   text("click or press SPACE to continue", boxX + boxW - 20, boxY + boxH - 12);
 }
 
+function drawLevel3FoodCollectedDialogueBox() {
+  drawLevel3FoodDialogueBox(
+    level3FoodCollectedDialogue,
+    level3FoodCollectedDialogueIndex
+  );
+}
+
+function drawLevel3FoodDeliveredDialogueBox() {
+  drawLevel3FoodDialogueBox(
+    level3FoodDeliveredDialogue,
+    level3FoodDeliveredDialogueIndex
+  );
+}
+
+function drawLevel3CafeteriaMinigameDialogueBox() {
+  drawLevel3FoodDialogueBox(
+    level3CafeteriaMinigameDialogue,
+    level3CafeteriaMinigameDialogueIndex
+  );
+}
+
+function drawLevel3FoodDialogueBox(dialogue, dialogueIndex) {
+  const boxW = 900;
+  const boxH = 140;
+  const boxX = (width - boxW) / 2;
+  const boxY = height - boxH - 60;
+
+  fill(20, 20, 30, 230);
+  stroke(255);
+  strokeWeight(2);
+  rect(boxX, boxY, boxW, boxH, 12);
+
+  noStroke();
+  fill(255, 220, 120);
+  textAlign(LEFT, TOP);
+  textFont("Monospace");
+  textStyle(BOLD);
+  textSize(18);
+  text("Faith", boxX + 30, boxY + 18);
+
+  fill(255);
+  textStyle(NORMAL);
+  textSize(16);
+  text(dialogue[dialogueIndex], boxX + 30, boxY + 55, boxW - 60, boxH - 80);
+
+  fill(200);
+  textAlign(RIGHT, BOTTOM);
+  textSize(13);
+  text("click or press SPACE to continue", boxX + boxW - 20, boxY + boxH - 12);
+}
+
+// LEVEL 3 CAFETERIA MINIGAME
+function startLevel3CafeteriaMinigame() {
+  resetLevel3CafeteriaMinigame();
+  level3CafeteriaMinigameActive = true;
+  level3CafeteriaMinigameSpawnTimer = LEVEL3_MINIGAME_SPAWN_INTERVAL;
+}
+
+function drawLevel3CafeteriaMinigame() {
+  background(20, 35, 45);
+
+  drawLevel3CafeteriaMinigameHUD();
+  drawLevel3CafeteriaMinigameHoles();
+
+  updateLevel3CafeteriaMinigame();
+  drawLevel3CafeteriaMinigameFaith();
+  drawLevel3CafeteriaMinigameGoblins();
+  drawLevel3CafeteriaMinigameFood();
+
+  if (hitFlashAlpha > 0) {
+    hitFlashAlpha = max(0, hitFlashAlpha - HIT_FLASH_DECAY);
+    drawRedFlash(hitFlashAlpha);
+  }
+}
+
+function drawLevel3CafeteriaMinigameHUD() {
+  fill(8, 12, 45);
+  rect(0, 0, width, 85);
+
+  fill(255, 225, 115);
+  textAlign(LEFT, CENTER);
+  textFont("Monospace");
+  textStyle(BOLD);
+  textSize(22);
+  text("Goblin Whack-a-Mole", 35, 32);
+
+  fill(255);
+  textStyle(NORMAL);
+  textSize(15);
+  text("Click goblins before their food reaches Faith!", 35, 62);
+
+  textAlign(RIGHT, CENTER);
+  text("Goblins: " + level3CafeteriaMinigameDefeated + " / " + LEVEL3_MINIGAME_GOBLIN_TARGET, width - 35, 32);
+  text("Social Battery: " + socialBattery, width - 35, 62);
+}
+
+function getLevel3CafeteriaMinigameSpawnPoints() {
+  return [
+    { x: width * 0.16, y: height * 0.25 },
+    { x: width * 0.38, y: height * 0.2 },
+    { x: width * 0.62, y: height * 0.2 },
+    { x: width * 0.84, y: height * 0.25 },
+    { x: width * 0.14, y: height * 0.55 },
+    { x: width * 0.86, y: height * 0.55 },
+    { x: width * 0.28, y: height * 0.82 },
+    { x: width * 0.72, y: height * 0.82 },
+  ];
+}
+
+function drawLevel3CafeteriaMinigameHoles() {
+  for (let hole of getLevel3CafeteriaMinigameSpawnPoints()) {
+    noStroke();
+    fill(55, 32, 23);
+    ellipse(hole.x, hole.y, 95, 45);
+    fill(25, 15, 12);
+    ellipse(hole.x, hole.y + 4, 68, 26);
+  }
+}
+
+function updateLevel3CafeteriaMinigame() {
+  level3CafeteriaMinigameSpawnTimer++;
+
+  if (
+    level3CafeteriaMinigameSpawnTimer >= LEVEL3_MINIGAME_SPAWN_INTERVAL &&
+    level3CafeteriaMinigameGoblins.length < LEVEL3_MINIGAME_MAX_GOBLINS &&
+    level3CafeteriaMinigameDefeated + level3CafeteriaMinigameGoblins.length < LEVEL3_MINIGAME_GOBLIN_TARGET
+  ) {
+    spawnLevel3CafeteriaMinigameGoblin();
+    level3CafeteriaMinigameSpawnTimer = 0;
+  }
+
+  for (let i = level3CafeteriaMinigameGoblins.length - 1; i >= 0; i--) {
+    let goblin = level3CafeteriaMinigameGoblins[i];
+
+    if (goblin.popTimer < LEVEL3_MINIGAME_POP_DURATION) {
+      goblin.popTimer++;
+      continue;
+    }
+
+    goblin.throwTimer++;
+
+    if (goblin.throwTimer >= LEVEL3_MINIGAME_THROW_INTERVAL) {
+      throwLevel3CafeteriaMinigameFood(goblin);
+      goblin.throwTimer = 0;
+    }
+  }
+
+  for (let i = level3CafeteriaMinigameFood.length - 1; i >= 0; i--) {
+    let food = level3CafeteriaMinigameFood[i];
+    food.x += food.vx;
+    food.y += food.vy;
+
+    let distanceToFaith = dist(food.x, food.y, width / 2, height / 2 + 25);
+
+    if (distanceToFaith <= LEVEL3_MINIGAME_PLAYER_RADIUS + LEVEL3_MINIGAME_FOOD_HIT_RADIUS) {
+      hitFaithInLevel3CafeteriaMinigame();
+      level3CafeteriaMinigameFood.splice(i, 1);
+      continue;
+    }
+
+    if (
+      food.x < -LEVEL3_MINIGAME_FOOD_HIT_RADIUS ||
+      food.x > width + LEVEL3_MINIGAME_FOOD_HIT_RADIUS ||
+      food.y < 85 - LEVEL3_MINIGAME_FOOD_HIT_RADIUS ||
+      food.y > height + LEVEL3_MINIGAME_FOOD_HIT_RADIUS
+    ) {
+      level3CafeteriaMinigameFood.splice(i, 1);
+    }
+  }
+
+  updateInvincibility();
+
+  if (socialBattery <= 0) {
+    socialBattery = 0;
+    level3CafeteriaMinigameActive = false;
+    gameOver = true;
+    fail.play();
+  }
+}
+
+function spawnLevel3CafeteriaMinigameGoblin() {
+  let spawnPoints = getLevel3CafeteriaMinigameSpawnPoints();
+  let hole = random(spawnPoints);
+
+  level3CafeteriaMinigameGoblins.push({
+    x: hole.x,
+    y: hole.y,
+    popTimer: 0,
+    throwTimer: 0,
+  });
+}
+
+function throwLevel3CafeteriaMinigameFood(goblin) {
+  let targetX = width / 2;
+  let targetY = height / 2 + 25;
+  let dx = targetX - goblin.x;
+  let dy = targetY - goblin.y;
+  let distanceToFaith = sqrt(dx * dx + dy * dy);
+
+  level3CafeteriaMinigameFood.push({
+    x: goblin.x,
+    y: goblin.y,
+    vx: (dx / distanceToFaith) * LEVEL3_MINIGAME_FOOD_SPEED,
+    vy: (dy / distanceToFaith) * LEVEL3_MINIGAME_FOOD_SPEED,
+    type: random(level3CafeteriaMinigameFoodTypes),
+  });
+}
+
+function drawLevel3CafeteriaMinigameFaith() {
+  imageMode(CENTER);
+
+  let frame = floor(frameCount / 12) % SPRITE.numFrames;
+  image(
+    character,
+    width / 2,
+    height / 2 + 25,
+    90,
+    140,
+    frame * SPRITE.frameWidth,
+    SPRITE.rows.down * SPRITE.frameHeight,
+    SPRITE.frameWidth,
+    SPRITE.frameHeight
+  );
+
+  fill(255);
+  textAlign(CENTER, BOTTOM);
+  textFont("Monospace");
+  textSize(15);
+  text("Faith", width / 2, height / 2 - 60);
+}
+
+function drawLevel3CafeteriaMinigameGoblins() {
+  imageMode(CENTER);
+
+  let frame = floor(frameCount / GOBLIN_LVL3.animSpeed) % GOBLIN_LVL3.numFrames;
+  let drawW = GOBLIN_LVL3.frameWidth * LEVEL3_MINIGAME_GOBLIN_SCALE;
+  let drawH = GOBLIN_LVL3.frameHeight * LEVEL3_MINIGAME_GOBLIN_SCALE;
+
+  for (let goblin of level3CafeteriaMinigameGoblins) {
+    let popScale = map(goblin.popTimer, 0, LEVEL3_MINIGAME_POP_DURATION, 0.2, 1);
+    popScale = constrain(popScale, 0.2, 1);
+
+    image(
+      goblinslvl3,
+      goblin.x,
+      goblin.y,
+      drawW * popScale,
+      drawH * popScale,
+      frame * GOBLIN_LVL3.frameWidth,
+      0,
+      GOBLIN_LVL3.frameWidth,
+      GOBLIN_LVL3.frameHeight
+    );
+  }
+}
+
+function drawLevel3CafeteriaMinigameFood() {
+  imageMode(CENTER);
+
+  for (let food of level3CafeteriaMinigameFood) {
+    let foodImg = getLevel3CafeteriaMinigameFoodImage(food.type);
+    image(foodImg, food.x, food.y, 30, 24);
+  }
+}
+
+function getLevel3CafeteriaMinigameFoodImage(type) {
+  switch (type) {
+    case "apple":
+      return apple;
+
+    case "watermelon":
+      return watermelon;
+
+    case "chicken":
+      return chicken;
+
+    case "burger":
+      return burger;
+
+    case "sandwich":
+      return sandwich;
+
+    case "cookie":
+      return cookie;
+
+    case "corn":
+      return corn;
+  }
+}
+
+function checkLevel3CafeteriaMinigameClick() {
+  for (let i = level3CafeteriaMinigameGoblins.length - 1; i >= 0; i--) {
+    let goblin = level3CafeteriaMinigameGoblins[i];
+    let clickDistance = dist(mouseX, mouseY, goblin.x, goblin.y);
+
+    if (clickDistance <= LEVEL3_MINIGAME_GOBLIN_HIT_RADIUS) {
+      level3CafeteriaMinigameGoblins.splice(i, 1);
+      level3CafeteriaMinigameDefeated++;
+
+      if (level3CafeteriaMinigameDefeated >= LEVEL3_MINIGAME_GOBLIN_TARGET) {
+        endLevel3CafeteriaMinigame();
+      }
+
+      return;
+    }
+  }
+}
+
+function hitFaithInLevel3CafeteriaMinigame() {
+  if (playerInvincible) return;
+
+  socialBattery -= LEVEL3_MINIGAME_DAMAGE;
+  socialBattery = max(0, socialBattery);
+
+  playerInvincible = true;
+  invincibleTimer = INVINCIBLE_FRAMES;
+  playerHitSound.play();
+  hitFlashAlpha = HIT_FLASH_MAX;
+}
+
+function endLevel3CafeteriaMinigame() {
+  level3CafeteriaMinigameActive = false;
+  level3CafeteriaMinigameComplete = true;
+  level3CafeteriaMinigameDialogueActive = true;
+  level3CafeteriaMinigameDialogueIndex = 0;
+  win.play();
+}
+
+function resetLevel3CafeteriaMinigame() {
+  level3CafeteriaMinigameActive = false;
+  level3CafeteriaMinigameComplete = false;
+  level3CafeteriaMinigameGoblins = [];
+  level3CafeteriaMinigameFood = [];
+  level3CafeteriaMinigameDefeated = 0;
+  level3CafeteriaMinigameSpawnTimer = 0;
+  level3CafeteriaMinigameDialogueActive = false;
+  level3CafeteriaMinigameDialogueIndex = 0;
+}
+
 
 // BADGE
 function drawBadge() {
-  if (!badgeUnlocked && !potionBadgeUnlocked) return;
+  if (
+    !badgeUnlocked &&
+    !potionbadgeUnlocked &&
+    !foodBadgeUnlocked
+  ) return;
 
   imageMode(CENTER);
 
   let badgeSize = 300 * badgeScale;
 
-if (potionBadgeUnlocked) {
-  image(potionBadge, badgeX, badgeY, badgeSize, badgeSize);
+if (foodBadgeUnlocked) {
+  image(foodBadge, badgeX, badgeY, badgeSize, badgeSize);
+}
+
+else if (potionbadgeUnlocked) {
+  image(potionbadge, badgeX, badgeY, badgeSize, badgeSize);
 }
 
 else {
@@ -2082,25 +2663,53 @@ else {
 
   textAlign(CENTER);
 
+  // Level 3 badge
+if (foodBadgeUnlocked) {
+
+  textSize(26);
+  text(
+    "Cafeteria Champion Badge Earned!",
+    width / 2,
+    height / 2 + 130
+  );
+
+  textSize(18);
+  text(
+    "You collected all the food!",
+    width / 2,
+    height / 2 + 165
+  );
+
+  text(
+    "Nothing goes to waste!",
+    width / 2,
+    height / 2 + 195
+  );
+}
+
   // Level 2 badge
-  if (potionBadgeUnlocked) {
+else if (potionBadgeUnlocked) {
 
-    textSize(26);
-    text("Potion Master Badge Earned!", width / 2, height / 2 + 130);
+  textSize(26);
+  text(
+    "Potion Master Badge Earned!",
+    width / 2,
+    height / 2 + 130
+  );
 
-    textSize(18);
-    text(
-      "You collected all 5 ingredients!",
-      width / 2,
-      height / 2 + 165
-    );
+  textSize(18);
+  text(
+    "You collected all 5 ingredients!",
+    width / 2,
+    height / 2 + 165
+  );
 
-    text(
-      "+5 Social Battery Boost",
-      width / 2,
-      height / 2 + 195
-    );
-  }
+  text(
+    "+5 Social Battery Boost",
+    width / 2,
+    height / 2 + 195
+  );
+}
 
   // Level 1 badge
   else if (badgeUnlocked) {
@@ -2132,7 +2741,11 @@ else {
 
 
 function updateBadge() {
-  if (!badgeUnlocked && !potionBadgeUnlocked) return;
+  if (
+    !badgeUnlocked &&
+    !potionbadgeUnlocked &&
+    !foodBadgeUnlocked
+  ) return;
 
   if (badgeMessageTimer > 0) {
     badgeMessageTimer--;
@@ -2442,7 +3055,12 @@ function restartGame() {
 
   // Reset collectible progress
   collectedCount = 0;
-  setupCollectibles();
+  if (maze === maze3) {
+    resetLevel3FoodDelivery();
+    setupFoodCollectibles();
+  } else {
+    setupCollectibles();
+  }
 
   outer: for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
@@ -2673,7 +3291,8 @@ collectedCount = 0;
   setupPotionIngredients();
 
   badgeUnlocked = false;
-  potionBadgeUnlocked = false;
+potionBadgeUnlocked = false;
+foodBadgeUnlocked = false;
 
   // Reset Level 2 beakers
   resetBeakers();
@@ -2706,6 +3325,7 @@ function loadThirdLevel() {
 
   firstLevelComplete = false;
   secondLevelComplete = false;
+  resetLevel3FoodDelivery();
 
   character = characterlvl3;
 
@@ -2734,7 +3354,8 @@ function loadThirdLevel() {
 
   collectedCount = 0;
   badgeUnlocked = false;
-  potionBadgeUnlocked = false;
+potionBadgeUnlocked = false;
+foodBadgeUnlocked = false;
 
   // Load Level 3 food
   setupFoodCollectibles();
@@ -2742,4 +3363,15 @@ function loadThirdLevel() {
 
   level3DialogueActive = true;
   level3DialogueIndex = 0;
+}
+
+function resetLevel3FoodDelivery() {
+  thirdLevelComplete = false;
+  level3AllFoodCollected = false;
+  level3FoodDelivered = false;
+  level3FoodCollectedDialogueActive = false;
+  level3FoodCollectedDialogueIndex = 0;
+  level3FoodDeliveredDialogueActive = false;
+  level3FoodDeliveredDialogueIndex = 0;
+  resetLevel3CafeteriaMinigame();
 }
