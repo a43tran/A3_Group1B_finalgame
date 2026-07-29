@@ -465,7 +465,21 @@ let lasers3 = [
   },
 
   //2ND FROM TOP
+  {
+    row: 4.9,
+    col: 1.3,
+    facing: "up",
+    direction: "left",
 
+    blinkRate: 150,
+    on: true,
+    timer: 0,
+
+    shaking: false,
+    popOffset: 18,
+  },
+
+  //3rd FROM TOP
   {
     row: 5.9,
     col: 4.3,
@@ -480,19 +494,7 @@ let lasers3 = [
     popOffset: 18,
   },
 
-  {
-    row: 9.3,
-    col: 18.2,
-    facing: "up",
-    direction: "left",
-
-    blinkRate: 150,
-    on: true,
-    timer: 0,
-
-    shaking: false,
-    popOffset: 18,
-  },
+  
 
   //BOTTOM MOST
   {
@@ -1087,11 +1089,11 @@ updateInvincibility();
   let playerCol = floor(player.x / tileSize);
   let playerRow = floor(player.y / tileSize);
 
-    if (maze[playerRow][playerCol] === 3) {
-    if (maze === maze1) {
-      firstLevelComplete = true;
-    } else if (maze === maze2) {
-      secondLevelComplete = true;
+  if (maze[playerRow][playerCol] === 3) {
+  if (maze === maze1) {
+    firstLevelComplete = true;
+  } else if (maze === maze2) {
+    secondLevelComplete = true;
     }
   }
   drawSocialBar();
@@ -1604,8 +1606,6 @@ function checkCollectibles() {
         item.collected = true;
         collectedCount++;
         collect.play();
-        // Every collectible restores 5% Social Battery
-        socialBattery = min(100, socialBattery + 5);
 
         // LEVEL 1 BADGE
         if (
@@ -1626,22 +1626,22 @@ function checkCollectibles() {
         }
 
         // LEVEL 2 BADGE
-        if (
-          maze === maze2 &&
-          collectedCount === 5 &&
-          !potionBadgeUnlocked
-        ) {
+       if (
+  maze === maze2 &&
+  collectedCount === 5 &&
+  !potionBadgeUnlocked
+) {
 
-          potionBadgeUnlocked = true;
+  potionBadgeUnlocked = true;
 
-         
+  socialBattery = min(100, socialBattery + 5);
 
-          badgeX = width / 2;
-          badgeY = height / 2 - 80;
+  badgeX = width / 2;
+  badgeY = height / 2 - 80;
 
-          badgeScale = 1.3;
-          badgeMessageTimer = 180;
-        }
+  badgeScale = 1.3;
+  badgeMessageTimer = 180;
+}
       }
     }
   }
@@ -1749,28 +1749,6 @@ function drawBadge() {
   noStroke();
 }
 
-  // LEVEL 2 BADGE
-  if (potionBadgeUnlocked) {
-
-    textSize(26);
-    text("Potion Master Badge Earned!", width / 2, height / 2 + 130);
-
-    textSize(18);
-    text(
-      "You collected all 5 ingredients!",
-      width / 2,
-      height / 2 + 165
-    );
-
-    text(
-      "+5 Social Battery Boost",
-      width / 2,
-      height / 2 + 195
-    );
-  }
-
-  noStroke();
-}
 
 function updateBadge() {
   if (!badgeUnlocked && !potionBadgeUnlocked) return;
@@ -2250,7 +2228,7 @@ collectedCount = 0;
   setupPotionIngredients();
 
   badgeUnlocked = false;
-  potionBadgeUnlocked = false
+  potionBadgeUnlocked = false;
 
   // Reset Level 2 beakers
   resetBeakers();
@@ -2269,10 +2247,12 @@ function resetBeakers() {
  
 
 function loadThirdLevel() {
+  
   maze = maze3;
 
   lasers = lasers3;
   laserBeams = laserBeams3;
+  
 
   firstLevelComplete = false;
   secondLevelComplete = false;
@@ -2289,12 +2269,12 @@ function loadThirdLevel() {
       }
     }
   }
-  // Reset systems for Level 3
-initWallExpansion();
+    // Reset systems for Level 3
+  initWallExpansion();
 
-collectedCount = 0;
-badgeUnlocked = false;
+  collectedCount = 0;
+  badgeUnlocked = false;
 
-// Level 3 uses food collectibles
-setupFoodCollectibles();
+  // Level 3 uses food collectibles
+  setupFoodCollectibles();
 }
