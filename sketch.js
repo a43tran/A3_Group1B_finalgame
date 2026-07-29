@@ -102,6 +102,7 @@ let paperStone;
 let paperStone2;
 
 let cafeTable;
+let emptyCafeTable;
 
 let feather;
 let eyeballs;
@@ -475,7 +476,7 @@ let lasers3 = [
   //2ND FROM TOP
   {
     row: 3.9,
-    col: 3.3,
+    col: 5.3,
     facing: "up",
     direction: "left",
 
@@ -565,9 +566,9 @@ let laserBeams = [
 let laserBeams2 = [
   //top most laser
   {
-    x1: 85,
+    x1: 125,
     y1: 105, // beam start (pixel coordinates)
-    x2: 260,
+    x2: 1010,
     y2: 105, // beam end (pixel coordinates)
     blinkRate: 80, // HAS TO MATCH WITH LASERS ABOVE
     on: true,
@@ -929,6 +930,7 @@ function preload() {
   paperStone2 = loadImage("assets/images/paperStone2.png");
 
   cafeTable = loadImage("assets/images/cafeTable.png");
+  emptyCafeTable = loadImage("assets/images/emptyCafeTable.png");
 
   feather = loadImage("assets/images/feather.png");
 eyeballs = loadImage("assets/images/eyeballs.png");
