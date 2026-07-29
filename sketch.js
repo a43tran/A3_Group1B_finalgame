@@ -85,6 +85,7 @@ let school;
 let banner;
 let goblins;
 let goblin;
+let classroomdoor;
 
 // SOUNDS
 let playerHitSound;
@@ -661,6 +662,8 @@ function preload() {
 
   goblins = loadImage("assets/images/goblins.png");
   goblin = loadImage("assets/images/goblin.png");
+
+  classroomdoor = loadImage("assets/images/classroomdoor.png");
 
   playerHitSound = loadSound("assets/sounds/hit.mp3");
 
@@ -1927,6 +1930,9 @@ function drawTutorialOverlay() {
 function loadSecondLevel() {
   maze = maze2;
   firstLevelComplete = false;
+
+  home = classroomdoor;
+  school = classroomdoor;
 
   // Reposition player at the new start tile
   outer: for (let r = 0; r < ROWS; r++) {
