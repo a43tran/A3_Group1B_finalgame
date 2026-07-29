@@ -187,10 +187,7 @@ let hitFlashAlpha = 0;
 const HIT_FLASH_MAX = 150;
 const HIT_FLASH_DECAY = 8;
 
-// HEALTH RECOVERY GLOW
-let healFlashAlpha = 0;
-const HEAL_FLASH_MAX = 120;
-const HEAL_FLASH_DECAY = 5;
+
 
 // PLAYER HITBOX
 const HITBOX_RADIUS = 12;
@@ -869,7 +866,7 @@ const GOBLIN_LVL1 = {
 };
 
 const GOBLIN_LVL2 = {
-  frameWidth: 150,
+  frameWidth: 149,
   frameHeight: 180,
   numFrames: 16,
   animSpeed: 12,
@@ -1084,10 +1081,7 @@ updateInvincibility();
     drawRedFlash(hitFlashAlpha);
   }
 
-  if (healFlashAlpha > 0) {
-  healFlashAlpha = max(0, healFlashAlpha - HEAL_FLASH_DECAY);
-  drawHealFlash(healFlashAlpha);
-  }
+
 
   drawVignette();
 
@@ -1611,19 +1605,22 @@ function drawCollectibles() {
 
 function checkCollectibles() {
   for (let item of collectibles) {
-
     if (!item.collected) {
-
       let x = item.col * tileSize + tileSize / 2;
       let y = item.row * tileSize + tileSize / 2;
 
       let d = dist(player.x, player.y, x, y);
 
       if (d < 20) {
-
         item.collected = true;
         collectedCount++;
         collect.play();
+
+        // Every collectible in every level restores 5%
+        socialBattery = min(100, socialBattery + 5);
+
+        // Trigger the green recovery glow
+        healFlashAlpha = HEAL_FLASH_MAX;
 
         // LEVEL 1 BADGE
         if (
@@ -1631,10 +1628,7 @@ function checkCollectibles() {
           collectedCount === collectibles.length &&
           !badgeUnlocked
         ) {
-
           badgeUnlocked = true;
-
-          
 
           badgeX = width / 2;
           badgeY = height / 2 - 80;
@@ -1644,26 +1638,19 @@ function checkCollectibles() {
         }
 
         // LEVEL 2 BADGE
-       if (
-  maze === maze2 &&
-  collectedCount === 5 &&
-  !potionBadgeUnlocked
-) {
+        if (
+          maze === maze2 &&
+          collectedCount === collectibles.length &&
+          !potionBadgeUnlocked
+        ) {
+          potionBadgeUnlocked = true;
 
-  potionBadgeUnlocked = true;
-  
-  // Every collectible restores 5% Social Battery
-  socialBattery = min(100, socialBattery + 5);
-  
-  // Trigger green recovery glow
-  healFlashAlpha = HEAL_FLASH_MAX;
+          badgeX = width / 2;
+          badgeY = height / 2 - 80;
 
-  badgeX = width / 2;
-  badgeY = height / 2 - 80;
-
-  badgeScale = 1.3;
-  badgeMessageTimer = 180;
-}
+          badgeScale = 1.3;
+          badgeMessageTimer = 180;
+        }
       }
     }
   }
@@ -1962,13 +1949,6 @@ function drawRedFlash(alpha) {
   rect(0, 0, width, height);
 }
 
-function drawHealFlash(alpha) {
-  noStroke();
-
-  // Soft transparent green overlay
-  fill(80, 255, 120, alpha);
-  rect(0, 0, width, height);
-}
 
 function updateInvincibility() {
   if (playerInvincible) {
