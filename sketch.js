@@ -72,6 +72,9 @@ let thirdLevelComplete = false;
 
 // IMAGES
 let character;
+let characterlvl2;
+let characterlvl3;
+
 let startScreen;
 let restartScreen;
 let levelOneComplete;
@@ -87,7 +90,12 @@ let goblins;
 let goblin;
 let classroomdoor;
 let cafedoor;
-let characterlvl2;
+
+let cobblestone;
+let crackedStone;
+let mossStone;
+let paperStone;
+let paperStone2;
 
 // SOUNDS
 let playerHitSound;
@@ -367,9 +375,207 @@ let lasers = [
   },
 ];
 
+let lasers2 = [
+  {
+    //TOP ONE
+    row: 2.3,
+    col: 20.3,
+    facing: "up",
+    direction: "left",
+
+    blinkRate: 80,
+    on: true,
+    timer: 0,
+
+    shaking: false,
+    popOffset: 18,
+  },
+
+  // Row 7 corridor — shoots right, wall at col 12
+  {
+    row: 7.3,
+    col: 3.8,
+    facing: "down",
+    direction: "right",
+    blinkRate: 100,
+    on: true,
+    timer: 0,
+    shaking: false,
+    popOffset: 18,
+  },
+
+  // Row 11 corridor — shoots left, wall at col 0/1
+  {
+    row: 11.3,
+    col: 11.3,
+    facing: "up",
+    direction: "left",
+    blinkRate: 150,
+    on: true,
+    timer: 0,
+    shaking: false,
+    popOffset: 18,
+  },
+
+  // Row 12 corridor near the exit — shoots left, wall at col 10
+  {
+    row: 12.3,
+    col: 13.2,
+    facing: "up",
+    direction: "left",
+    blinkRate: 60,
+    on: true,
+    timer: 0,
+    shaking: false,
+    popOffset: 18,
+  },
+];
+
+let lasers3 = [
+  // Top-most goblin
+  {
+    row: 2.3,
+    col: 6.3,
+    facing: "up",
+    direction: "left",
+
+    blinkRate: 80,
+    on: true,
+    timer: 0,
+
+    shaking: false,
+    popOffset: 18,
+  },
+
+  // Right-most goblin
+  {
+    row: 5.3,
+    col: 13.8,
+    facing: "down",
+    direction: "right",
+
+    blinkRate: 100,
+    on: true,
+    timer: 0,
+
+    shaking: false,
+    popOffset: 18,
+  },
+
+  // Goblin covering longest hallway
+  {
+    row: 9.3,
+    col: 18.2,
+    facing: "up",
+    direction: "left",
+
+    blinkRate: 150,
+    on: true,
+    timer: 0,
+
+    shaking: false,
+    popOffset: 18,
+  },
+
+  // Goblin blocking the exit
+  {
+    row: 7.3,
+    col: 23.2,
+    facing: "up",
+    direction: "left",
+
+    blinkRate: 60,
+    on: true,
+    timer: 0,
+
+    shaking: false,
+    popOffset: 18,
+  },
+];
+
 
 
 let laserBeams = [
+  //top most laser
+  {
+    x1: 85,
+    y1: 105, // beam start (pixel coordinates)
+    x2: 260,
+    y2: 105, // beam end (pixel coordinates)
+    blinkRate: 80, // HAS TO MATCH WITH LASERS ABOVE
+    on: true,
+    timer: 0,
+  },
+  {
+    x1: 575,
+    y1: 225,
+    x2: 680,
+    y2: 225,
+    blinkRate: 100,
+    on: true,
+    timer: 0,
+  },
+  {
+    x1: 320,
+    y1: 385,
+    x2: 740,
+    y2: 385,
+    blinkRate: 150,
+    on: true,
+    timer: 0,
+  },
+  {
+    x1: 844,
+    y1: 305,
+    x2: 940,
+    y2: 305,
+    blinkRate: 60,
+    on: true,
+    timer: 0,
+  },
+];
+
+let laserBeams2 = [
+  //top most laser
+  {
+    x1: 125,
+    y1: 105, // beam start (pixel coordinates)
+    x2: 825,
+    y2: 105, // beam end (pixel coordinates)
+    blinkRate: 80, // HAS TO MATCH WITH LASERS ABOVE
+    on: true,
+    timer: 0,
+  },
+  {
+    x1: 575,
+    y1: 225,
+    x2: 680,
+    y2: 225,
+    blinkRate: 100,
+    on: true,
+    timer: 0,
+  },
+  {
+    x1: 320,
+    y1: 385,
+    x2: 740,
+    y2: 385,
+    blinkRate: 150,
+    on: true,
+    timer: 0,
+  },
+  {
+    x1: 320,
+    y1: 195,
+    x2: 1044,
+    y2: 105,
+    blinkRate: 60,
+    on: true,
+    timer: 0,
+  },
+];
+
+let laserBeams3 = [
   //top most laser
   {
     x1: 85,
@@ -652,6 +858,7 @@ function tileCenter(col, row, offX, offY) {
 function preload() {
   character = loadImage("assets/images/character.png");
   characterlvl2 = loadImage("assets/images/characterlvl2.png");
+  characterlvl3 = loadImage("assets/images/characterlvl3.png");
 
   startScreen = loadImage("assets/images/homescreen.png");
   restartScreen = loadImage("assets/images/restartscreen.png");
@@ -671,6 +878,12 @@ function preload() {
 
   classroomdoor = loadImage("assets/images/classroomdoor.png");
   cafedoor = loadImage("assets/images/cafedoor.png");
+
+  cobblestone = loadImage("assets/images/cobblestone.png");
+  crackedStone = loadImage("assets/images/crackedStone.png");
+  mossStone = loadImage("assets/images/mossStone.png");
+  paperStone = loadImage("assets/images/paperStone.png");
+  paperStone2 = loadImage("assets/images/paperStone2.png");
 
   playerHitSound = loadSound("assets/sounds/hit.mp3");
 
@@ -764,7 +977,7 @@ function draw() {
   drawMaze();
 
 // LEVEL 1 HAZARDS
-if (maze === maze1) {
+if (maze === maze1 || maze === maze2 || maze === maze3) {
   updateLasers();
   drawLasers();
 }
@@ -782,7 +995,7 @@ if (socialBattery > 0) {
 }
 
 // Laser beams only appear in Level 1
-if (maze === maze1) {
+if (maze === maze1 || maze === maze2 || maze === maze3) {
   drawLaserBeams();
 }
 
@@ -791,8 +1004,7 @@ drawCollectibles();
 checkCollectibles();
 player.draw();
 
-// LEVEL 1 DAMAGE
-if (maze === maze1) {
+if (maze === maze1 || maze === maze2 || maze === maze3) {
   checkLaserPlayerCollision();
 }
 
@@ -1937,6 +2149,9 @@ function drawTutorialOverlay() {
 function loadSecondLevel() {
   maze = maze2;
 
+  lasers = lasers2;
+  laserBeams = laserBeams2;
+
   firstLevelComplete = false;
 
   home = classroomdoor;
@@ -1981,8 +2196,14 @@ function resetBeakers() {
 
 function loadThirdLevel() {
   maze = maze3;
+
+  lasers = lasers3;
+  laserBeams = laserBeams3;
+
   firstLevelComplete = false;
   secondLevelComplete = false;
+
+  character = characterlvl3;
   
   // Reposition player at the new start tile
   outer: for (let r = 0; r < ROWS; r++) {
