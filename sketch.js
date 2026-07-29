@@ -1194,7 +1194,7 @@ function preload() {
   fireflySprite = loadImage("assets/images/firefly.png");
   fireflyBadge = loadImage("assets/images/fireflybadge.png");
   potionbadge = loadImage("assets/images/potionbadge.png");
-  foodBadge = loadImage("assets/images/foodbadge.png");
+  foodBadge = loadImage("assets/images/foodBadge.png");
 
   completelvl2 = loadImage("assets/images/completelvl2.png");
   gamecompleted = loadImage("assets/images/gamecompleted.png");
