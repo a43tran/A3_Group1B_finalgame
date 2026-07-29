@@ -81,7 +81,10 @@ let levelOneComplete;
 let fireflySprite;
 let fireflyBadge;
 let potionbadge;
+
+
 let forest;
+let library;
 let wall;
 let ground;
 let home;
@@ -91,7 +94,7 @@ let banner;
 let goblins;
 let goblin;
 let goblinslvl2;
-let globlinslvl
+let goblinslvl3;
 
 let classroomdoor;
 let cafedoor;
@@ -181,7 +184,7 @@ let level2DialogueActive = false;
 let level2DialogueIndex = 0;
 const level2Dialogue = [
   "Okay, that journey was a lot... but I made it.",
-  "I have to go to chemistry class. I need ingredients for the potions assignment.",
+  "I can't be late for chemistry class! I need ingredients for the potions assignment.",
   "Let's get moving before the ingredients run out!",
 ];
 
@@ -800,6 +803,16 @@ const GOBLIN_LVL2 = {
   redEyeEnd: 11,
 };
 
+const GOBLIN_LVL3 = {
+  frameWidth: 149,
+  frameHeight: 180,
+  numFrames: 16,
+  animSpeed: 12,
+  scale: 0.27,   // scaled down since frames are 3x bigger — tune to taste
+  redEyeStart: 8,
+  redEyeEnd: 11,
+};
+
 let GOBLIN = GOBLIN_LVL1;
 
 // TUTORIAL PAGE
@@ -832,6 +845,7 @@ function preload() {
   potionBadge = loadImage("assets/images/potionbadge.png");
 
   forest = loadImage("assets/images/forest.png");
+  library = loadImage("assets/images/library.png");
   wall = loadImage("assets/images/trees.png");
   ground = loadImage("assets/images/dirt.png");
   home = loadImage("assets/images/house.png");
@@ -844,6 +858,11 @@ function preload() {
 
   classroomdoor = loadImage("assets/images/classroomdoor.png");
   cafedoor = loadImage("assets/images/cafedoor.png");
+  
+  desk = loadImage("assets/images/desksMaterials.png");
+  desk1 = loadImage("assets/images/desksMaterials2.png");
+  desk2 = loadImage("assets/images/desksMaterials3.png");
+  desk3 = loadImage("assets/images/cafedoor.png");
 
   cobblestone = loadImage("assets/images/cobblestone.png");
   crackedStone = loadImage("assets/images/crackedStone.png");
@@ -1890,11 +1909,7 @@ else if (maze === maze2) {
 }
 
 else if (maze === maze3) {
-  text(
-    "Goblins stopped: " + foodGame.defeated + " / " + FOOD_GAME_TARGET,
-    50,
-    height - 34
-  );
+  //text("Goblins stopped: " + foodGame.defeated + " / " + FOOD_GAME_TARGET, 50, height - 34);
 }
 
   // Social Battery Bar
@@ -2057,7 +2072,7 @@ function restartGame() {
   socialBattery = 100;
   gameOver = false;
   trappedTimer = 0;
-  if (maze === maze3) resetFoodGame();
+  ///if (maze === maze3) resetFoodGame();
   trappedTimer = 0;
 
   // Reset collectible progress
@@ -2274,6 +2289,8 @@ function loadSecondLevel() {
 
   GOBLIN = GOBLIN_LVL2;
 
+  forest = library;
+
   // Reposition player at the new start tile
   outer: for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
@@ -2323,6 +2340,10 @@ function loadThirdLevel() {
   secondLevelComplete = false;
 
   character = characterlvl3;
+
+  goblins = goblinslvl3;
+
+  GOBLIN = GOBLIN_LVL3;
   
   // Reposition player at the new start tile
   outer: for (let r = 0; r < ROWS; r++) {
@@ -2340,7 +2361,5 @@ function loadThirdLevel() {
   collectedCount = 0;
   badgeUnlocked = false;
 
-  // Level 3 swaps corridor lasers for the bird's-eye food fight.
-  collectibles = [];
-  resetFoodGame();
+
 }
