@@ -112,6 +112,7 @@ let fail;
 let win;
 let collect;
 let walking;
+let bgMusic;
 
 // SOCIAL BATTERY
 let socialBattery = 100;
@@ -119,11 +120,11 @@ let socialBattery = 100;
 
 // INGREDIENTS (LVL2)
 const ingredientTypes = [
-  "Pixie Dust",
-  "Fish Eyeball",
   "Feather",
-  "Mushroom",
-  "Crystal"
+  "Eyeballs",
+  "Kraken Ink",
+  "Stardust",
+  "Bone"
 ];
 let potionBadgeUnlocked = false;
 
@@ -493,6 +494,7 @@ let lasers3 = [
     popOffset: 18,
   },
 
+  //BOTTOM MOST
   {
     row: 10.3,
     col: 22.2,
@@ -845,13 +847,27 @@ const SPRITE = {
   },
 };
 
-const GOBLIN = {
-  frameWidth: 100,   // Width of ONE goblin frame
-  frameHeight: 120,  // Height of ONE goblin frame
-  numFrames: 16,      // Number of frames across the row
-  animSpeed: 12,     // Animation speed
-  scale: 0.4,        // Size of goblin
+const GOBLIN_LVL1 = {
+  frameWidth: 100,
+  frameHeight: 120,
+  numFrames: 16,
+  animSpeed: 12,
+  scale: 0.4,
+  redEyeStart: 9,
+  redEyeEnd: 12,
 };
+
+const GOBLIN_LVL2 = {
+  frameWidth: 150,
+  frameHeight: 180,
+  numFrames: 16,
+  animSpeed: 12,
+  scale: 0.27,   // scaled down since frames are 3x bigger — tune to taste
+  redEyeStart: 8,
+  redEyeEnd: 11,
+};
+
+let GOBLIN = GOBLIN_LVL1;
 
 // TUTORIAL PAGE
 let showTutorial = false;
@@ -1528,21 +1544,29 @@ function drawCollectibles() {
     // LEVEL 2: POTION COLLECTIBLE 
     else if (maze === maze2) {
 
-    push();
+  let img;
 
-   fill(200, 100, 255);
-    stroke(255);
-    strokeWeight(2);
+  if (item.type === "Feather") {
+    img = feather;
+  }
 
-    circle(x, y, 15);
+  else if (item.type === "Eyeballs") {
+    img = eyeballs;
+  }
 
-    fill(255);
-    textAlign(CENTER, CENTER);
-    textSize(8);
+  else if (item.type === "Kraken Ink") {
+    img = krakenInk;
+  }
 
-    text("P", x, y);
+  else if (item.type === "Stardust") {
+    img = stardust;
+  }
 
-    pop();
+  else if (item.type === "Bone") {
+    img = bone;
+  }
+
+  image(img, x, y, 32, 32);
 }
 
     // LEVEL 3: Temporary food circles
@@ -1580,6 +1604,8 @@ function checkCollectibles() {
         item.collected = true;
         collectedCount++;
         collect.play();
+        // Every collectible restores 5% Social Battery
+        socialBattery = min(100, socialBattery + 5);
 
         // LEVEL 1 BADGE
         if (
@@ -1590,7 +1616,7 @@ function checkCollectibles() {
 
           badgeUnlocked = true;
 
-          socialBattery = min(100, socialBattery + 15);
+          
 
           badgeX = width / 2;
           badgeY = height / 2 - 80;
@@ -1608,7 +1634,7 @@ function checkCollectibles() {
 
           potionBadgeUnlocked = true;
 
-          socialBattery = min(100, socialBattery + 5);
+         
 
           badgeX = width / 2;
           badgeY = height / 2 - 80;
@@ -1983,17 +2009,12 @@ function drawLaserBeams() {
     noStroke();
   }
 }
-
 function updateLasers() {
   let frame = floor(frameCount / GOBLIN.animSpeed) % GOBLIN.numFrames;
 
   for (let i = 0; i < lasers.length; i++) {
     let goblin = lasers[i];
-
-    // Beam is only active while the eyes are red (frames 9–12)
-    goblin.on = frame >= 9 && frame <= 12;
-
-    // Make the beam match the goblin
+    goblin.on = frame >= GOBLIN.redEyeStart && frame <= GOBLIN.redEyeEnd;
     laserBeams[i].on = goblin.on;
   }
 }
@@ -2209,6 +2230,8 @@ function loadSecondLevel() {
   character = characterlvl2;
 
   goblins = goblinslvl2;
+
+  GOBLIN = GOBLIN_LVL2;
 
   // Reposition player at the new start tile
   outer: for (let r = 0; r < ROWS; r++) {
