@@ -91,6 +91,7 @@ let banner;
 let goblins;
 let goblin;
 let goblinslvl2;
+let globlinslvl
 
 let classroomdoor;
 let cafedoor;
@@ -187,10 +188,6 @@ let hitFlashAlpha = 0;
 const HIT_FLASH_MAX = 150;
 const HIT_FLASH_DECAY = 8;
 
-// GREEN HEALTH RECOVERY EDGE GLOW
-let healFlashAlpha = 0;
-const HEAL_FLASH_MAX = 120;
-const HEAL_FLASH_DECAY = 5;
 
 
 // PLAYER HITBOX
@@ -565,83 +562,11 @@ let laserBeams = [
 ];
 
 let laserBeams2 = [
-  //top most laser
-  {
-    x1: 125,
-    y1: 105, // beam start (pixel coordinates)
-    x2: 1010,
-    y2: 105, // beam end (pixel coordinates)
-    blinkRate: 80, // HAS TO MATCH WITH LASERS ABOVE
-    on: true,
-    timer: 0,
-  },
-  {
-    x1: 575,
-    y1: 225,
-    x2: 680,
-    y2: 225,
-    blinkRate: 100,
-    on: true,
-    timer: 0,
-  },
-  {
-    x1: 320,
-    y1: 385,
-    x2: 740,
-    y2: 385,
-    blinkRate: 150,
-    on: true,
-    timer: 0,
-  },
-  {
-    x1: 844,
-    y1: 305,
-    x2: 940,
-    y2: 305,
-    blinkRate: 60,
-    on: true,
-    timer: 0,
-  },
-];
-
-let laserBeams3 = [
-  //top most laser
-  {
-    x1: 85,
-    y1: 105, // beam start (pixel coordinates)
-    x2: 260,
-    y2: 105, // beam end (pixel coordinates)
-    blinkRate: 80, // HAS TO MATCH WITH LASERS ABOVE
-    on: true,
-    timer: 0,
-  },
-  {
-    x1: 575,
-    y1: 225,
-    x2: 680,
-    y2: 225,
-    blinkRate: 100,
-    on: true,
-    timer: 0,
-  },
-  {
-    x1: 320,
-    y1: 385,
-    x2: 740,
-    y2: 385,
-    blinkRate: 150,
-    on: true,
-    timer: 0,
-  },
-  {
-    x1: 844,
-    y1: 305,
-    x2: 940,
-    y2: 305,
-    blinkRate: 60,
-    on: true,
-    timer: 0,
-  },
+  // Each beam begins at its Level 2 goblin and follows the open corridor to the left.
+  { x1: 125, y1: 112, x2: 832, y2: 112, blinkRate: 80, on: true, timer: 0 },
+  { x1: 125, y1: 216, x2: 316, y2: 216, blinkRate: 150, on: true, timer: 0 },
+  { x1: 45, y1: 296, x2: 112, y2: 296, blinkRate: 100, on: true, timer: 0 },
+  { x1: 245, y1: 496, x2: 428, y2: 496, blinkRate: 60, on: true, timer: 0 },
 ];
 
 // LEVEL 2 BEAKER OBSTACLES
@@ -733,6 +658,152 @@ let beakers = [
     hasHitPlayer: false,
   },
 ];
+
+// LEVEL 3: FOOD FIGHT MINI-GAME
+const FOOD_GAME_TARGET = 12;
+const FOOD_DAMAGE = 30;
+const FOOD_WARNING_FRAMES = 100;
+const FOOD_PROJECTILE_SPEED = 7;
+let foodGame = { goblins: [], projectiles: [], defeated: 0, spawnTimer: 0 };
+
+const foodGoblinSpots = [
+  { x: 210, y: 170 }, { x: 430, y: 130 }, { x: 850, y: 130 },
+  { x: 1070, y: 170 }, { x: 180, y: 390 }, { x: 1100, y: 390 },
+  { x: 300, y: 585 }, { x: 980, y: 585 },
+];
+
+function resetFoodGame() {
+  foodGame = { goblins: [], projectiles: [], defeated: 0, spawnTimer: 35 };
+  thirdLevelComplete = false;
+}
+
+function spawnFoodGoblin() {
+  let available = foodGoblinSpots.filter(
+    (spot) => !foodGame.goblins.some((g) => g.x === spot.x && g.y === spot.y),
+  );
+  if (available.length === 0) return;
+  let spot = random(available);
+  foodGame.goblins.push({ x: spot.x, y: spot.y, timer: FOOD_WARNING_FRAMES });
+}
+
+function throwFood(goblin) {
+  let angle = atan2(height / 2 - goblin.y, width / 2 - goblin.x);
+  foodGame.projectiles.push({
+    x: goblin.x,
+    y: goblin.y,
+    vx: cos(angle) * FOOD_PROJECTILE_SPEED,
+    vy: sin(angle) * FOOD_PROJECTILE_SPEED,
+    radius: 14,
+  });
+}
+
+function updateFoodMinigame() {
+  if (thirdLevelComplete || gameOver) return;
+
+  foodGame.spawnTimer--;
+  if (foodGame.spawnTimer <= 0 && foodGame.defeated + foodGame.goblins.length < FOOD_GAME_TARGET) {
+    spawnFoodGoblin();
+    foodGame.spawnTimer = max(35, 80 - foodGame.defeated * 3);
+  }
+
+  for (let i = foodGame.goblins.length - 1; i >= 0; i--) {
+    let goblinEnemy = foodGame.goblins[i];
+    goblinEnemy.timer--;
+    if (goblinEnemy.timer <= 0) {
+      throwFood(goblinEnemy);
+      foodGame.goblins.splice(i, 1);
+    }
+  }
+
+  for (let i = foodGame.projectiles.length - 1; i >= 0; i--) {
+    let food = foodGame.projectiles[i];
+    food.x += food.vx;
+    food.y += food.vy;
+    if (dist(food.x, food.y, width / 2, height / 2) < food.radius + 25) {
+      socialBattery = max(0, socialBattery - FOOD_DAMAGE);
+      hitFlashAlpha = HIT_FLASH_MAX;
+      playerHitSound.play();
+      foodGame.projectiles.splice(i, 1);
+      if (socialBattery === 0) gameOver = true;
+    }
+  }
+
+  if (foodGame.defeated >= FOOD_GAME_TARGET && foodGame.goblins.length === 0 && foodGame.projectiles.length === 0) {
+    thirdLevelComplete = true;
+    win.play();
+  }
+}
+
+function drawFoodMinigame() {
+  background(forest);
+  updateFoodMinigame();
+
+  // Bird's-eye arena keeps the established HUD while making every target easy to read.
+  noStroke();
+  fill(42, 70, 48, 220);
+  ellipse(width / 2, height / 2 + 25, 1040, 560);
+  fill(25, 45, 30, 190);
+  ellipse(width / 2, height / 2 + 25, 850, 430);
+
+  imageMode(CENTER);
+  player.vx = 0;
+  player.vy = 0;
+  let oldX = player.x;
+  let oldY = player.y;
+  player.x = width / 2;
+  player.y = height / 2;
+  player.draw();
+  player.x = oldX;
+  player.y = oldY;
+
+  for (let enemy of foodGame.goblins) {
+    let pulse = 1 + sin(frameCount * 0.2) * 0.08;
+    fill(255, 205, 75, map(enemy.timer, 0, FOOD_WARNING_FRAMES, 230, 70));
+    circle(enemy.x, enemy.y, 78 * pulse);
+    image(goblin, enemy.x, enemy.y, 74, 74);
+    fill(255);
+    textAlign(CENTER, CENTER);
+    textSize(13);
+    text(ceil(enemy.timer / 60), enemy.x, enemy.y - 52);
+  }
+
+  for (let food of foodGame.projectiles) {
+    fill(235, 82, 50);
+    circle(food.x, food.y, food.radius * 2);
+    fill(251, 210, 75);
+    circle(food.x - 4, food.y - 3, food.radius);
+  }
+
+  drawSocialBar();
+  fill(255);
+  textAlign(CENTER, TOP);
+  textStyle(BOLD);
+  textSize(20);
+  text("Click the goblins before they throw their food!", width / 2, 74);
+  textStyle(NORMAL);
+  textSize(15);
+  text(`Goblins stopped: ${foodGame.defeated} / ${FOOD_GAME_TARGET}`, width / 2, 104);
+
+  if (hitFlashAlpha > 0) {
+    hitFlashAlpha = max(0, hitFlashAlpha - HIT_FLASH_DECAY);
+    drawRedFlash(hitFlashAlpha);
+  }
+  if (gameOver) drawLoseScreen();
+  if (thirdLevelComplete) drawThirdLevelCompleteScreen();
+}
+
+function clickFoodGoblin() {
+  for (let i = foodGame.goblins.length - 1; i >= 0; i--) {
+    let enemy = foodGame.goblins[i];
+    if (dist(mouseX, mouseY, enemy.x, enemy.y) <= 48) {
+      foodGame.goblins.splice(i, 1);
+      foodGame.defeated++;
+      collect.play();
+      return true;
+    }
+  }
+  return false;
+}
 
 // PLAYER MODEL CONSTRUCTOR
 let player;
@@ -908,7 +979,7 @@ function preload() {
   levelOneComplete = loadImage("assets/images/level1complete.png");
   fireflySprite = loadImage("assets/images/firefly.png");
   fireflyBadge = loadImage("assets/images/fireflybadge.png");
-  potionBadge = loadImage("assets/images/potionBadge.png");
+  potionBadge = loadImage("assets/images/potionbadge.png");
 
   forest = loadImage("assets/images/forest.png");
   wall = loadImage("assets/images/trees.png");
@@ -989,6 +1060,11 @@ function draw() {
     return;
   }
 
+  if (maze === maze3) {
+    drawFoodMinigame();
+    return;
+  }
+
   if (firstLevelComplete) {
     drawFirstLevelCompleteScreen();
     return;
@@ -1036,7 +1112,7 @@ function draw() {
   drawMaze();
 
 // LEVEL 1 HAZARDS
-if (maze === maze1 || maze === maze2 || maze === maze3) {
+if (maze === maze1 || maze === maze2) {
   updateLasers();
   drawLasers();
 }
@@ -1054,7 +1130,7 @@ if (socialBattery > 0) {
 }
 
 // Laser beams only appear in Level 1
-if (maze === maze1 || maze === maze2 || maze === maze3) {
+if (maze === maze1 || maze === maze2) {
   drawLaserBeams();
 }
 
@@ -1063,7 +1139,7 @@ drawCollectibles();
 checkCollectibles();
 player.draw();
 
-if (maze === maze1 || maze === maze2 || maze === maze3) {
+if (maze === maze1 || maze === maze2) {
   checkLaserPlayerCollision();
 }
 
@@ -1080,19 +1156,10 @@ updateInvincibility();
 
   pop();
 
-
   if (hitFlashAlpha > 0) {
     hitFlashAlpha = max(0, hitFlashAlpha - HIT_FLASH_DECAY);
     drawRedFlash(hitFlashAlpha);
   }
-
-   if (healFlashAlpha > 0) {
-  drawHealFlash(healFlashAlpha);
-  healFlashAlpha = max(
-    0,
-    healFlashAlpha - HEAL_FLASH_DECAY
-  );
-}
 
 
 
@@ -1157,6 +1224,8 @@ function keyPressed() {
 }
 
 function mousePressed() {
+  if (maze === maze3 && !thirdLevelComplete && !gameOver && clickFoodGoblin()) return;
+
   if (introDialogueActive) {
     introDialogueIndex++;
     if (introDialogueIndex >= introDialogue.length) {
@@ -1629,12 +1698,11 @@ function checkCollectibles() {
         collectedCount++;
         collect.play();
 
-        // Only heal and show the glow when health is below 100
-        if (socialBattery < 100) {
-          socialBattery = min(100, socialBattery + 5);
-          healFlashAlpha = HEAL_FLASH_MAX;
-        }
+        // Every collectible in every level restores 5%
+        socialBattery = min(100, socialBattery + 5);
 
+        // Trigger the green recovery glow
+        healFlashAlpha = HEAL_FLASH_MAX;
 
         // LEVEL 1 BADGE
         if (
@@ -1871,7 +1939,10 @@ function drawSocialBar() {
   textAlign(LEFT, TOP);
   textFont("Monospace");
   textSize(15);
-  text("LVL 1: Make your way to school!", 50, 24);
+  let objective = "LVL 1: Make your way to school!";
+  if (maze === maze2) objective = "LVL 2: Reach the cafe!";
+  if (maze === maze3) objective = "LVL 3: Stop the food fight!";
+  text(objective, 50, 24);
 
  // Collectible Count
 textSize(15);
@@ -1894,7 +1965,7 @@ else if (maze === maze2) {
 
 else if (maze === maze3) {
   text(
-    "Food: " + collectedCount + " / " + collectibles.length,
+    "Goblins stopped: " + foodGame.defeated + " / " + FOOD_GAME_TARGET,
     50,
     height - 34
   );
@@ -1961,34 +2032,6 @@ function drawRedFlash(alpha) {
   noStroke();
   fill(255, 0, 0, alpha);
   rect(0, 0, width, height);
-}
-
-function drawHealFlash(alpha) {
-  let ctx = drawingContext;
-
-  let gradient = ctx.createRadialGradient(
-    width / 2,
-    height / 2,
-    height * 0.25,
-    width / 2,
-    height / 2,
-    height * 0.75
-  );
-
-  // Transparent centre — the game map stays normal
-  gradient.addColorStop(0, "rgba(80, 255, 120, 0)");
-  gradient.addColorStop(0.55, "rgba(80, 255, 120, 0)");
-
-  // Green glow only around the screen edges
-  gradient.addColorStop(
-    1,
-    `rgba(80, 255, 120, ${alpha / 255})`
-  );
-
-  ctx.save();
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, width, height);
-  ctx.restore();
 }
 
 
@@ -2071,6 +2114,8 @@ function restartGame() {
   socialBattery = 100;
   gameOver = false;
   trappedTimer = 0;
+  if (maze === maze3) resetFoodGame();
+  trappedTimer = 0;
 
   // Reset collectible progress
   collectedCount = 0;
@@ -2113,6 +2158,20 @@ function drawSecondLevelCompleteScreen() {
 }
 
 // TUTORIAL OVERLAY
+function drawThirdLevelCompleteScreen() {
+  fill(8, 12, 45, 225);
+  rect(0, 0, width, height);
+  fill(255, 225, 115);
+  textAlign(CENTER, CENTER);
+  textStyle(BOLD);
+  textSize(46);
+  text("Food fight over!", width / 2, height / 2 - 35);
+  fill(255);
+  textStyle(NORMAL);
+  textSize(21);
+  text("You stopped the goblins and protected Faith.", width / 2, height / 2 + 25);
+}
+
 function drawTutorialOverlay() {
   fill(0, 180);
   rect(0, 0, width, height);
@@ -2255,6 +2314,8 @@ function drawTutorialOverlay() {
 
 function loadSecondLevel() {
   maze = maze2;
+  socialBattery = 100;
+  gameOver = false;
 
   lasers = lasers2;
   laserBeams = laserBeams2;
@@ -2306,12 +2367,10 @@ function resetBeakers() {
  
 
 function loadThirdLevel() {
-  
   maze = maze3;
+  socialBattery = 100;
+  gameOver = false;
 
-  lasers = lasers3;
-  laserBeams = laserBeams3;
-  
 
   firstLevelComplete = false;
   secondLevelComplete = false;
@@ -2334,6 +2393,7 @@ function loadThirdLevel() {
   collectedCount = 0;
   badgeUnlocked = false;
 
-  // Level 3 uses food collectibles
-  setupFoodCollectibles();
+  // Level 3 swaps corridor lasers for the bird's-eye food fight.
+  collectibles = [];
+  resetFoodGame();
 }
