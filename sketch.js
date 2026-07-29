@@ -604,35 +604,35 @@ let laserBeams2 = [
   {
     x1: 125,
     y1: 105, // beam start (pixel coordinates)
-    x2: 1010,
+    x2: 810,
     y2: 105, // beam end (pixel coordinates)
     blinkRate: 80, // HAS TO MATCH WITH LASERS ABOVE
     on: true,
     timer: 0,
   },
   {
-    x1: 575,
+    x1: 325,
     y1: 225,
-    x2: 680,
+    x2: 550,
     y2: 225,
     blinkRate: 100,
     on: true,
     timer: 0,
   },
   {
-    x1: 320,
-    y1: 385,
-    x2: 740,
-    y2: 385,
+    x1: 120,
+    y1: 305,
+    x2: 500,
+    y2: 305,
     blinkRate: 150,
     on: true,
     timer: 0,
   },
   {
-    x1: 844,
-    y1: 305,
-    x2: 940,
-    y2: 305,
+    x1: 440,
+    y1: 485,
+    x2: 980,
+    y2: 485,
     blinkRate: 60,
     on: true,
     timer: 0,
@@ -692,6 +692,22 @@ function setupPathTiles() {
     for (let c = 0; c < COLS; c++) {
       let index = floor(random(stoneVariants.length));
       pathTiles[r][c] = stoneVariants[index];
+    }
+  }
+}
+
+// WALL TILE VARIATION (LEVEL 3)
+let wallTiles3 = []; // wallTiles3[row][col] = image to use for that wall tile
+
+function setupWallTiles3() {
+  let tableVariants = [cafeTable, emptyCafeTable];
+
+  wallTiles3 = [];
+  for (let r = 0; r < ROWS; r++) {
+    wallTiles3[r] = [];
+    for (let c = 0; c < COLS; c++) {
+      let index = floor(random(tableVariants.length));
+      wallTiles3[r][c] = tableVariants[index];
     }
   }
 }
@@ -1065,6 +1081,7 @@ function setup() {
   setupCollectibles();
   setupPathTiles();
   setupWallTiles();
+  setupWallTiles3();
 }
 
 function updateCamera() {
@@ -1214,8 +1231,6 @@ if (maze === maze2) {
 updateInvincibility();
 
   
-
-
   pop();
 
   if (hitFlashAlpha > 0) {
@@ -1587,78 +1602,16 @@ function setupCollectibles() {
   ];
 }
 function setupFoodCollectibles() {
-  collectibles = [
-    // Near the Level 3 start
-    {
-      col: 21,
-      row: 2,
-      collected: false,
-      type: "food",
-    },
-
-    // Upper-right section
-    {
-      col: 17,
-      row: 3,
-      collected: false,
-      type: "food",
-    },
-
-    // Upper-middle section
-    {
-      col: 12,
-      row: 5,
-      collected: false,
-      type: "food",
-    },
-
-    // Upper-left section
-    {
-      col: 5,
-      row: 5,
-      collected: false,
-      type: "food",
-    },
-
-    // Centre-right section
-    {
-      col: 18,
-      row: 7,
-      collected: false,
-      type: "food",
-    },
-
-    // Centre-left section
-    {
-      col: 4,
-      row: 8,
-      collected: false,
-      type: "food",
-    },
-
-    // Lower-middle section
-    {
-      col: 11,
-      row: 10,
-      collected: false,
-      type: "food",
-    },
-
-    // Lower-right section
-    {
-      col: 21,
-      row: 11,
-      collected: false,
-      type: "food",
-    },
-
-    // Near the Level 3 exit
-    {
-      col: 4,
-      row: 12,
-      collected: false,
-      type: "food",
-    },
+  ollectibles = [
+    { col: 21, row: 2, collected: false, type: "apple" },
+    { col: 17, row: 3, collected: false, type: "watermelon" },
+    { col: 12, row: 5, collected: false, type: "burger" },
+    { col: 5, row: 5, collected: false, type: "sandwich" },
+    { col: 18, row: 7, collected: false, type: "cookie" },
+    { col: 4, row: 8, collected: false, type: "corn" },
+    { col: 11, row: 10, collected: false, type: "chicken" },
+    { col: 21, row: 11, collected: false, type: "apple" },
+    { col: 4, row: 12, collected: false, type: "burger" }
   ];
 }
 
@@ -1769,23 +1722,43 @@ function drawCollectibles() {
   image(img, x, y, 32, 32);
 }
 
-    // LEVEL 3: Temporary food circles
-    else if (maze === maze3) {
-      push();
+// LEVEL 3: Food Images
+else if (maze === maze3) {
 
-      // Outer glow
-      noStroke();
-      fill(255, 190, 70, 100);
-      circle(x, y, 24);
+  let img;
 
-      // Food circle
-      stroke(255);
-      strokeWeight(2);
-      fill(255, 120, 70);
-      circle(x, y, 14);
+  switch (item.type) {
+    case "apple":
+      img = apple;
+      break;
 
-      pop();
-    }
+    case "watermelon":
+      img = watermelon;
+      break;
+
+    case "chicken":
+      img = chicken;
+      break;
+
+    case "burger":
+      img = burger;
+      break;
+
+    case "sandwich":
+      img = sandwich;
+      break;
+
+    case "cookie":
+      img = cookie;
+      break;
+
+    case "corn":
+      img = corn;
+      break;
+  }
+
+  image(img, x, y, 34, 34);
+}
   }
 }
 
@@ -2085,6 +2058,8 @@ function drawMaze() {
         if (tile === 0) {
           if (maze === maze2) {
             image(pathTiles[row][col], col * tileSize, row * tileSize, tileSize, tileSize);
+          } else if (maze === maze3) {
+            image(floorlvl3, col * tileSize, row * tileSize, tileSize, tileSize);
           } else {
             image(ground, col * tileSize, row * tileSize, tileSize, tileSize);
           }
@@ -2602,6 +2577,10 @@ function loadThirdLevel() {
 
   collectedCount = 0;
   badgeUnlocked = false;
+  // Load the Level 3 food items
+  setupFoodCollectibles();
+
+
 
   // Start the Level 3 intro dialogue
   level3DialogueActive = true;
