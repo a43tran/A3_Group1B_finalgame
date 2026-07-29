@@ -239,6 +239,62 @@ const HEAL_FLASH_DECAY = 5;
 const HITBOX_RADIUS = 12;
 const HITBOX_OFFSET_Y = 9;
 
+function updateBeakers() {
+  if (maze !== maze2 && maze !== maze3) return;
+
+  let activeBeakers = maze === maze3 ? beakers3 : beakers;
+
+  for (let b of activeBeakers) {
+    if (b.state === "waiting") {
+      b.timer++;
+
+      if (b.timer >= 90) {
+        b.state = "warning";
+        b.timer = 0;
+      }
+    }
+
+    else if (b.state === "warning") {
+      b.timer++;
+
+      if (b.timer >= 30) {
+        b.state = "smashing";
+        b.timer = 0;
+        b.hasHitPlayer = false;
+      }
+    }
+
+    else if (b.state === "smashing") {
+      b.y += 8;
+
+      if (b.y >= b.bottomY) {
+        b.y = b.bottomY;
+        b.state = "holding";
+        b.timer = 0;
+      }
+    }
+
+    else if (b.state === "holding") {
+      b.timer++;
+
+      if (b.timer >= 30) {
+        b.state = "returning";
+      }
+    }
+
+    else if (b.state === "returning") {
+      b.y -= 5;
+
+      if (b.y <= b.topY) {
+        b.y = b.topY;
+        b.state = "waiting";
+        b.timer = 0;
+        b.hasHitPlayer = false;
+      }
+    }
+  }
+}
+
 function drawBeakers() {
   // Only draw in Level 2 and Level 3
   if (maze !== maze2 && maze !== maze3) return;
