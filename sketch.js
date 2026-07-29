@@ -88,11 +88,14 @@ let restartScreen;
 let levelOneComplete;
 let fireflySprite;
 
+let completelvl2;
+let gamecompleted;
+let faillvl2;
+let faillvl3;
+
 let fireflyBadge;
 let potionbadge;
 let foodBadge;
-
-
 
 let forest;
 let library;
@@ -1193,6 +1196,11 @@ function preload() {
   potionbadge = loadImage("assets/images/potionbadge.png");
   foodBadge = loadImage("assets/images/foodbadge.png");
 
+  completelvl2 = loadImage("assets/images/completelvl2.png");
+  gamecompleted = loadImage("assets/images/gamecompleted.png");
+  faillvl2 = loadImage("assets/images/faillvl2.png");
+  faillvl3 = loadImage("assets/images/faillvl3.png");
+
   forest = loadImage("assets/images/forest.png");
   library = loadImage("assets/images/library.png");
   wall = loadImage("assets/images/trees.png");
@@ -1600,7 +1608,7 @@ function keyPressed() {
   }
 
     if (key === "m" || key === "M") {
-    loadThirdLevel();
+   loadThirdLevel();
   }
 }
 
@@ -3042,7 +3050,15 @@ function drawStartScreen() {
 
 // LOSE SCREEN
 function drawLoseScreen() {
-  image(restartScreen, 0, 0, width, height);
+  let loseImg = restartScreen;
+
+  if (maze === maze2) {
+    loseImg = faillvl2;
+  } else if (maze === maze3) {
+    loseImg = faillvl3;
+  }
+
+  image(loseImg, 0, 0, width, height);
 }
 
 // RESTART SCREEN
@@ -3050,7 +3066,6 @@ function restartGame() {
   socialBattery = 100;
   gameOver = false;
   trappedTimer = 0;
-  ///if (maze === maze3) resetFoodGame();
   trappedTimer = 0;
 
   // Reset collectible progress
@@ -3080,22 +3095,9 @@ function drawFirstLevelCompleteScreen() {
   image(levelOneComplete, 0, 0, width, height);
 }
 
-// LEVEL 2 COMPLETE SCREEN (placeholder)
+// LEVEL 2 COMPLETE SCREEN
 function drawSecondLevelCompleteScreen() {
-  background(20, 20, 40);
-
-  fill(255);
-  textAlign(CENTER, CENTER);
-  textFont("Monospace");
-
-  textSize(48);
-  textStyle(BOLD);
-  text("Level 2 Complete!", width / 2, height / 2 - 40);
-
-  textSize(20);
-  textStyle(NORMAL);
-  text("Great job brewing up all those potion ingredients.", width / 2, height / 2 + 20);
-  text("Press M to continue to Level 3", width / 2, height / 2 + 60);
+  image(completelvl2, 0, 0, width, height);
 }
 
 // TUTORIAL OVERLAY
