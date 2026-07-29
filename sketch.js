@@ -294,124 +294,7 @@ function updateBeakers() {
     }
   }
 }
-
-function drawBeakers() {
-  // Only draw in Level 2 and Level 3
-  if (maze !== maze2 && maze !== maze3) return;
-
-  imageMode(CENTER);
-
-  let activeBeakers = maze === maze3 ? beakers3 : beakers;
-  let hazardImg = maze === maze3 ? fork : beaker;
-
-  for (let b of activeBeakers) {
-    let shakeX = 0;
-
-    // Shake before smashing
-    if (b.state === "warning") {
-      shakeX = sin(frameCount * 1.5) * 3;
-    }
-
-    // Level 2 keeps the hanging line
-    if (maze === maze2) {
-      stroke(100);
-      strokeWeight(3);
-      line(b.x, b.topY - 40, b.x, b.y);
-    }
-
-    noStroke();
-
-    let hazardSize = b.radius * 2.2;
-
-    image(
-      hazardImg,
-      b.x + shakeX,
-      b.y,
-      hazardSize,
-      hazardSize
-    );
-  }
-}
-
-let beakers3 = [
-  // Attached to top wall
-  {
-    x: 4 * tileSize + tileSize / 2,
-    anchorY: 1 * tileSize,
-    topY: 1 * tileSize + tileSize / 2,
-    bottomY: 4 * tileSize + tileSize / 2,
-    y: 1 * tileSize + tileSize / 2,
-    radius: 18,
-    state: "waiting",
-    timer: 0,
-    hasHitPlayer: false,
-  },
-
-  // Attached to top wall
-  {
-    x: 11 * tileSize + tileSize / 2,
-    anchorY: 1 * tileSize,
-    topY: 1 * tileSize + tileSize / 2,
-    bottomY: 4 * tileSize + tileSize / 2,
-    y: 1 * tileSize + tileSize / 2,
-    radius: 18,
-    state: "waiting",
-    timer: 30,
-    hasHitPlayer: false,
-  },
-
-  // Attached underneath the upper-right table
-  {
-    x: 18 * tileSize + tileSize / 2,
-    anchorY: 2 * tileSize,
-    topY: 2 * tileSize + tileSize / 2,
-    bottomY: 5 * tileSize + tileSize / 2,
-    y: 2 * tileSize + tileSize / 2,
-    radius: 18,
-    state: "waiting",
-    timer: 60,
-    hasHitPlayer: false,
-  },
-
-  // Attached underneath a middle-left table
-  {
-    x: 6 * tileSize + tileSize / 2,
-    anchorY: 5 * tileSize,
-    topY: 5 * tileSize + tileSize / 2,
-    bottomY: 7 * tileSize + tileSize / 2,
-    y: 5 * tileSize + tileSize / 2,
-    radius: 18,
-    state: "waiting",
-    timer: 90,
-    hasHitPlayer: false,
-  },
-
-  // Attached underneath a lower-middle table
-  {
-    x: 9 * tileSize + tileSize / 2,
-    anchorY: 9 * tileSize,
-    topY: 9 * tileSize + tileSize / 2,
-    bottomY: 11 * tileSize + tileSize / 2,
-    y: 9 * tileSize + tileSize / 2,
-    radius: 18,
-    state: "waiting",
-    timer: 15,
-    hasHitPlayer: false,
-  },
-
-  // Attached underneath a lower-right table
-  {
-    x: 16 * tileSize + tileSize / 2,
-    anchorY: 9 * tileSize,
-    topY: 9 * tileSize + tileSize / 2,
-    bottomY: 11 * tileSize + tileSize / 2,
-    y: 9 * tileSize + tileSize / 2,
-    radius: 18,
-    state: "waiting",
-    timer: 45,
-    hasHitPlayer: false,
-  }
-];
+;
 
 
 function checkBeakerPlayerCollision() {
@@ -937,12 +820,48 @@ let beakers = [
     hasHitPlayer: false,
   },
 ];
+function drawBeakers() {
+  // Only draw in Level 2 and Level 3
+  if (maze !== maze2 && maze !== maze3) return;
 
-let beaker3 = [
+  imageMode(CENTER);
+
+  let activeBeakers = maze === maze3 ? beakers3 : beakers;
+  let hazardImg = maze === maze3 ? fork : beaker;
+
+  for (let b of activeBeakers) {
+    let shakeX = 0;
+
+    if (b.state === "warning") {
+      shakeX = sin(frameCount * 1.5) * 3;
+    }
+
+    if (maze === maze2) {
+      stroke(100);
+      strokeWeight(3);
+      line(b.x, b.topY - 40, b.x, b.y);
+    }
+
+    noStroke();
+
+    let hazardSize = b.radius * 2.2;
+
+    image(
+      hazardImg,
+      b.x + shakeX,
+      b.y,
+      hazardSize,
+      hazardSize
+    );
+  }
+}
+
+let beakers3 = [
 
   // Top left
   {
     x: 4 * tileSize + tileSize / 2,
+    anchorY: 1 * tileSize,
     topY: 80,
     bottomY: 200,
     y: 80,
@@ -955,6 +874,7 @@ let beaker3 = [
   // Top middle
   {
     x: 11 * tileSize + tileSize / 2,
+    anchorY: 2 * tileSize,
     topY: 120,
     bottomY: 240,
     y: 120,
@@ -967,6 +887,7 @@ let beaker3 = [
   // Top right
   {
     x: 18 * tileSize + tileSize / 2,
+    anchorY: 2 * tileSize,
     topY: 120,
     bottomY: 240,
     y: 120,
@@ -979,6 +900,7 @@ let beaker3 = [
   // Bottom left
   {
     x: 5 * tileSize + tileSize / 2,
+    anchorY: 6 * tileSize,
     topY: 280,
     bottomY: 400,
     y: 280,
@@ -991,6 +913,7 @@ let beaker3 = [
   // Bottom middle
   {
     x: 13 * tileSize + tileSize / 2,
+    anchorY: 6 * tileSize,
     topY: 280,
     bottomY: 400,
     y: 280,
@@ -1003,6 +926,7 @@ let beaker3 = [
   // Bottom right
   {
     x: 22 * tileSize + tileSize / 2,
+    anchorY: 6 * tileSize,
     topY: 280,
     bottomY: 400,
     y: 280,
@@ -2761,7 +2685,7 @@ collectedCount = 0;
 
 
 function resetBeakers() {
-  let activeBeakers = maze === maze3 ? beaker3 : beakers;
+  let activeBeakers = maze === maze3 ? beakers3 : beakers;
 
   for (let i = 0; i < activeBeakers.length; i++) {
     activeBeakers[i].y = activeBeakers[i].topY;
