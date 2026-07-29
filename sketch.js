@@ -3100,19 +3100,9 @@ function drawSecondLevelCompleteScreen() {
   image(completelvl2, 0, 0, width, height);
 }
 
-// TUTORIAL OVERLAY
+// LEVEL 3 / GAME COMPLETE SCREEN
 function drawThirdLevelCompleteScreen() {
-  fill(8, 12, 45, 225);
-  rect(0, 0, width, height);
-  fill(255, 225, 115);
-  textAlign(CENTER, CENTER);
-  textStyle(BOLD);
-  textSize(46);
-  text("Food fight over!", width / 2, height / 2 - 35);
-  fill(255);
-  textStyle(NORMAL);
-  textSize(21);
-  text("You stopped the goblins and protected Faith.", width / 2, height / 2 + 25);
+  image(gamecompleted, 0, 0, width, height);
 }
 
 function drawTutorialOverlay() {
