@@ -95,6 +95,8 @@ let banner;
 let classroomdoor;
 let cafedoor;
 
+let beaker;
+
 let desk;
 let desk1;
 let desk2;
@@ -284,32 +286,32 @@ function drawBeakers() {
   // Only draw in Level 2
   if (maze !== maze2) return;
 
-  for (let beaker of beakers) {
+  imageMode(CENTER);
+
+  for (let b of beakers) {
     let shakeX = 0;
 
     // Shake before smashing
-    if (beaker.state === "warning") {
+    if (b.state === "warning") {
       shakeX = sin(frameCount * 1.5) * 3;
     }
 
     // Line connecting beaker to ceiling
     stroke(100);
     strokeWeight(3);
-    line(beaker.x, beaker.topY - 40, beaker.x, beaker.y);
+    line(b.x, b.topY - 40, b.x, b.y);
 
-    // Temporary circle representing the beaker
+    // Beaker image
     noStroke();
 
-    if (beaker.state === "warning") {
-      fill(255, 180, 60);
-    } else {
-      fill(100, 220, 255);
-    }
+    let beakerSize = b.radius * 2.2;
 
-    circle(
-      beaker.x + shakeX,
-      beaker.y,
-      beaker.radius * 2
+    image(
+      beaker,
+      b.x + shakeX,
+      b.y,
+      beakerSize,
+      beakerSize
     );
   }
 }
@@ -629,9 +631,9 @@ let laserBeams2 = [
 let laserBeams3 = [
   //top most laser
   {
-    x1: 85,
+    x1: 140,
     y1: 105, // beam start (pixel coordinates)
-    x2: 260,
+    x2: 800,
     y2: 105, // beam end (pixel coordinates)
     blinkRate: 80, // HAS TO MATCH WITH LASERS ABOVE
     on: true,
@@ -936,8 +938,8 @@ const GOBLIN_LVL2 = {
 };
 
 const GOBLIN_LVL3 = {
-  frameWidth: 149,
-  frameHeight: 180,
+  frameWidth: 100,
+  frameHeight: 120,
   numFrames: 16,
   animSpeed: 12,
   scale: 0.27,   // scaled down since frames are 3x bigger — tune to taste
@@ -991,7 +993,7 @@ function preload() {
   classroomdoor = loadImage("assets/images/classroomdoor.png");
   cafedoor = loadImage("assets/images/cafedoor.png");
 
-  flask = loadImage("assets/images/flask.png");
+  beaker = loadImage("assets/images/flask.png");
   
   desk = loadImage("assets/images/desk.png");
   desk1 = loadImage("assets/images/desksMaterials.jpg");
@@ -1065,8 +1067,6 @@ function draw() {
     return;
   }
 
-
-
   if (firstLevelComplete) {
     drawFirstLevelCompleteScreen();
     return;
@@ -1112,8 +1112,25 @@ function draw() {
     drawLevel2DialogueBox();
     return;
   }
+  
 
- 
+  if (level3DialogueActive) {
+    updateCamera();
+    push();
+    let zoom = 3.5;
+    translate(width / 2, height / 2);
+    scale(zoom);
+    translate(-player.x, -player.y);
+
+    drawMaze();
+    player.draw();
+
+    pop();
+
+    drawSocialBar();
+    drawLevel3DialogueBox();
+    return;
+  } 
 
   updateCamera();
 
@@ -1134,7 +1151,7 @@ function draw() {
   drawMaze();
 
 // LEVEL 1 HAZARDS
-if (maze === maze1 || maze === maze2) {
+if (maze === maze1 || maze === maze2 || maze === maze3) {
   updateLasers();
   drawLasers();
 }
@@ -1151,8 +1168,8 @@ if (socialBattery > 0) {
   resolveWallPush();
 }
 
-// Laser beams only appear in Level 1
-if (maze === maze1 || maze === maze2) {
+// Laser beams 
+if (maze === maze1 || maze === maze2 || maze === maze3) {
   drawLaserBeams();
 }
 
@@ -1161,7 +1178,7 @@ drawCollectibles();
 checkCollectibles();
 player.draw();
 
-if (maze === maze1 || maze === maze2) {
+if (maze === maze1 || maze === maze2 || maze === maze3) {
   checkLaserPlayerCollision();
 }
 
@@ -1183,8 +1200,10 @@ updateInvincibility();
     drawRedFlash(hitFlashAlpha);
   }
   
-
-
+    if (healFlashAlpha > 0) {
+    drawHealFlash(healFlashAlpha);
+    healFlashAlpha = max(0, healFlashAlpha - HEAL_FLASH_DECAY);
+  }
 
   drawVignette();
 
@@ -1276,6 +1295,14 @@ function mousePressed() {
     level2DialogueIndex++;
     if (level2DialogueIndex >= level2Dialogue.length) {
       level2DialogueActive = false;
+    }
+    return;
+  }
+
+    if (level3DialogueActive) {
+    level3DialogueIndex++;
+    if (level3DialogueIndex >= level3Dialogue.length) {
+      level3DialogueActive = false;
     }
     return;
   }
@@ -1858,6 +1885,41 @@ function drawLevel2DialogueBox() {
   text("click or press SPACE to continue", boxX + boxW - 20, boxY + boxH - 12);
 }
 
+function drawLevel3DialogueBox() {
+  const boxW = 900;
+  const boxH = 140;
+  const boxX = (width - boxW) / 2;
+  const boxY = height - boxH - 60;
+
+  fill(20, 20, 30, 230);
+  stroke(255);
+  strokeWeight(2);
+  rect(boxX, boxY, boxW, boxH, 12);
+
+  noStroke();
+  fill(255, 220, 120);
+  textAlign(LEFT, TOP);
+  textFont("Monospace");
+  textStyle(BOLD);
+  textSize(18);
+  text("Faith", boxX + 30, boxY + 18);
+
+  fill(255);
+  textStyle(NORMAL);
+  textSize(16);
+  text(
+    level3Dialogue[level3DialogueIndex],
+    boxX + 30,
+    boxY + 55,
+    boxW - 60,
+    boxH - 80,
+  );
+
+  fill(200);
+  textAlign(RIGHT, BOTTOM);
+  textSize(13);
+  text("click or press SPACE to continue", boxX + boxW - 20, boxY + boxH - 12);
+}
 
 
 // BADGE
@@ -2474,8 +2536,6 @@ function resetBeakers() {
   }
 }
 
- 
-
 function loadThirdLevel() {
 
   maze = maze3;
@@ -2488,13 +2548,10 @@ function loadThirdLevel() {
   lasers = lasers3;
   laserBeams = laserBeams3;
 
-
   firstLevelComplete = false;
   secondLevelComplete = false;
 
   character = characterlvl3;
-
-  
   
   // Reposition player at the new start tile
   outer: for (let r = 0; r < ROWS; r++) {
