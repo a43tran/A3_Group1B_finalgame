@@ -86,6 +86,8 @@ let banner;
 let goblins;
 let goblin;
 let classroomdoor;
+let cafedoor;
+let characterlvl2;
 
 // SOUNDS
 let playerHitSound;
@@ -364,6 +366,8 @@ let lasers = [
     popOffset: 18,
   },
 ];
+
+
 
 let laserBeams = [
   //top most laser
@@ -647,6 +651,8 @@ function tileCenter(col, row, offX, offY) {
 
 function preload() {
   character = loadImage("assets/images/character.png");
+  characterlvl2 = loadImage("assets/images/characterlvl2.png");
+
   startScreen = loadImage("assets/images/homescreen.png");
   restartScreen = loadImage("assets/images/restartscreen.png");
   levelOneComplete = loadImage("assets/images/level1complete.png");
@@ -664,6 +670,7 @@ function preload() {
   goblin = loadImage("assets/images/goblin.png");
 
   classroomdoor = loadImage("assets/images/classroomdoor.png");
+  cafedoor = loadImage("assets/images/cafedoor.png");
 
   playerHitSound = loadSound("assets/sounds/hit.mp3");
 
@@ -1929,10 +1936,13 @@ function drawTutorialOverlay() {
 
 function loadSecondLevel() {
   maze = maze2;
+
   firstLevelComplete = false;
 
   home = classroomdoor;
-  school = classroomdoor;
+  school = cafedoor;
+
+  character = characterlvl2;
 
   // Reposition player at the new start tile
   outer: for (let r = 0; r < ROWS; r++) {
