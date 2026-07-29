@@ -653,7 +653,7 @@ let laserBeams3 = [
   {
     x1: 85,
     y1: 125,
-    x2: 280,
+    x2: 140,
     y2: 125,
     blinkRate: 100,
     on: true,
@@ -1602,7 +1602,17 @@ function setupCollectibles() {
   ];
 }
 
-
+function setupFoodCollectibles() {
+  collectibles = [
+    { col: 21, row: 2, collected: false, type: "apple" },
+    { col: 17, row: 3, collected: false, type: "watermelon" },
+    { col: 12, row: 5, collected: false, type: "burger" },
+    { col: 5, row: 5, collected: false, type: "sandwich" },
+    { col: 18, row: 7, collected: false, type: "cookie" },
+    { col: 4, row: 8, collected: false, type: "corn" },
+    { col: 11, row: 10, collected: false, type: "chicken" }
+  ];
+}
 
 function setupPotionIngredients() {
   collectibles = [];
