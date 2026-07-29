@@ -110,6 +110,8 @@ let paperStone2;
 
 let cafeTable;
 let emptyCafeTable;
+let floorlvl3;
+let garbage;
 
 let feather;
 let eyeballs;
@@ -237,69 +239,6 @@ const HEAL_FLASH_DECAY = 5;
 const HITBOX_RADIUS = 12;
 const HITBOX_OFFSET_Y = 9;
 
-
-function updateBeakers() {
-  // Only run this mechanic in Level 2
-  if (maze !== maze2 && maze !== maze3) return;
-
-  let activeBeakers = maze === maze3 ? beakers3 : beakers;
-
-  for (let beaker of activeBeakers) {
-    if (beaker.state === "waiting") {
-      beaker.timer++;
-
-      // Wait before giving a warning
-      if (beaker.timer >= 90) {
-        beaker.state = "warning";
-        beaker.timer = 0;
-      }
-    }
-
-    else if (beaker.state === "warning") {
-      beaker.timer++;
-
-      // Circle shakes for about half a second
-      if (beaker.timer >= 30) {
-        beaker.state = "smashing";
-        beaker.timer = 0;
-        beaker.hasHitPlayer = false;
-      }
-    }
-
-    else if (beaker.state === "smashing") {
-      // Quickly move downward
-      beaker.y += 8;
-
-      if (beaker.y >= beaker.bottomY) {
-        beaker.y = beaker.bottomY;
-        beaker.state = "holding";
-        beaker.timer = 0;
-      }
-    }
-
-    else if (beaker.state === "holding") {
-      beaker.timer++;
-
-      // Stay down briefly
-      if (beaker.timer >= 25) {
-        beaker.state = "rising";
-      }
-    }
-
-    else if (beaker.state === "rising") {
-      // Slowly move back up
-      beaker.y -= 2.5;
-
-      if (beaker.y <= beaker.topY) {
-        beaker.y = beaker.topY;
-        beaker.state = "waiting";
-        beaker.timer = 0;
-        beaker.hasHitPlayer = false;
-      }
-    }
-  }
-}
-
 function drawBeakers() {
   // Only draw in Level 2 and Level 3
   if (maze !== maze2 && maze !== maze3) return;
@@ -337,6 +276,87 @@ function drawBeakers() {
     );
   }
 }
+
+let beakers3 = [
+  // Attached to top wall
+  {
+    x: 4 * tileSize + tileSize / 2,
+    anchorY: 1 * tileSize,
+    topY: 1 * tileSize + tileSize / 2,
+    bottomY: 4 * tileSize + tileSize / 2,
+    y: 1 * tileSize + tileSize / 2,
+    radius: 18,
+    state: "waiting",
+    timer: 0,
+    hasHitPlayer: false,
+  },
+
+  // Attached to top wall
+  {
+    x: 11 * tileSize + tileSize / 2,
+    anchorY: 1 * tileSize,
+    topY: 1 * tileSize + tileSize / 2,
+    bottomY: 4 * tileSize + tileSize / 2,
+    y: 1 * tileSize + tileSize / 2,
+    radius: 18,
+    state: "waiting",
+    timer: 30,
+    hasHitPlayer: false,
+  },
+
+  // Attached underneath the upper-right table
+  {
+    x: 18 * tileSize + tileSize / 2,
+    anchorY: 2 * tileSize,
+    topY: 2 * tileSize + tileSize / 2,
+    bottomY: 5 * tileSize + tileSize / 2,
+    y: 2 * tileSize + tileSize / 2,
+    radius: 18,
+    state: "waiting",
+    timer: 60,
+    hasHitPlayer: false,
+  },
+
+  // Attached underneath a middle-left table
+  {
+    x: 6 * tileSize + tileSize / 2,
+    anchorY: 5 * tileSize,
+    topY: 5 * tileSize + tileSize / 2,
+    bottomY: 7 * tileSize + tileSize / 2,
+    y: 5 * tileSize + tileSize / 2,
+    radius: 18,
+    state: "waiting",
+    timer: 90,
+    hasHitPlayer: false,
+  },
+
+  // Attached underneath a lower-middle table
+  {
+    x: 9 * tileSize + tileSize / 2,
+    anchorY: 9 * tileSize,
+    topY: 9 * tileSize + tileSize / 2,
+    bottomY: 11 * tileSize + tileSize / 2,
+    y: 9 * tileSize + tileSize / 2,
+    radius: 18,
+    state: "waiting",
+    timer: 15,
+    hasHitPlayer: false,
+  },
+
+  // Attached underneath a lower-right table
+  {
+    x: 16 * tileSize + tileSize / 2,
+    anchorY: 9 * tileSize,
+    topY: 9 * tileSize + tileSize / 2,
+    bottomY: 11 * tileSize + tileSize / 2,
+    y: 9 * tileSize + tileSize / 2,
+    radius: 18,
+    state: "waiting",
+    timer: 45,
+    hasHitPlayer: false,
+  }
+];
+
 
 function checkBeakerPlayerCollision() {
   // Only check collisions in Level 2
@@ -398,6 +418,18 @@ function drawFoodCounters() {
     let y = c.row * tileSize + tileSize / 2;
     image(c.img, x, y, tileSize, tileSize);
   }
+}
+
+// LEVEL 3 GARBAGE DECOR
+function drawGarbage() {
+  if (maze !== maze3) return;
+
+  imageMode(CENTER);
+
+  let x = 23 * tileSize + tileSize / 2;
+  let y = 3 * tileSize + tileSize / 2;
+
+  image(garbage, x, y, tileSize, tileSize);
 }
 
 let lasers = [
@@ -675,36 +707,36 @@ let laserBeams3 = [
   //top most laser
   {
     x1: 160,
-    y1: 105, // beam start (pixel coordinates)
+    y1: 100, // beam start (pixel coordinates)
     x2: 955,
-    y2: 105, // beam end (pixel coordinates)
+    y2: 100, // beam end (pixel coordinates)
     blinkRate: 80, // HAS TO MATCH WITH LASERS ABOVE
     on: true,
     timer: 0,
   },
   {
-    x1: 25,
-    y1: 175,
-    x2: 240,
-    y2: 175,
+    x1: 50,
+    y1: 165,
+    x2: 230,
+    y2: 165,
     blinkRate: 100,
     on: true,
     timer: 0,
   },
   {
-    x1: 250,
-    y1: 265,
+    x1: 215,
+    y1: 245,
     x2: 920,
-    y2: 265,
+    y2: 245,
     blinkRate: 150,
     on: true,
     timer: 0,
   },
   {
     x1: 170,
-    y1: 425,
+    y1: 420,
     x2: 900,
-    y2: 425,
+    y2: 420,
     blinkRate: 60,
     on: true,
     timer: 0,
@@ -850,72 +882,80 @@ let beakers = [
   },
 ];
 
-let beakers3 = [
+let beaker3 = [
+
+  // Top left
   {
     x: 4 * tileSize + tileSize / 2,
-    topY: 3 * tileSize,
-    bottomY: 5 * tileSize + tileSize / 2,
-    y: 3 * tileSize,
+    topY: 80,
+    bottomY: 200,
+    y: 80,
     radius: 18,
     state: "waiting",
     timer: 0,
     hasHitPlayer: false,
   },
 
+  // Top middle
   {
     x: 11 * tileSize + tileSize / 2,
-    topY: 4 * tileSize,
-    bottomY: 6 * tileSize + tileSize / 2,
-    y: 4 * tileSize,
+    topY: 120,
+    bottomY: 240,
+    y: 120,
     radius: 18,
     state: "waiting",
     timer: 30,
     hasHitPlayer: false,
   },
 
+  // Top right
   {
     x: 18 * tileSize + tileSize / 2,
-    topY: 4 * tileSize,
-    bottomY: 6 * tileSize + tileSize / 2,
-    y: 4 * tileSize,
+    topY: 120,
+    bottomY: 240,
+    y: 120,
     radius: 18,
     state: "waiting",
     timer: 60,
     hasHitPlayer: false,
   },
 
+  // Bottom left
   {
     x: 5 * tileSize + tileSize / 2,
-    topY: 8 * tileSize,
-    bottomY: 10 * tileSize + tileSize / 2,
-    y: 8 * tileSize,
+    topY: 280,
+    bottomY: 400,
+    y: 280,
     radius: 18,
     state: "waiting",
     timer: 90,
     hasHitPlayer: false,
   },
 
+  // Bottom middle
   {
     x: 13 * tileSize + tileSize / 2,
-    topY: 8 * tileSize,
-    bottomY: 10 * tileSize + tileSize / 2,
-    y: 8 * tileSize,
+    topY: 280,
+    bottomY: 400,
+    y: 280,
     radius: 18,
     state: "waiting",
     timer: 15,
     hasHitPlayer: false,
   },
 
+  // Bottom right
   {
     x: 22 * tileSize + tileSize / 2,
-    topY: 8 * tileSize,
-    bottomY: 10 * tileSize + tileSize / 2,
-    y: 8 * tileSize,
+    topY: 280,
+    bottomY: 400,
+    y: 280,
     radius: 18,
     state: "waiting",
     timer: 45,
     hasHitPlayer: false,
   }
+
 ];
 
 
@@ -1065,11 +1105,11 @@ const GOBLIN_LVL2 = {
 };
 
 const GOBLIN_LVL3 = {
-  frameWidth: 100,
-  frameHeight: 120,
+  frameWidth: 150,
+  frameHeight: 180,
   numFrames: 16,
-  animSpeed: 12,
-  scale: 0.27,   // scaled down since frames are 3x bigger — tune to taste
+  animSpeed: 10,
+  scale: 0.3,   // scaled down since frames are 3x bigger — tune to taste
   redEyeStart: 8,
   redEyeEnd: 11,
 };
@@ -1120,6 +1160,8 @@ function preload() {
 
   classroomdoor = loadImage("assets/images/classroomdoor.png");
   cafedoor = loadImage("assets/images/cafedoor.png");
+  cafeentrance = loadImage("assets/images/cafeentrance.png");
+  blackhole = loadImage("assets/images/blackhole.png");
 
   beaker = loadImage("assets/images/flask.png");
   
@@ -1137,6 +1179,7 @@ function preload() {
   cafeTable = loadImage("assets/images/cafeTable.png");
   emptyCafeTable = loadImage("assets/images/emptyCafeTable.png");
   floorlvl3 = loadImage("assets/images/floorlvl3.png");
+  garbage = loadImage("assets/images/garbage.png");
 
   feather = loadImage("assets/images/feather.png");
   eyeballs = loadImage("assets/images/eyeballs.png");
@@ -1297,6 +1340,7 @@ function draw() {
   updateWallExpansion();
   drawMaze();
   drawFoodCounters();
+  drawGarbage();
 
 // LEVEL 1 HAZARDS
 if (maze === maze1 || maze === maze2 || maze === maze3) {
@@ -2379,6 +2423,13 @@ function drawLaserBeams() {
     strokeWeight(4);
     line(l.x1, l.y1, l.x2, l.y2);
     noStroke();
+
+     if (laserBeams === laserBeams2) {
+       stroke(0, 255, 0, 255);       
+       strokeWeight(4);
+       line(l.x1, l.y1, l.x2, l.y2);
+       noStroke();
+    }
   }
 }
 function updateLasers() {
@@ -2654,7 +2705,7 @@ collectedCount = 0;
 
 
 function resetBeakers() {
-  let activeBeakers = maze === maze3 ? beakers3 : beakers;
+  let activeBeakers = maze === maze3 ? beaker3 : beakers;
 
   for (let i = 0; i < activeBeakers.length; i++) {
     activeBeakers[i].y = activeBeakers[i].topY;
@@ -2677,6 +2728,15 @@ function loadThirdLevel() {
   secondLevelComplete = false;
 
   character = characterlvl3;
+
+
+  goblins = goblinslvl3;
+
+  GOBLIN = GOBLIN_LVL3;
+
+
+  home = cafeentrance;
+  school = blackhole;
 
   // Spawn at the tile marked 2
   outer: for (let r = 0; r < ROWS; r++) {
