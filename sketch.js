@@ -176,6 +176,15 @@ const introDialogue = [
   "Oh, and the fireflies! Don't forget the fireflies.",
 ];
 
+// DIALOGUE (LEVEL 2 INTRO)
+let level2DialogueActive = false;
+let level2DialogueIndex = 0;
+const level2Dialogue = [
+  "Okay, that journey was a lot... but I made it.",
+  "I have to go to chemistry class. I need ingredients for the potions assignment.",
+  "Let's get moving before the ingredients run out!",
+];
+
 // LASER DAMAGE
 const INVINCIBLE_FRAMES = 60;
 let playerInvincible = false;
@@ -188,7 +197,10 @@ let hitFlashAlpha = 0;
 const HIT_FLASH_MAX = 150;
 const HIT_FLASH_DECAY = 8;
 
-
+// GREEN HEALTH RECOVERY EDGE GLOW
+let healFlashAlpha = 0;
+const HEAL_FLASH_MAX = 120;
+const HEAL_FLASH_DECAY = 5;
 
 // PLAYER HITBOX
 const HITBOX_RADIUS = 12;
@@ -522,43 +534,10 @@ let lasers3 = [
 
 
 let laserBeams = [
-  //top most laser
-  {
-    x1: 85,
-    y1: 105, // beam start (pixel coordinates)
-    x2: 260,
-    y2: 105, // beam end (pixel coordinates)
-    blinkRate: 80, // HAS TO MATCH WITH LASERS ABOVE
-    on: true,
-    timer: 0,
-  },
-  {
-    x1: 575,
-    y1: 225,
-    x2: 680,
-    y2: 225,
-    blinkRate: 100,
-    on: true,
-    timer: 0,
-  },
-  {
-    x1: 320,
-    y1: 385,
-    x2: 740,
-    y2: 385,
-    blinkRate: 150,
-    on: true,
-    timer: 0,
-  },
-  {
-    x1: 844,
-    y1: 305,
-    x2: 940,
-    y2: 305,
-    blinkRate: 60,
-    on: true,
-    timer: 0,
-  },
+  { x1: 125, y1: 112, x2: 832, y2: 112, blinkRate: 80, on: true, timer: 0 },
+  { x1: 125, y1: 216, x2: 316, y2: 216, blinkRate: 150, on: true, timer: 0 },
+  { x1: 45, y1: 296, x2: 112, y2: 296, blinkRate: 100, on: true, timer: 0 },
+  { x1: 245, y1: 496, x2: 428, y2: 496, blinkRate: 60, on: true, timer: 0 },
 ];
 
 let laserBeams2 = [
@@ -568,6 +547,22 @@ let laserBeams2 = [
   { x1: 45, y1: 296, x2: 112, y2: 296, blinkRate: 100, on: true, timer: 0 },
   { x1: 245, y1: 496, x2: 428, y2: 496, blinkRate: 60, on: true, timer: 0 },
 ];
+
+// PATHWAY TILE VARIATION (LEVEL 2)
+let pathTiles = []; // pathTiles[row][col] = image to use for that floor tile
+
+function setupPathTiles() {
+  let stoneVariants = [cobblestone, crackedStone, mossStone, paperStone, paperStone2];
+
+  pathTiles = [];
+  for (let r = 0; r < ROWS; r++) {
+    pathTiles[r] = [];
+    for (let c = 0; c < COLS; c++) {
+      let index = floor(random(stoneVariants.length));
+      pathTiles[r][c] = stoneVariants[index];
+    }
+  }
+}
 
 // LEVEL 2 BEAKER OBSTACLES
 const BEAKER_DAMAGE = 10;
@@ -659,151 +654,6 @@ let beakers = [
   },
 ];
 
-// LEVEL 3: FOOD FIGHT MINI-GAME
-const FOOD_GAME_TARGET = 12;
-const FOOD_DAMAGE = 30;
-const FOOD_WARNING_FRAMES = 100;
-const FOOD_PROJECTILE_SPEED = 7;
-let foodGame = { goblins: [], projectiles: [], defeated: 0, spawnTimer: 0 };
-
-const foodGoblinSpots = [
-  { x: 210, y: 170 }, { x: 430, y: 130 }, { x: 850, y: 130 },
-  { x: 1070, y: 170 }, { x: 180, y: 390 }, { x: 1100, y: 390 },
-  { x: 300, y: 585 }, { x: 980, y: 585 },
-];
-
-function resetFoodGame() {
-  foodGame = { goblins: [], projectiles: [], defeated: 0, spawnTimer: 35 };
-  thirdLevelComplete = false;
-}
-
-function spawnFoodGoblin() {
-  let available = foodGoblinSpots.filter(
-    (spot) => !foodGame.goblins.some((g) => g.x === spot.x && g.y === spot.y),
-  );
-  if (available.length === 0) return;
-  let spot = random(available);
-  foodGame.goblins.push({ x: spot.x, y: spot.y, timer: FOOD_WARNING_FRAMES });
-}
-
-function throwFood(goblin) {
-  let angle = atan2(height / 2 - goblin.y, width / 2 - goblin.x);
-  foodGame.projectiles.push({
-    x: goblin.x,
-    y: goblin.y,
-    vx: cos(angle) * FOOD_PROJECTILE_SPEED,
-    vy: sin(angle) * FOOD_PROJECTILE_SPEED,
-    radius: 14,
-  });
-}
-
-function updateFoodMinigame() {
-  if (thirdLevelComplete || gameOver) return;
-
-  foodGame.spawnTimer--;
-  if (foodGame.spawnTimer <= 0 && foodGame.defeated + foodGame.goblins.length < FOOD_GAME_TARGET) {
-    spawnFoodGoblin();
-    foodGame.spawnTimer = max(35, 80 - foodGame.defeated * 3);
-  }
-
-  for (let i = foodGame.goblins.length - 1; i >= 0; i--) {
-    let goblinEnemy = foodGame.goblins[i];
-    goblinEnemy.timer--;
-    if (goblinEnemy.timer <= 0) {
-      throwFood(goblinEnemy);
-      foodGame.goblins.splice(i, 1);
-    }
-  }
-
-  for (let i = foodGame.projectiles.length - 1; i >= 0; i--) {
-    let food = foodGame.projectiles[i];
-    food.x += food.vx;
-    food.y += food.vy;
-    if (dist(food.x, food.y, width / 2, height / 2) < food.radius + 25) {
-      socialBattery = max(0, socialBattery - FOOD_DAMAGE);
-      hitFlashAlpha = HIT_FLASH_MAX;
-      playerHitSound.play();
-      foodGame.projectiles.splice(i, 1);
-      if (socialBattery === 0) gameOver = true;
-    }
-  }
-
-  if (foodGame.defeated >= FOOD_GAME_TARGET && foodGame.goblins.length === 0 && foodGame.projectiles.length === 0) {
-    thirdLevelComplete = true;
-    win.play();
-  }
-}
-
-function drawFoodMinigame() {
-  background(forest);
-  updateFoodMinigame();
-
-  // Bird's-eye arena keeps the established HUD while making every target easy to read.
-  noStroke();
-  fill(42, 70, 48, 220);
-  ellipse(width / 2, height / 2 + 25, 1040, 560);
-  fill(25, 45, 30, 190);
-  ellipse(width / 2, height / 2 + 25, 850, 430);
-
-  imageMode(CENTER);
-  player.vx = 0;
-  player.vy = 0;
-  let oldX = player.x;
-  let oldY = player.y;
-  player.x = width / 2;
-  player.y = height / 2;
-  player.draw();
-  player.x = oldX;
-  player.y = oldY;
-
-  for (let enemy of foodGame.goblins) {
-    let pulse = 1 + sin(frameCount * 0.2) * 0.08;
-    fill(255, 205, 75, map(enemy.timer, 0, FOOD_WARNING_FRAMES, 230, 70));
-    circle(enemy.x, enemy.y, 78 * pulse);
-    image(goblin, enemy.x, enemy.y, 74, 74);
-    fill(255);
-    textAlign(CENTER, CENTER);
-    textSize(13);
-    text(ceil(enemy.timer / 60), enemy.x, enemy.y - 52);
-  }
-
-  for (let food of foodGame.projectiles) {
-    fill(235, 82, 50);
-    circle(food.x, food.y, food.radius * 2);
-    fill(251, 210, 75);
-    circle(food.x - 4, food.y - 3, food.radius);
-  }
-
-  drawSocialBar();
-  fill(255);
-  textAlign(CENTER, TOP);
-  textStyle(BOLD);
-  textSize(20);
-  text("Click the goblins before they throw their food!", width / 2, 74);
-  textStyle(NORMAL);
-  textSize(15);
-  text(`Goblins stopped: ${foodGame.defeated} / ${FOOD_GAME_TARGET}`, width / 2, 104);
-
-  if (hitFlashAlpha > 0) {
-    hitFlashAlpha = max(0, hitFlashAlpha - HIT_FLASH_DECAY);
-    drawRedFlash(hitFlashAlpha);
-  }
-  if (gameOver) drawLoseScreen();
-  if (thirdLevelComplete) drawThirdLevelCompleteScreen();
-}
-
-function clickFoodGoblin() {
-  for (let i = foodGame.goblins.length - 1; i >= 0; i--) {
-    let enemy = foodGame.goblins[i];
-    if (dist(mouseX, mouseY, enemy.x, enemy.y) <= 48) {
-      foodGame.goblins.splice(i, 1);
-      foodGame.defeated++;
-      collect.play();
-      return true;
-    }
-  }
-  return false;
-}
 
 // PLAYER MODEL CONSTRUCTOR
 let player;
@@ -1035,6 +885,7 @@ function setup() {
 
   initWallExpansion();
   setupCollectibles();
+  setupPathTiles();
 }
 
 function updateCamera() {
@@ -1061,7 +912,7 @@ function draw() {
   }
 
   if (maze === maze3) {
-    drawFoodMinigame();
+    //drawFoodMinigame();
     return;
   }
 
@@ -1091,6 +942,24 @@ function draw() {
     drawSocialBar();
     drawIntroDialogueBox();
     return; // skip player movement, lasers, collectibles until she's done talking
+  }
+
+   if (level2DialogueActive) {
+    updateCamera();
+    push();
+    let zoom = 3.5;
+    translate(width / 2, height / 2);
+    scale(zoom);
+    translate(-player.x, -player.y);
+
+    drawMaze();
+    player.draw();
+
+    pop();
+
+    drawSocialBar();
+    drawLevel2DialogueBox();
+    return;
   }
 
   updateCamera();
@@ -1160,6 +1029,7 @@ updateInvincibility();
     hitFlashAlpha = max(0, hitFlashAlpha - HIT_FLASH_DECAY);
     drawRedFlash(hitFlashAlpha);
   }
+  
 
 
 
@@ -1201,6 +1071,14 @@ function keyPressed() {
     return;
   }
 
+  if (level2DialogueActive && (key === " " || keyCode === ENTER)) {
+    level2DialogueIndex++;
+    if (level2DialogueIndex >= level2Dialogue.length) {
+      level2DialogueActive = false;
+    }
+    return;
+  }
+
   if (key === " " && !gameStarted) {
     showTutorial = true;
 
@@ -1232,6 +1110,14 @@ function mousePressed() {
       introDialogueActive = false;
     }
     return; // don't let this click fall through to help button etc.
+  }
+
+   if (level2DialogueActive) {
+    level2DialogueIndex++;
+    if (level2DialogueIndex >= level2Dialogue.length) {
+      level2DialogueActive = false;
+    }
+    return;
   }
 
   // Continue button
@@ -1776,6 +1662,42 @@ function drawIntroDialogueBox() {
   text("click or press SPACE to continue", boxX + boxW - 20, boxY + boxH - 12);
 }
 
+function drawLevel2DialogueBox() {
+  const boxW = 900;
+  const boxH = 140;
+  const boxX = (width - boxW) / 2;
+  const boxY = height - boxH - 60;
+
+  fill(20, 20, 30, 230);
+  stroke(255);
+  strokeWeight(2);
+  rect(boxX, boxY, boxW, boxH, 12);
+
+  noStroke();
+  fill(255, 220, 120);
+  textAlign(LEFT, TOP);
+  textFont("Monospace");
+  textStyle(BOLD);
+  textSize(18);
+  text("Faith", boxX + 30, boxY + 18);
+
+  fill(255);
+  textStyle(NORMAL);
+  textSize(16);
+  text(
+    level2Dialogue[level2DialogueIndex],
+    boxX + 30,
+    boxY + 55,
+    boxW - 60,
+    boxH - 80,
+  );
+
+  fill(200);
+  textAlign(RIGHT, BOTTOM);
+  textSize(13);
+  text("click or press SPACE to continue", boxX + boxW - 20, boxY + boxH - 12);
+}
+
 // BADGE
 function drawBadge() {
   if (!badgeUnlocked && !potionBadgeUnlocked) return;
@@ -1904,7 +1826,11 @@ function drawMaze() {
       } else {
         // Floor blocks
         if (tile === 0) {
-          image(ground, col * tileSize, row * tileSize, tileSize, tileSize);
+          if (maze === maze2) {
+            image(pathTiles[row][col], col * tileSize, row * tileSize, tileSize, tileSize);
+          } else {
+            image(ground, col * tileSize, row * tileSize, tileSize, tileSize);
+          }
         }
         // Start from home block
         else if (tile === 2) {
@@ -2034,6 +1960,23 @@ function drawRedFlash(alpha) {
   rect(0, 0, width, height);
 }
 
+function drawHealFlash(alpha) {
+  let ctx = drawingContext;
+
+  let gradient = ctx.createRadialGradient(
+    width / 2, height / 2, height * 0.25,
+    width / 2, height / 2, height * 0.75
+  );
+
+  gradient.addColorStop(0, "rgba(80, 255, 120, 0)");
+  gradient.addColorStop(0.55, "rgba(80, 255, 120, 0)");
+  gradient.addColorStop(1, `rgba(80, 255, 120, ${alpha / 255})`);
+
+  ctx.save();
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, width, height);
+  ctx.restore();
+}
 
 function updateInvincibility() {
   if (playerInvincible) {
@@ -2352,6 +2295,10 @@ collectedCount = 0;
 
   // Reset Level 2 beakers
   resetBeakers();
+
+  // Start the Level 2 intro dialogue
+  level2DialogueActive = true;
+  level2DialogueIndex = 0;
 }
 
 
