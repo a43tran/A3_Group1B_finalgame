@@ -86,8 +86,11 @@ let ground;
 let home;
 let school;
 let banner;
+
 let goblins;
 let goblin;
+let goblinslvl2;
+
 let classroomdoor;
 let cafedoor;
 
@@ -376,8 +379,8 @@ let lasers = [
 ];
 
 let lasers2 = [
+  // Top-most goblin
   {
-    //TOP ONE
     row: 2.3,
     col: 20.3,
     facing: "up",
@@ -391,41 +394,48 @@ let lasers2 = [
     popOffset: 18,
   },
 
-  // Row 7 corridor — shoots right, wall at col 12
-  {
-    row: 7.3,
-    col: 3.8,
-    facing: "down",
-    direction: "right",
-    blinkRate: 100,
-    on: true,
-    timer: 0,
-    shaking: false,
-    popOffset: 18,
-  },
 
-  // Row 11 corridor — shoots left, wall at col 0/1
+
   {
-    row: 11.3,
-    col: 11.3,
+    // 2ND TOP
+    row: 4.9,
+    col: 7.4,
     facing: "up",
     direction: "left",
+
     blinkRate: 150,
     on: true,
     timer: 0,
+
     shaking: false,
     popOffset: 18,
   },
 
-  // Row 12 corridor near the exit — shoots left, wall at col 10
   {
-    row: 12.3,
-    col: 13.2,
+    // 2ND BOTTOM
+    row: 6.9,
+    col: 2.3,
     facing: "up",
     direction: "left",
+
+    blinkRate: 100,
+    on: true,
+    timer: 0,
+
+    shaking: false,
+    popOffset: 18,
+  },
+  {
+    // BOTTOM GOBLIN
+    row: 11.9 ,
+    col: 10.2,
+    facing: "up",
+    direction: "left",
+
     blinkRate: 60,
     on: true,
     timer: 0,
+
     shaking: false,
     popOffset: 18,
   },
@@ -435,7 +445,7 @@ let lasers3 = [
   // Top-most goblin
   {
     row: 2.3,
-    col: 6.3,
+    col: 23.3,
     facing: "up",
     direction: "left",
 
@@ -447,7 +457,8 @@ let lasers3 = [
     popOffset: 18,
   },
 
-  // Right-most goblin
+  //2ND FROM TOP
+
   {
     row: 5.3,
     col: 13.8,
@@ -462,7 +473,6 @@ let lasers3 = [
     popOffset: 18,
   },
 
-  // Goblin covering longest hallway
   {
     row: 9.3,
     col: 18.2,
@@ -477,7 +487,6 @@ let lasers3 = [
     popOffset: 18,
   },
 
-  // Goblin blocking the exit
   {
     row: 7.3,
     col: 23.2,
@@ -538,9 +547,9 @@ let laserBeams = [
 let laserBeams2 = [
   //top most laser
   {
-    x1: 125,
+    x1: 85,
     y1: 105, // beam start (pixel coordinates)
-    x2: 825,
+    x2: 260,
     y2: 105, // beam end (pixel coordinates)
     blinkRate: 80, // HAS TO MATCH WITH LASERS ABOVE
     on: true,
@@ -565,10 +574,10 @@ let laserBeams2 = [
     timer: 0,
   },
   {
-    x1: 320,
-    y1: 195,
-    x2: 1044,
-    y2: 105,
+    x1: 844,
+    y1: 305,
+    x2: 940,
+    y2: 305,
     blinkRate: 60,
     on: true,
     timer: 0,
@@ -874,6 +883,7 @@ function preload() {
   banner = loadImage("assets/images/HUD.png");
 
   goblins = loadImage("assets/images/goblins.png");
+  goblinslvl2 = loadImage("assets/images/goblinslvl2.png");
   goblin = loadImage("assets/images/goblin.png");
 
   classroomdoor = loadImage("assets/images/classroomdoor.png");
@@ -967,7 +977,7 @@ function draw() {
 
   push();
 
-  let zoom = 3.5;
+  let zoom = 1;
 
   translate(width / 2, height / 2);
   scale(zoom);
@@ -2158,6 +2168,8 @@ function loadSecondLevel() {
   school = cafedoor;
 
   character = characterlvl2;
+
+  goblins = goblinslvl2;
 
   // Reposition player at the new start tile
   outer: for (let r = 0; r < ROWS; r++) {
