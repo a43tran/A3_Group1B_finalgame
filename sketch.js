@@ -80,6 +80,7 @@ let restartScreen;
 let levelOneComplete;
 let fireflySprite;
 let fireflyBadge;
+let potionbadge;
 let forest;
 let wall;
 let ground;
@@ -99,6 +100,8 @@ let crackedStone;
 let mossStone;
 let paperStone;
 let paperStone2;
+
+let cafeTable;
 
 let feather;
 let eyeballs;
@@ -182,6 +185,11 @@ const LASER_DAMAGE = 10;
 let hitFlashAlpha = 0;
 const HIT_FLASH_MAX = 150;
 const HIT_FLASH_DECAY = 8;
+
+// HEALTH RECOVERY GLOW
+let healFlashAlpha = 0;
+const HEAL_FLASH_MAX = 120;
+const HEAL_FLASH_DECAY = 5;
 
 // PLAYER HITBOX
 const HITBOX_RADIUS = 12;
@@ -466,8 +474,8 @@ let lasers3 = [
 
   //2ND FROM TOP
   {
-    row: 4.9,
-    col: 1.3,
+    row: 3.9,
+    col: 3.3,
     facing: "up",
     direction: "left",
 
@@ -898,6 +906,7 @@ function preload() {
   levelOneComplete = loadImage("assets/images/level1complete.png");
   fireflySprite = loadImage("assets/images/firefly.png");
   fireflyBadge = loadImage("assets/images/fireflybadge.png");
+  potionBadge = loadImage("assets/images/potionBadge.png");
 
   forest = loadImage("assets/images/forest.png");
   wall = loadImage("assets/images/trees.png");
@@ -918,6 +927,8 @@ function preload() {
   mossStone = loadImage("assets/images/mossStone.png");
   paperStone = loadImage("assets/images/paperStone.png");
   paperStone2 = loadImage("assets/images/paperStone2.png");
+
+  cafeTable = loadImage("assets/images/cafeTable.png");
 
   feather = loadImage("assets/images/feather.png");
 eyeballs = loadImage("assets/images/eyeballs.png");
@@ -1069,6 +1080,11 @@ updateInvincibility();
   if (hitFlashAlpha > 0) {
     hitFlashAlpha = max(0, hitFlashAlpha - HIT_FLASH_DECAY);
     drawRedFlash(hitFlashAlpha);
+  }
+
+  if (healFlashAlpha > 0) {
+  healFlashAlpha = max(0, healFlashAlpha - HEAL_FLASH_DECAY);
+  drawHealFlash(healFlashAlpha);
   }
 
   drawVignette();
@@ -1633,8 +1649,12 @@ function checkCollectibles() {
 ) {
 
   potionBadgeUnlocked = true;
-
+  
+  // Every collectible restores 5% Social Battery
   socialBattery = min(100, socialBattery + 5);
+  
+  // Trigger green recovery glow
+  healFlashAlpha = HEAL_FLASH_MAX;
 
   badgeX = width / 2;
   badgeY = height / 2 - 80;
@@ -1693,7 +1713,13 @@ function drawBadge() {
 
   let badgeSize = 300 * badgeScale;
 
+if (potionBadgeUnlocked) {
+  image(potionBadge, badgeX, badgeY, badgeSize, badgeSize);
+}
+
+else {
   image(fireflyBadge, badgeX, badgeY, badgeSize, badgeSize);
+}
 
   if (badgeMessageTimer > 0) {
   fill(255);
@@ -1747,6 +1773,7 @@ function drawBadge() {
   }
 
   noStroke();
+}
 }
 
 
@@ -1930,6 +1957,14 @@ function drawRedFlash(alpha) {
   let borderSize = 30;
   noStroke();
   fill(255, 0, 0, alpha);
+  rect(0, 0, width, height);
+}
+
+function drawHealFlash(alpha) {
+  noStroke();
+
+  // Soft transparent green overlay
+  fill(80, 255, 120, alpha);
   rect(0, 0, width, height);
 }
 
