@@ -1076,10 +1076,19 @@ updateInvincibility();
 
   pop();
 
+
   if (hitFlashAlpha > 0) {
     hitFlashAlpha = max(0, hitFlashAlpha - HIT_FLASH_DECAY);
     drawRedFlash(hitFlashAlpha);
   }
+
+   if (healFlashAlpha > 0) {
+  drawHealFlash(healFlashAlpha);
+  healFlashAlpha = max(
+    0,
+    healFlashAlpha - HEAL_FLASH_DECAY
+  );
+}
 
 
 
@@ -1616,6 +1625,12 @@ function checkCollectibles() {
         collectedCount++;
         collect.play();
 
+        // Only heal and show the glow when health is below 100
+        if (socialBattery < 100) {
+          socialBattery = min(100, socialBattery + 5);
+          healFlashAlpha = HEAL_FLASH_MAX;
+        }
+
         // Every collectible in every level restores 5%
         socialBattery = min(100, socialBattery + 5);
 
@@ -1947,6 +1962,34 @@ function drawRedFlash(alpha) {
   noStroke();
   fill(255, 0, 0, alpha);
   rect(0, 0, width, height);
+}
+
+function drawHealFlash(alpha) {
+  let ctx = drawingContext;
+
+  let gradient = ctx.createRadialGradient(
+    width / 2,
+    height / 2,
+    height * 0.25,
+    width / 2,
+    height / 2,
+    height * 0.75
+  );
+
+  // Transparent centre — the game map stays normal
+  gradient.addColorStop(0, "rgba(80, 255, 120, 0)");
+  gradient.addColorStop(0.55, "rgba(80, 255, 120, 0)");
+
+  // Green glow only around the screen edges
+  gradient.addColorStop(
+    1,
+    `rgba(80, 255, 120, ${alpha / 255})`
+  );
+
+  ctx.save();
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, width, height);
+  ctx.restore();
 }
 
 
