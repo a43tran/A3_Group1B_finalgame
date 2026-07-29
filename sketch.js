@@ -40,7 +40,7 @@ let maze2 = [
   [1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1],
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1],
   [1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1],
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
 
 let maze3 = [
@@ -304,52 +304,100 @@ function checkBeakerPlayerCollision() {
 
 let lasers = [
   // Top-most goblin
-  { row: 2.3, col: 6.3, facing: "up", blinkRate: 80, on: true, timer: 0 },
+  {
+    row: 2.3,
+    col: 6.3,
+    facing: "up",
+    direction: "left",
+
+    blinkRate: 80,
+    on: true,
+    timer: 0,
+
+    shaking: false,
+    popOffset: 18,
+  },
 
   // Right-most goblin
-  { row: 5.3, col: 13.8, facing: "down", blinkRate: 100, on: true, timer: 0 },
+  {
+    row: 5.3,
+    col: 13.8,
+    facing: "down",
+    direction: "right",
+
+    blinkRate: 100,
+    on: true,
+    timer: 0,
+
+    shaking: false,
+    popOffset: 18,
+  },
 
   // Goblin covering longest hallway
-  { row: 9.3, col: 18.2, facing: "up", blinkRate: 150, on: true, timer: 0 },
+  {
+    row: 9.3,
+    col: 18.2,
+    facing: "up",
+    direction: "left",
+
+    blinkRate: 150,
+    on: true,
+    timer: 0,
+
+    shaking: false,
+    popOffset: 18,
+  },
 
   // Goblin blocking the exit
-  { row: 7.3, col: 23.2, facing: "up", blinkRate: 60, on: true, timer: 0 },
+  {
+    row: 7.3,
+    col: 23.2,
+    facing: "up",
+    direction: "left",
+
+    blinkRate: 60,
+    on: true,
+    timer: 0,
+
+    shaking: false,
+    popOffset: 18,
+  },
 ];
 
 let laserBeams = [
   //top most laser
   {
     x1: 85,
-    y1: 96, // beam start (pixel coordinates)
+    y1: 105, // beam start (pixel coordinates)
     x2: 260,
-    y2: 96, // beam end (pixel coordinates)
+    y2: 105, // beam end (pixel coordinates)
     blinkRate: 80, // HAS TO MATCH WITH LASERS ABOVE
     on: true,
     timer: 0,
   },
   {
-    x1: 580,
-    y1: 248,
+    x1: 575,
+    y1: 225,
     x2: 680,
-    y2: 248,
+    y2: 225,
     blinkRate: 100,
     on: true,
     timer: 0,
   },
   {
     x1: 320,
-    y1: 380,
-    x2: 750,
-    y2: 380,
+    y1: 385,
+    x2: 740,
+    y2: 385,
     blinkRate: 150,
     on: true,
     timer: 0,
   },
   {
     x1: 844,
-    y1: 300,
+    y1: 305,
     x2: 940,
-    y2: 300,
+    y2: 305,
     blinkRate: 60,
     on: true,
     timer: 0,
@@ -572,11 +620,11 @@ const SPRITE = {
 };
 
 const GOBLIN = {
-  frameWidth: 70,   // Width of ONE goblin frame
-  frameHeight: 100,  // Height of ONE goblin frame
+  frameWidth: 100,   // Width of ONE goblin frame
+  frameHeight: 120,  // Height of ONE goblin frame
   numFrames: 16,      // Number of frames across the row
   animSpeed: 12,     // Animation speed
-  scale: 0.5,        // Size of goblin
+  scale: 0.4,        // Size of goblin
 };
 
 // TUTORIAL PAGE
@@ -725,7 +773,6 @@ if (socialBattery > 0) {
 
 // Laser beams only appear in Level 1
 if (maze === maze1) {
-  updateLaserBeams();
   drawLaserBeams();
 }
 
@@ -1654,35 +1701,22 @@ function drawLasers() {
     let drawW = GOBLIN.frameWidth * GOBLIN.scale;
     let drawH = GOBLIN.frameHeight * GOBLIN.scale;
 
-    push();
-
-    // Position goblin in the maze
+     push();
     translate(cx, cy);
 
-    // Draw the current animation frame
+    // flip horizontally if this goblin's beam shoots left
+    if (l.direction === "left") {
+      scale(-1, 1);
+    }
     image(
       goblins,
-      0,
-      0,
-      drawW,
-      drawH,
-      srcX,
-      srcY,
-      GOBLIN.frameWidth,
-      GOBLIN.frameHeight
+      0, 0,
+      drawW, drawH,
+      srcX, srcY,
+      GOBLIN.frameWidth, GOBLIN.frameHeight
     );
 
     pop();
-  }
-}
-
-function updateLaserBeams() {
-  for (let l of laserBeams) {
-    l.timer++;
-    if (l.timer >= l.blinkRate) {
-      l.timer = 0;
-      l.on = !l.on;
-    }
   }
 }
 
@@ -1698,12 +1732,16 @@ function drawLaserBeams() {
 }
 
 function updateLasers() {
-  for (let l of lasers) {
-    l.timer++;
-    if (l.timer >= l.blinkRate) {
-      l.timer = 0;
-      l.on = !l.on;
-    }
+  let frame = floor(frameCount / GOBLIN.animSpeed) % GOBLIN.numFrames;
+
+  for (let i = 0; i < lasers.length; i++) {
+    let goblin = lasers[i];
+
+    // Beam is only active while the eyes are red (frames 9–12)
+    goblin.on = frame >= 9 && frame <= 12;
+
+    // Make the beam match the goblin
+    laserBeams[i].on = goblin.on;
   }
 }
 
