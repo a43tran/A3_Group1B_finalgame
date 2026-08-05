@@ -3209,6 +3209,10 @@ function checkCollectibleCompletion() {
 
     level3AllFoodCollected = true;
 
+    playerInvincible = false;
+    invincibleTimer = 0;
+
+
     startLevel3Chase();
 
     level3FoodCollectedDialogueActive = true;
@@ -3763,6 +3767,7 @@ function updateLevel3Chase() {
     level3ChaseWaveTimer = 0;
   }
 }
+
 function drawLevel3ChaseGoblins() {
   if (!level3ChaseActive) return;
 
