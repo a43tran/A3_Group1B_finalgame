@@ -412,7 +412,7 @@ const level3FoodCollectedDialogue = [
 
 const LEVEL3_CHASE_GOBLIN_COUNT = 4;
 
-const LEVEL3_CHASE_GOBLIN_SPEED = 1.1;
+const LEVEL3_CHASE_GOBLIN_SPEED = 1.4;
 
 const LEVEL3_CHASE_CATCH_RADIUS = 16;
 
@@ -2496,10 +2496,6 @@ function keyPressed() {
 
   if (key === "r" || key === "R") {
     if (gameOver) restartGame();
-  }
-
-  if (key === "m" || key === "M") {
-    loadThirdLevel();
   }
 
   if (key === "n" || key === "N") {
