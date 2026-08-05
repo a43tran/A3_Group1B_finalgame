@@ -2461,10 +2461,6 @@ function keyPressed() {
     if (gameOver) restartGame();
   }
 
-  if (key === "e" || key === "E") {
-    if (thirdLevelComplete) restartGame();
-  }
-  
   if (key === "m" || key === "M") {
     loadThirdLevel();
   }
