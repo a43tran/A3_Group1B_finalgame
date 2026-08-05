@@ -141,6 +141,7 @@ let goblinslvl2;
 let goblinslvl3;
 let goblin;
 
+
 let startScreen;
 
 let restartScreen;
@@ -256,6 +257,8 @@ let fail;
 
 let win;
 
+let lvlComplete;
+
 let collect;
 
 let walking;
@@ -267,6 +270,8 @@ let lvl2Music;
 let lvl3Music;
 
 let click;
+
+let punch;
 
 
 let legendTimer = 0;
@@ -436,7 +441,7 @@ const level3ChaseCompleteDialogue = [
 const GOBLIN_COLLISION_RADIUS = 14;
 
 const GOBLIN_LVL3_RUNNING = {
-  frameWidth: 160,
+  frameWidth: 130,
 
   frameHeight: 180,
 
@@ -2002,6 +2007,8 @@ function preload() {
 
   win = loadSound("assets/sounds/win.mp3");
 
+  lvlComplete = loadSound("assets/sounds/miniGameWin.mp3");
+
   collect = loadSound("assets/sounds/collect.mp3");
 
   walking = loadSound("assets/sounds/walking.mp3");
@@ -2013,6 +2020,8 @@ function preload() {
   lvl3Music = loadSound("assets/sounds/lvl3Music.mp3");
 
   click = loadSound("assets/sounds/pop.mp3");
+
+  punch = loadSound("assets/sounds/punch.mp3");
 }
 
 function setup() {
@@ -2352,8 +2361,12 @@ function draw() {
   if (maze[playerRow][playerCol] === 3) {
     if (maze === maze1) {
       firstLevelComplete = true;
+      if (bgMusic.isPlaying()) bgMusic.stop();
+      lvlComplete.play();
     } else if (maze === maze2) {
       secondLevelComplete = true;
+      if (lvl2Music.isPlaying()) lvl2Music.stop();
+      lvlComplete.play();
     } else if (maze === maze3 && level3ChaseActive) {
       level3ChaseActive = false;
 
@@ -2448,6 +2461,7 @@ function keyPressed() {
   }
 
   if (key === " " && !gameStarted) {
+    click.play();
     showTutorial = true;
 
     // start background music once
@@ -2527,13 +2541,16 @@ function mousePressed() {
 
   if (level3ChaseCompleteDialogueActive) {
     level3ChaseCompleteDialogueIndex++;
+    click.play();
 
     if (
       level3ChaseCompleteDialogueIndex >= level3ChaseCompleteDialogue.length
     ) {
       level3ChaseCompleteDialogueActive = false;
-
+      if (lvl3Music.isPlaying()) lvl3Music.stop();
+      lvlComplete.play();
       completeLevel3();
+      
     }
 
     return;
