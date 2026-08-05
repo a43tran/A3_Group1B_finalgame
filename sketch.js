@@ -99,6 +99,7 @@ let foodBadge;
 
 let forest;
 let library;
+let cafeteria;
 let wall;
 let ground;
 let home;
@@ -1236,6 +1237,7 @@ function preload() {
 
   forest = loadImage("assets/images/forest.png");
   library = loadImage("assets/images/library.png");
+  cafeteria = loadImage("assets/images/cafeteria.png");
   wall = loadImage("assets/images/trees.png");
   ground = loadImage("assets/images/dirt.png");
   home = loadImage("assets/images/house.png");
@@ -1417,8 +1419,32 @@ function draw() {
   } 
 
   if (level3FoodCollectedDialogueActive) {
-  level3FoodCollectedDialogueActive = false;
-  }
+    updateCamera();
+
+    push();
+
+    let zoom = 3.5;
+
+    translate(width / 2, height / 2);
+    scale(zoom);
+    translate(-player.x, -player.y);
+
+    drawMaze();
+    drawFoodCounters();
+    drawGarbage();
+    player.draw();
+
+    pop();
+
+    drawSocialBar();
+
+    drawLevel3FoodDialogueBox(
+      level3FoodCollectedDialogue,
+      level3FoodCollectedDialogueIndex
+  );
+
+  return;
+}
 
   if (level3FoodDeliveredDialogueActive) {
     updateCamera();
@@ -2381,17 +2407,17 @@ function drawLevel3FoodDialogueBox(dialogue, dialogueIndex) {
   textAlign(LEFT, TOP);
   textFont("Monospace");
   textStyle(BOLD);
-  textSize(18);
+  textSize(25);
   text("Faith", boxX + 30, boxY + 18);
 
   fill(255);
   textStyle(NORMAL);
-  textSize(16);
+  textSize(23);
   text(dialogue[dialogueIndex], boxX + 30, boxY + 55, boxW - 60, boxH - 80);
 
   fill(200);
   textAlign(RIGHT, BOTTOM);
-  textSize(13);
+  textSize(14);
   text("click or press SPACE to continue", boxX + boxW - 20, boxY + boxH - 12);
 }
 
@@ -3444,6 +3470,7 @@ function loadThirdLevel() {
 
   GOBLIN = GOBLIN_LVL3;
 
+  forest = cafeteria;
 
   home = cafeentrance;
   school = blackhole;
