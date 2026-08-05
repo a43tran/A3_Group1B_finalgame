@@ -433,6 +433,8 @@ const level3ChaseCompleteDialogue = [
 
 // GOBLIN CHASE SPRITE SHEET (running animation)
 
+const GOBLIN_COLLISION_RADIUS = 14;
+
 const GOBLIN_LVL3_RUNNING = {
   frameWidth: 160,
 
@@ -2595,8 +2597,6 @@ function canMoveTo(x, y) {
 
     if (tile !== 0 && tile !== 2 && tile !== 3) return false;
 
-    // NEW: also block if this point falls inside a nearby wall's expanded footprint
-
     for (let dr = -1; dr <= 1; dr++) {
       for (let dc = -1; dc <= 1; dc++) {
         let nr = row + dr,
@@ -2619,7 +2619,16 @@ function canMoveTo(x, y) {
         if (px > left && px < right && py > top && py < bottom) return false;
       }
     }
+  
+      for (let g of lasers) {
+      let gx = g.col * tileSize + tileSize / 2;
+      let gy = g.row * tileSize + tileSize / 2;
+
+      let d = dist(px, py, gx, gy);
+      if (d < GOBLIN_COLLISION_RADIUS) return false;
+    }
   }
+
 
   return true;
 }
