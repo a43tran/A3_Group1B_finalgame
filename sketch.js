@@ -306,8 +306,8 @@ const HEAL_FLASH_MAX = 120;
 const HEAL_FLASH_DECAY = 5;
 
 // PLAYER HITBOX
-const HITBOX_RADIUS = 12;
-const HITBOX_OFFSET_Y = 9;
+const HITBOX_RADIUS = 8;
+const HITBOX_OFFSET_Y = 10;
 
 function updateBeakers() {
   if (maze !== maze2 && maze !== maze3) return;
@@ -1069,12 +1069,45 @@ class Player {
       walking.stop();
     }
 
-    if (this.vx !== 0 && canMoveTo(nextX, this.y)) {
-      this.x = nextX;
-    }
-    if (this.vy !== 0 && canMoveTo(this.x, nextY)) {
-      this.y = nextY;
-    }
+    const SLIDE_AMOUNT = 3;
+
+  if (this.vx !== 0) {
+      // Try normal horizontal movement
+    if (canMoveTo(nextX, this.y)) {
+     this.x = nextX;
+   }
+
+    // If blocked, gently slide upward
+  else if (canMoveTo(nextX, this.y - SLIDE_AMOUNT)) {
+    this.x = nextX;
+    this.y -= SLIDE_AMOUNT;
+  }
+
+  // If still blocked, gently slide downward
+  else if (canMoveTo(nextX, this.y + SLIDE_AMOUNT)) {
+    this.x = nextX;
+    this.y += SLIDE_AMOUNT;
+  }
+}
+
+if (this.vy !== 0) {
+  // Try normal vertical movement
+  if (canMoveTo(this.x, nextY)) {
+    this.y = nextY;
+  }
+
+  // If blocked, gently slide left
+  else if (canMoveTo(this.x - SLIDE_AMOUNT, nextY)) {
+    this.x -= SLIDE_AMOUNT;
+    this.y = nextY;
+  }
+
+  // If still blocked, gently slide right
+  else if (canMoveTo(this.x + SLIDE_AMOUNT, nextY)) {
+    this.x += SLIDE_AMOUNT;
+    this.y = nextY;
+  }
+}
   }
 
   draw() {
@@ -1530,9 +1563,12 @@ updateInvincibility();
     firstLevelComplete = true;
   } else if (maze === maze2) {
     secondLevelComplete = true;
-  } else if (maze === maze3 && level3FoodDelivered) {
-    thirdLevelComplete = true;
-    }
+  }  else if (
+  maze === maze3 &&
+  level3CafeteriaMinigameComplete
+  ) {
+  thirdLevelComplete = true;
+  }
   }
   drawSocialBar();
 }
@@ -1714,13 +1750,14 @@ function canMoveTo(x, y) {
     let tile = maze[row][col];
     if (tile !== 0 && tile !== 2 && tile !== 3) return false;
 
-    // Level 3's exit remains locked after collecting food until it is delivered.
+    // Level 3 exit stays locked until the cafeteria minigame is complete
     if (
       maze === maze3 &&
-      level3AllFoodCollected &&
-      !level3FoodDelivered &&
-      tile === 3
-    ) return false;
+      tile === 3 &&
+      !level3CafeteriaMinigameComplete
+    ) {
+      return false;
+    }
 
     // NEW: also block if this point falls inside a nearby wall's expanded footprint
     for (let dr = -1; dr <= 1; dr++) {
@@ -2830,13 +2867,45 @@ function drawMaze() {
         else if (tile === 2) {
           image(home, col * tileSize, row * tileSize, tileSize, tileSize);
         }
-        // Exit to school block
+        // Exit block
         else if (tile === 3) {
-          image(school, col * tileSize, row * tileSize, tileSize, tileSize);
+
+          // In Level 3, only show the exit after the minigame is complete
+          if (maze === maze3) {
+            if (level3CafeteriaMinigameComplete) {
+              image(
+               school,
+                col * tileSize,
+                row * tileSize,
+                tileSize,
+                 tileSize
+              );
+            } else {
+            // Draw normal floor while the exit is still hidden
+              image(
+                floorlvl3,
+                col * tileSize,
+                row * tileSize,
+                tileSize,
+                tileSize
+              );
+           }
+        }
+
+        // Levels 1 and 2 always show their exits
+        else {
+          image(
+            school,
+            col * tileSize,
+            row * tileSize,
+            tileSize,
+            tileSize
+          );
         }
       }
     }
   }
+}
 
   // Trapped Wall if Social Battery = 0
   if (socialBattery <= 0) {
@@ -2865,31 +2934,31 @@ function drawSocialBar() {
   text(objective, 50, 24);
 
  // Collectible Count
+
+fill(255);
+textAlign(CENTER, TOP);
+textFont("Monospace");
+textStyle(BOLD);
 textSize(15);
 
+let collectibleText = "";
+
 if (maze === maze1) {
-  text(
-    "Fireflies: " + collectedCount + " / " + collectibles.length,
-    50,
-    height - 34
-  );
+  collectibleText =
+    "Fireflies: " + collectedCount + " / " + collectibles.length;
 }
 
 else if (maze === maze2) {
-  text(
-    "Potion Ingredients: " + collectedCount + " / 5",
-    50,
-    height - 34
-  );
+  collectibleText =
+    "Ingredients: " + collectedCount + " / 5";
 }
 
 else if (maze === maze3) {
-  text(
-    "Food: " + collectedCount + " / " + collectibles.length,
-    50,
-    height - 34
-  );
+  collectibleText =
+    "Food: " + collectedCount + " / " + collectibles.length;
 }
+
+text(collectibleText, 670, 24);
 
   // Social Battery Bar
   textAlign(RIGHT, TOP);
@@ -3066,7 +3135,8 @@ function restartGame() {
   socialBattery = 100;
   gameOver = false;
   trappedTimer = 0;
-  trappedTimer = 0;
+
+  initWallExpansion();
 
   // Reset collectible progress
   collectedCount = 0;
@@ -3283,7 +3353,7 @@ collectedCount = 0;
   setupPotionIngredients();
 
   badgeUnlocked = false;
-potionBadgeUnlocked = false;
+potionbadgeunlocked = false;
 foodBadgeUnlocked = false;
 
   // Reset Level 2 beakers
