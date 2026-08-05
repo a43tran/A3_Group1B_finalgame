@@ -2457,6 +2457,10 @@ function keyPressed() {
     }
   }
 
+  if (key === "r" || key === "R") {
+    if (gameOver) restartGame();
+  }
+
 if (key === "n" || key === "N") {
     if (firstLevelComplete) {
       loadSecondLevel();
