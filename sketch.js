@@ -2237,13 +2237,7 @@ function draw() {
   }
 
   if (level3ChaseCompleteDialogueActive) {
-    background(15, 15, 30);
-
-      if (level3ChaseCompleteDialogueIndex === level3ChaseCompleteDialogue.length - 1) {
-    imageMode(CENTER);
-    image(endFairy, width / 2, height / 2 - 80, width, height); // adjust size/position to taste
-  }
-
+    background(endfairy);
 
     drawLevel3FoodDialogueBox(
       level3ChaseCompleteDialogue,
@@ -3856,7 +3850,7 @@ function drawLevel2Tip() {
   rectMode(CENTER);
   noStroke();
   fill(10, 12, 20, alpha * (210 / 255));
-  rect(width / 2, 100, 460, 42, 8);
+  rect(width / 2, 100, 600, 42, 8);
 
   fill(255, 230, 120, alpha);
   textAlign(CENTER, CENTER);
