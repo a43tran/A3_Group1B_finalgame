@@ -266,6 +266,17 @@ const level3FoodDeliveredDialogue = [
   "Okay... breathe. Lunch service is saved.",
 ];
 
+// DIALOGUE (GAME END)
+let gameEndDialogueActive = false;
+let gameEndDialogueIndex = 0;
+const gameEndDialogue = [
+  "Wait... the goblins. They're not goblins anymore.",
+  "Their scowls are gone — soft wings, warm light. They were never really monsters at all.",
+  "Maybe they were just as tired and overwhelmed as I was.",
+  "Funny how far a little kindness and patience can go.",
+  "This journey took everything out of me... but somehow, I feel more like myself than when I started.",
+];
+
 // LEVEL 3 GOBLIN WHACK-A-MOLE MINIGAME
 const LEVEL3_MINIGAME_GOBLIN_TARGET = 10;
 const LEVEL3_MINIGAME_MAX_GOBLINS = 3;
@@ -1603,6 +1614,21 @@ function draw() {
     return;
   }
 
+  if (gameEndDialogueActive) {
+    background(15, 15, 30);
+
+    // Placeholder scene — swap for real art later
+    fill(255, 220, 150);
+    textAlign(CENTER, CENTER);
+    textFont("Monospace");
+    textStyle(BOLD);
+    textSize(22);
+    text("[ placeholder: goblins transforming into fairies ]", width / 2, height / 2 - 80);
+
+    drawLevel3FoodDialogueBox(gameEndDialogue, gameEndDialogueIndex);
+    return;
+  }
+
   updateCamera();
 
   if (gameOver) {
@@ -1713,13 +1739,15 @@ if (maze[playerRow][playerCol] === 3) {
     firstLevelComplete = true;
   } else if (maze === maze2) {
     secondLevelComplete = true;
-  } else if (
-    maze === maze3 &&
-    level3CafeteriaMinigameComplete
+  }  else if (
+  maze === maze3 &&
+  level3CafeteriaMinigameComplete &&
+  !gameEndDialogueActive
   ) {
-    thirdLevelComplete = true;
+  gameEndDialogueActive = true;
+  gameEndDialogueIndex = 0;
   }
-}
+  }
 
 // HUD first
 drawSocialBar();
@@ -1775,6 +1803,15 @@ function keyPressed() {
     level3CafeteriaMinigameDialogueIndex++;
     if (level3CafeteriaMinigameDialogueIndex >= level3CafeteriaMinigameDialogue.length) {
       level3CafeteriaMinigameDialogueActive = false;
+    }
+    return;
+  }
+
+    if (gameEndDialogueActive && (key === " " || keyCode === ENTER)) {
+    gameEndDialogueIndex++;
+    if (gameEndDialogueIndex >= gameEndDialogue.length) {
+      gameEndDialogueActive = false;
+      thirdLevelComplete = true;
     }
     return;
   }
@@ -1850,6 +1887,15 @@ function mousePressed() {
     level3CafeteriaMinigameDialogueIndex++;
     if (level3CafeteriaMinigameDialogueIndex >= level3CafeteriaMinigameDialogue.length) {
       level3CafeteriaMinigameDialogueActive = false;
+    }
+    return;
+  }
+
+  if (gameEndDialogueActive) {
+    gameEndDialogueIndex++;
+    if (gameEndDialogueIndex >= gameEndDialogue.length) {
+      gameEndDialogueActive = false;
+      thirdLevelComplete = true;
     }
     return;
   }
@@ -3505,6 +3551,7 @@ function restartGame() {
   level3FoodCollectedDialogueIndex = 0;
   level3FoodDeliveredDialogueIndex = 0;
   level3CafeteriaMinigameDialogueIndex = 0;
+  gameEndDialogueIndex = 0;
 
   playerInvincible = false;
   invincibleTimer = 0;
