@@ -1,4 +1,4 @@
-# A2: Mid-Term Game
+# A3: Final Game
 **Group 1B**
 
 
@@ -6,20 +6,10 @@
 ## Game Description
 Illuminate is a 2D maze adventure that explores the experience of social anxiety disorder through a fantasy-styled gameplay. Players must help Faith overcome challenges she faces without her social battery bar dropping to zero, representing mental and emotional energy required when handling overwhelming social situations. 
 
-Players control Faith through the maze using the WASD keys while collecting glowing fireflies scattered across the map to achieve a badge. Along the journey, players must carefully navigate the environment, ensuring that her social battery doesn’t deplete as she encounters situations that increase her anxiety. The game combines exploration, resource management, and storytelling to create an engaging game experience, showcasing the challenges faced by individuals with social anxiety disorder. 
-
-
-
-## Design Rationale
-Illuminate uses its mechanics and visual design to help players understand both the gameplay and Faith’s experience with social anxiety. The Social Battery bar functions as a familiar health indicator, making it immediately clear when the player is in danger and providing constant feedback about their current state. As the bar decreases, Faith’s movement speed slows and the maze walls gradually close in, creating a direct connection between the player’s performance and the increasing sense of pressure. This design allows players to physically experience feelings of restriction and overwhelm rather than simply reading about them. The laser cameras act as clear affordances for danger, with their bright red beams signaling areas that should be avoided. Beyond their gameplay function, they represent the fear of being watched, judged, and scrutinized by others, which is a common experience associated with social anxiety [3]. Hidden eyes within the forest environment further reinforce this feeling of observation throughout the level. GameFlow principles are supported through gradual learning, clear objectives, and continuous feedback [10]. Players are introduced to the controls and mechanics through the tutorial before facing more difficult challenges, while the Social Battery bar, collectible counter, and achievement badge consistently communicate progress. The optional firefly collectibles provide an additional goal that rewards exploration with a badge achievement, encouraging engagement without preventing players from reaching the school and completing the level.
-
-
+Players control Faith through the maze using the WASD keys while collecting items, from fireflies, potion ingredients to food, scattered across the map to achieve a badge. Along the journey, players must carefully navigate the environment, ensuring that her social battery doesn’t deplete as she encounters situations that increase her anxiety. The game combines exploration, resource management, and storytelling to create an engaging game experience, showcasing the challenges faced by individuals with social anxiety disorder. 
 
 ## Setup and Interaction Instructions
 To run the sketch locally, open `index.html` in Google Chrome using Live Server. To play via GitHub Pages, visit the link provided on the submission page.
-
-### Game Objective
-The goal of Illuminate's first level is to find and make your way to the school, while simultaneously avoiding all the laser cameras that will decrease the social battery bar, essentially the health bar, if you make contact. The lower your social battery is, the slower you walk, the more caved in the walls are, and the more vulnerable you are to colliding into the laser cameras given your slowed walking speed. Scattered around the map, you can locate glowing fireflies that once all collected, will grant you a special badge. Collecting fireflies is not mandatory to arrive and access the school.
 
 **Controls:** 
 WASD to move.
@@ -46,18 +36,6 @@ In the initial game, the expanding walls solely served as a visual effect that m
 
 **Firefly Collectibles:**
 Prior to A2 playtesting, players simply progressed through the maze’s pathways to reach the final end point, represented through a school. To strengthen the game’s overall engagement, our group implemented flying fireflies as a collectible scattered throughout the map that players must collect. After collecting all 11 fireflies, players receive a special badge stored in their inventory (on the top right side of the screen) of which our group intends to place on the player’s backpack (in the character sprite). The fireflies are not mandatory to complete the level, but serve as an additional incentive that encourages players to actively explore different routes throughout the map. As glowing fireflies in the dark forest, these collectibles reflect a sense of light and comfort as insects that the character, Faith, has befriended and enjoys collecting in her jar as a daily routine. For her, the fireflies are predictable and familiar insects she encounters on her pathway to school and other locations in this game world. 
-
-
-
-### **Post-Showcase**
-**Laser Camera Imagery:**
-Based on our Mid-Term game showcase, a planned improvement we intend to implement is replacing the imagery of a laser camera with a more fitting image, such as Goblin with laser beams projected from its eyes as recommended by Karen and Jueun. As our game’s theme exudes a whimsical atmosphere and natural environment filled with a rich pattern of forestry and fireflies, the laser cameras disrupt the visual cohesion as a prominent sci-fi element. Through a goblin or mystical creature with a strong laser-beamed gaze, we plan to have the creature rotate, looking from side to side to enlarge the scope of which players’ social battery bar can take damage. To further strengthen the game's visual clarity, we will increase our fonts' visibility as during the showcase, people had difficulty reading the dialogue and heads-up display text. Larger text sizes would improve contrast, assisting players in understanding the game's objectives and mechanics more easily and partaking in a smoother gameplay experience. This also applies to the character's animations, where we plan to add more animation frames to create more natural, smoother moving movement and fluid transitions when players alternate their direction, especially when moving downward. This ensures the character feels more polished and enhances the overall gameplay experience.
-
-**Fireflies Boost Social Battery:**
-Another planned improvement our group is considering is adding more purpose to the firefly collectibles as they initially served as an optional collectible players can accumulate as they navigate through different routes in the maze. Rather than having eleven fireflies scattered throughout the map, Karen and Jueun suggested decreasing this amount and re-interpreting the fireflies as a collectible that boosts the player’s social battery bar, providing a form of light energy that energizes the player. By incorporating this feature, players not only have a greater incentive to collect the fireflies, but also gain the opportunity to replenish their depleted social battery and reach the endpoint without having to restart again. We also will remove the firefly counter to maintain a sense of mystery/unknown where players are not aware of how many fireflies/social battery boosters are available. Through this iteration, discovering the fireflies becomes more meaningful as encountering these glowing creatures restores the damage that players have taken rather than existing simply as a collectible count. 
-
-
-
 
 ## Assets
 
