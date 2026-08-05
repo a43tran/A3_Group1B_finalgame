@@ -2457,16 +2457,12 @@ function keyPressed() {
     }
   }
 
-  if (key === "r" || key === "R") {
-    if (gameOver) restartGame();
-  }
-
-  if (key === "n" || key === "N") {
-    loadSecondLevel();
-  }
-
-  if (key === "m" || key === "M") {
-    loadThirdLevel();
+if (key === "n" || key === "N") {
+    if (firstLevelComplete) {
+      loadSecondLevel();
+    } else if (secondLevelComplete) {
+      loadThirdLevel();
+    }
   }
 }
 
