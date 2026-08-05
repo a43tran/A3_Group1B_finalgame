@@ -151,6 +151,8 @@ let fireflySprite;
 
 let completelvl2;
 
+let endfairy;
+
 let gamecompleted;
 
 let faillvl2;
@@ -273,6 +275,10 @@ let click;
 let punch;
 
 let legendTimer = 0;
+
+let level1TipTimer = 0;
+
+let level2TipTimer = 0;
 
 const LEGEND_VISIBLE_FRAMES = 900;
 
@@ -446,7 +452,6 @@ const level3ChaseCompleteDialogue = [
   "Okay, phew... I made it out. I did it!",
 ];
 
-let level1TipTimer = 0;
 
 const TIP_VISIBLE_FRAMES = 240; // ~4 seconds
 
@@ -1903,6 +1908,8 @@ function preload() {
 
   restartScreen = loadImage("assets/images/restartscreen.png");
 
+  endfairy = loadImage("assets/images/endfairy.png");
+
   levelOneComplete = loadImage("assets/images/completelvl1.png");
 
   fireflySprite = loadImage("assets/images/firefly.png");
@@ -2232,6 +2239,12 @@ function draw() {
   if (level3ChaseCompleteDialogueActive) {
     background(15, 15, 30);
 
+      if (level3ChaseCompleteDialogueIndex === level3ChaseCompleteDialogue.length - 1) {
+    imageMode(CENTER);
+    image(endFairy, width / 2, height / 2 - 80, width, height); // adjust size/position to taste
+  }
+
+
     drawLevel3FoodDialogueBox(
       level3ChaseCompleteDialogue,
 
@@ -2257,6 +2270,7 @@ function draw() {
   ) {
     legendTimer++;
     level1TipTimer++;
+    level2TipTimer++; 
   }
 
   push();
@@ -2404,6 +2418,8 @@ function draw() {
   drawSocialBar();
 
   drawLevel1Tip();
+
+  drawLevel2Tip();
 
   drawLevel3ChaseTip();
 
@@ -3818,7 +3834,36 @@ function drawLevel1Tip() {
   textFont("Monospace");
   textStyle(BOLD);
   textSize(18);
-  text("TIP: Collect items to boost your health & gain a badge", width / 2, 100);
+  text("TIP: Collect items to restore health & earn a badge!", width / 2, 100);
+
+  pop();
+}
+
+function drawLevel2Tip() {
+  if (maze !== maze2) return;
+
+  if (level2TipTimer >= TIP_VISIBLE_FRAMES + TIP_FADE_FRAMES) return;
+
+  let alpha = 255;
+
+  if (level2TipTimer > TIP_VISIBLE_FRAMES) {
+    let fadeProgress = (level2TipTimer - TIP_VISIBLE_FRAMES) / TIP_FADE_FRAMES;
+    alpha = 255 * (1 - constrain(fadeProgress, 0, 1));
+  }
+
+  push();
+
+  rectMode(CENTER);
+  noStroke();
+  fill(10, 12, 20, alpha * (210 / 255));
+  rect(width / 2, 100, 460, 42, 8);
+
+  fill(255, 230, 120, alpha);
+  textAlign(CENTER, CENTER);
+  textFont("Monospace");
+  textStyle(BOLD);
+  textSize(18);
+  text("TIP: Avoid the beakers... they'll crush your health!", width / 2, 100);
 
   pop();
 }
@@ -4628,6 +4673,8 @@ function restartGame() {
 
   level1TipTimer = 0;
 
+  level2TipTimer = 0;
+
   // Reload the correct collectibles for the current level
 
   if (maze === maze1) {
@@ -4931,6 +4978,8 @@ function loadSecondLevel() {
   forest = library;
 
   legendTimer = 0;
+
+  level2TipTimer = 0;
 
   // --- MUSIC SWAP ---
 

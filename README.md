@@ -46,10 +46,13 @@ After conducting playtesting for our final game, we implemented a triangular las
 |-----------------------------------------|--------------------------------------------------------------------------------------------|
 | `assets/sounds/walking.mp3`[1]          | Abdalrahman_bm, 8-bit gravel footsteps 1 - Pixabay.com                                     |
 | `assets/sounds/collect.mp3`[5]          | floraphonic, 90s Game UI 6 - Pixabay.com                                                   |
+| `assets/sounds/lvl2Music.mp3`[4]        | kaazoom, The Happy Whistler (30 sec edit) - Pixabay.com                                                   |
 | `assets/sounds/win.mp3`[6]              | Latent-Rick, Retro Arcade Level Up - Pixabay.com                                           |
 | `assets/sounds/fail.mp3`[7]             | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
 | `assets/sounds/bgmusic.mp3`[9]          | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay.com  |
 | `assets/sounds/hit.mp3`[10]             | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
+| `assets/sounds/hit.mp3`[10]             | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
+
 |                                         |                                                                                            |
 | `assets/images/apple.png`               | Gemini 3.6 Flash                                                                           |
 | `assets/images/blackhole.png`           | Gemini 3.6 Flash                                                                           |
@@ -118,23 +121,28 @@ After conducting playtesting for our final game, we implemented a triangular las
 
 [1] Abdalrahman_bm. 2025. 8-bit gravel footsteps 1. Pixabay.com. Retrieved July 9, 2026 from https://pixabay.com/sound-effects/film-special-effects-8-bit-gravel-footsteps-1-408582/
 
-[2] Cardona-Rivera, R. E., and Young, R. M. 2013. A Cognitivist Theory of Affordances for Games. Proceedings of DiGRA 2013 Conference: DeFragging Game Studies. Digital Games Research Association (DiGRA), Atlanta, GA, USA.
+[2] Cleveland Clinic. 2026. Social Anxiety Disorder. Cleveland Clinic. Retrieved July 8, 2026 from https://my.clevelandclinic.org/health/diseases/22709-social-anxiety
 
-[3] Cleveland Clinic. 2026. Social Anxiety Disorder. Cleveland Clinic. Retrieved July 8, 2026 from https://my.clevelandclinic.org/health/diseases/22709-social-anxiety
+[3] floraphonic. 2024. 90s Game UI 6. Pixabay.com. Retrieved June 22, 2026 from https://pixabay.com/sound-effects/film-special-effects-90s-game-ui-6-185099/
 
-[4] Karen Cochrane. 2026. Week 3 Code Examples. Retrieved July 8, 2026 from https://learn.uwaterloo.ca/d2l/le/content/1265815/viewContent/6544450/View
+[4] kaazoom. 2026. The Happy Whistler (30 sec edit). Pixabay.com. Retrieved August 5, 2026 from https://pixabay.com/sound-effects/musical-the-happy-whistler-30-sec-edit-532434/
 
-[5] floraphonic. 2024. 90s Game UI 6. Pixabay.com. Retrieved June 22, 2026 from https://pixabay.com/sound-effects/film-special-effects-90s-game-ui-6-185099/
+[5] Karen Cochrane. 2026. Week 3 Code Examples. Retrieved July 8, 2026 from https://learn.uwaterloo.ca/d2l/le/content/1265815/viewContent/6544450/View
 
 [6] Latent-Rick. 2026. Retro Arcade Level Up. Pixabay.com. Retrieved June 22, 2026 from https://pixabay.com/sound-effects/musical-retro-arcade-level-up-552982/
 
 [7] Make_More_Sound. 2023. 8 Bit Video Game Lose Sound - Version 1. Pixabay.com. Retrieved June 22, 2026 from https://pixabay.com/sound-effects/film-special-effects-8-bit-video-game-lose-sound-version-1-145828/
 
-[8] Mayo Clinic . 2021. Social anxiety disorder (social phobia). Mayo Clinic. Retrieved July 8, 2026 from https://www.mayoclinic.org/diseases-conditions/social-anxiety-disorder/symptoms-causes/syc-20353561
+[8] Mayo Clinic. 2021. Social anxiety disorder (social phobia). Mayo Clinic. Retrieved July 8, 2026 from https://www.mayoclinic.org/diseases-conditions/social-anxiety-disorder/symptoms-causes/syc-20353561
 
 [9] Montogoronto. 2025. A night full of stars - Peaceful electronic 8-bit/piano track. Pixabay.com. Retrieved July 9, 2026 from https://pixabay.com/music/ambient-a-night-full-of-stars-peaceful-electronic-8-bitpiano-track-321551/
 
-[10] Pixabay. 2026. Retro Hurt Sound 01. Pixabay.com. Retrieved June 22, 2026 from https://pixabay.com/sound-effects/retro-hurt-sound-01-474779/
+[10] nakaradaalexander. 2024. Winning Loop. Retrieved August 5, 2026 from https://pixabay.com/sound-effects/musical-winning-loop-228639/
 
-[11] Sweetser, P. and Wyeth, P. 2005. GameFlow: A Model for Evaluating Player Enjoyment in Games. Computers in Entertainment 3, 3 (2005), 3:1–3:24. DOI:https://doi.org/10.1145/1077246.1077253
+[11] Pixabay. 2026. Retro Hurt Sound 01. Pixabay.com. Retrieved June 22, 2026 from https://pixabay.com/sound-effects/retro-hurt-sound-01-474779/
 
+[12] SoundReality. 2025. Pop Sound. Pixabay.com. Retrieved August 5, 2026 from https://pixabay.com/sound-effects/film-special-effects-pop-sound-423716/
+
+[13] soraatwod. 2025. Punch. Retrieved August 5, 2026 from https://pixabay.com/sound-effects/punch-416719/
+
+[14] Vadim_Makes_Sound. 2026. Fantasy Healing Spell Cast #1. Retrieved August 5, 2026 from https://pixabay.com/sound-effects/film-special-effects-fantasy-healing-spell-cast-1-547831/
