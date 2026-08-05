@@ -1746,8 +1746,12 @@ let playerRow = floor(player.y / tileSize);
 if (maze[playerRow][playerCol] === 3) {
   if (maze === maze1) {
     firstLevelComplete = true;
+    if (bgMusic.isPlaying()) bgMusic.stop();
+    miniGameWin.play();
   } else if (maze === maze2) {
     secondLevelComplete = true;
+    if (lvl2Music.isPlaying()) lvl2Music.stop();
+    miniGameWin.play();  
   }  else if (
   maze === maze3 &&
   level3CafeteriaMinigameComplete &&
@@ -1764,6 +1768,7 @@ drawSocialBar();
 // Flying collectible above the wooden HUD
 drawFlyingCollectibles();
 }
+
 
 
 function keyPressed() {
@@ -1821,6 +1826,8 @@ function keyPressed() {
     if (gameEndDialogueIndex >= gameEndDialogue.length) {
       gameEndDialogueActive = false;
       thirdLevelComplete = true;
+      if (lvl3Music.isPlaying()) lvl3Music.stop();
+      miniGameWin.play();
     }
     return;
   }
@@ -1905,6 +1912,8 @@ function mousePressed() {
     if (gameEndDialogueIndex >= gameEndDialogue.length) {
       gameEndDialogueActive = false;
       thirdLevelComplete = true;
+      if (lvl3Music.isPlaying()) lvl3Music.stop();
+      miniGameWin.play(); 
     }
     return;
   }
@@ -3799,6 +3808,11 @@ function loadSecondLevel() {
 
   forest = library;
 
+   // --- MUSIC SWAP ---
+  if (bgMusic.isPlaying()) bgMusic.stop();
+  if (lvl3Music.isPlaying()) lvl3Music.stop();
+  if (!lvl2Music.isPlaying()) lvl2Music.loop();
+
   // Reposition player at the new start tile
   outer: for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
@@ -3865,6 +3879,11 @@ function loadThirdLevel() {
   home = cafeentrance;
   
   school = blackhole;
+
+  // --- MUSIC SWAP ---
+  if (bgMusic.isPlaying()) bgMusic.stop();
+  if (lvl2Music.isPlaying()) lvl2Music.stop();
+  if (!lvl3Music.isPlaying()) lvl3Music.loop();
 
   // Spawn at the tile marked 2
   outer: for (let r = 0; r < ROWS; r++) {
