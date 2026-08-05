@@ -5127,6 +5127,8 @@ function resetLevel3State() {
 
   level3AllFoodCollected = false;
 
+  foodBadgeUnlocked = false; 
+  
   level3FoodCollectedDialogueActive = false;
 
   level3FoodCollectedDialogueIndex = 0;
@@ -5208,6 +5210,5 @@ function drawLaserWarningLegend() {
 
     rowY += 30;
   }
-
   pop();
 }
