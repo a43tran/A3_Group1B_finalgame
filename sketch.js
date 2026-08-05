@@ -441,13 +441,13 @@ const level3ChaseCompleteDialogue = [
 const GOBLIN_COLLISION_RADIUS = 14;
 
 const GOBLIN_LVL3_RUNNING = {
-  frameWidth: 130,
+  frameWidth: 160,
 
-  frameHeight: 170,
+  frameHeight: 180,
 
   numFrames: 15,
 
-  animSpeed: 4,
+  animSpeed: 5,
 
   scale: 0.3,
 };

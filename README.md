@@ -42,29 +42,72 @@ After conducting playtesting for our final game, we implemented a triangular las
 
 ## Assets
 
-|               File                |                                             Source                                         |
-|-----------------------------------|--------------------------------------------------------------------------------------------|
-| `assets/sounds/walking.mp3`[1]    | Abdalrahman_bm, 8-bit gravel footsteps 1 - Pixabay.com                                     |
-| `assets/sounds/collect.mp3`[5]    | floraphonic, 90s Game UI 6 - Pixabay.com                                                   |
-| `assets/sounds/win.mp3`[6]        | Latent-Rick, Retro Arcade Level Up - Pixabay.com                                           |
-| `assets/sounds/fail.mp3`[7]       | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
-| `assets/sounds/bgmusic.mp3`[9]    | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay.com  |
+|               File                 |                                             Source                                         |
+|------------------------------------|--------------------------------------------------------------------------------------------|
+| `assets/sounds/walking.mp3`[1]     | Abdalrahman_bm, 8-bit gravel footsteps 1 - Pixabay.com                                     |
+| `assets/sounds/collect.mp3`[5]     | floraphonic, 90s Game UI 6 - Pixabay.com                                                   |
+| `assets/sounds/win.mp3`[6]         | Latent-Rick, Retro Arcade Level Up - Pixabay.com                                           |
+| `assets/sounds/fail.mp3`[7]        | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
+| `assets/sounds/bgmusic.mp3`[9]     | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay.com  |
 | `assets/sounds/hit.mp3`[10]        | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
-|                                   |                                                                                            |
-| `assets/images/character.png`     | Gemini 3.5 Flash and ChatGPT                                                                         |
-| `assets/images/dirt.png`          | Gemini 3.5 Flash                                                                           |
-| `assets/images/firefly.png`       | Gemini 3.5 Flash                                                                           |
-| `assets/images/fireflybadge.png`  | Gemini 3.5 Flash                                                                           |        
-| `assets/images/forest.png`        | Gemini 3.5 Flash                                                                           |
-| `assets/images/homescreen.png`    | Gemini 3.5 Flash and ChatGPT                                                               |
-| `assets/images/house.png`         | Gemini 3.5 Flash                                                                           |
-| `assets/images/HUD.png`           | Gemini 3.5 Flash                                                                           |
-| `assets/images/laserOff.png`      | Gemini 3.5 Flash                                                                           |
-| `assets/images/laserOn.png`       | Gemini 3.5 Flash                                                                           |
-| `assets/images/level1complete.png`| Gemini 3.5 Flash and ChatGPT                                                               |
-| `assets/images/restartscreen.png` | Gemini 3.5 Flash and ChatGPT                                                               |
-| `assets/images/school.png`        | Gemini 3.5 Flash                                                                           |
-| `assets/images/trees.png`         | Gemini 3.5 Flash                                                                           |
+|                                    |                                                                                            |
+| `assets/images/apple.png`          | Gemini 3.6 Flash                                                                           |
+| `assets/images/blackhole.png`      | Gemini 3.6 Flash                                                                           |
+| `assets/images/bone.png`           | Gemini 3.6 Flash                                                                           |
+| `assets/images/burger.png`         | Gemini 3.6 Flash                                                                           |
+| `assets/images/cafedoor.png`       | Gemini 3.6 Flash                                                                           |
+| `assets/images/cafeentrance.png`   | Gemini 3.6 Flash                                                                           |
+| `assets/images/cafeTable.png`      | Gemini 3.6 Flash                                                                           |
+| `assets/images/cafeteria.png`      | Gemini 3.6 Flash                                                                           |
+| `assets/images/character.png`      | Gemini 3.6 Flash and ChatGPT                                                               |
+| `assets/images/characterlvl2.png`  | Gemini 3.6 Flash                                                                           |
+| `assets/images/characterlvl3.png`  | Gemini 3.6 Flash                                                                           |
+| `assets/images/classroomdoor.png`  | Gemini 3.6 Flash                                                                           |
+| `assets/images/cobblestone.png`    | Gemini 3.6 Flash and ChatGPT                                                               |
+| `assets/images/completelvl1.png`   | Gemini 3.6 Flash and ChatGPT                                                               |
+| `assets/images/completelvl2.png`   | Gemini 3.6 Flash and ChatGPT                                                               |
+| `assets/images/completelvl3.png`   | Gemini 3.6 Flash and ChatGPT                                                               |
+| `assets/images/cookie.png`         | Gemini 3.6 Flash                                                                           |
+| `assets/images/corn.png`           | Gemini 3.6 Flash                                                                           |
+| `assets/images/crackedStone.png`   | Gemini 3.6 Flash                                                                           |
+| `assets/images/desk.png`           | Gemini 3.6 Flash                                                                           |
+| `assets/images/desksMaterials.png` | Gemini 3.6 Flash                                                                           |
+| `assets/images/desksMaterials2.png`| Gemini 3.6 Flash                                                                           |
+| `assets/images/dirt.png`           | Gemini 3.6 Flash                                                                           |
+| `assets/images/dragonBlood.png`    | Gemini 3.6 Flash                                                                           |
+| `assets/images/drumstick.png`      | Gemini 3.6 Flash                                                                           |
+| `assets/images/emptyCafeTable.png` | Gemini 3.6 Flash                                                                           |
+| `assets/images/eyeballs.png`       | Gemini 3.6 Flash                                                                           |
+| `assets/images/faillvl2.png`       | Gemini 3.6 Flash                                                                           |
+| `assets/images/faillvl3.png`       | Gemini 3.6 Flash                                                                           |
+| `assets/images/feather.png`        | Gemini 3.6 Flash                                                                           |
+| `assets/images/firefly.png`        | Gemini 3.6 Flash                                                                           |
+| `assets/images/fireflybadge.png`   | Gemini 3.6 Flash                                                                           | 
+| `assets/images/flask.png`          | Gemini 3.6 Flash                                                                           |
+| `assets/images/floorlvl3.png`      | Gemini 3.6 Flash                                                                           |
+| `assets/images/foodBadge.png`      | Gemini 3.6 Flash                                                                           |
+| `assets/images/foodcounter1.png`   | Gemini 3.6 Flash                                                                           |
+| `assets/images/foodcounter2.png`   | Gemini 3.6 Flash                                                                           |
+| `assets/images/foodcounter3.png`   | Gemini 3.6 Flash                                                                           |
+| `assets/images/forest.png`         | Gemini 3.6 Flash                                                                           |
+| `assets/images/fork.png`           | Gemini 3.6 Flash                                                                           |
+| `assets/images/gamecompleted.png`  | Gemini 3.6 Flash                                                                           |
+| `assets/images/garbage.png`        | Gemini 3.6 Flash                                                                           |
+| `assets/images/goblin.png`         | Gemini 3.6 Flash                                                                           |
+| `assets/images/goblins.png`        | Gemini 3.6 Flash                                                                           |
+| `assets/images/goblinslvl2.png`    | Gemini 3.6 Flash                                                                           |
+| `assets/images/goblinslvl3-running.png`      | Gemini 3.6 Flash                                                                           |
+| `assets/images/goblinslvl3.png`    | Gemini 3.6 Flash                                                                           |
+
+| `assets/images/homescreen.png`     | Gemini 3.6 Flash and ChatGPT                                                               |
+| `assets/images/house.png`          | Gemini 3.6 Flash                                                                           |
+| `assets/images/HUD.png`            | Gemini 3.6 Flash                                                                           |
+| `assets/images/laserOff.png`       | Gemini 3.6 Flash                                                                           |
+| `assets/images/laserOn.png`        | Gemini 3.6 Flash                                                                           |
+| `assets/images/level1complete.png` | Gemini 3.6 Flash and ChatGPT                                                               |
+| `assets/images/restartscreen.png`  | Gemini 3.6 Flash and ChatGPT                                                               |
+| `assets/images/school.png`         | Gemini 3.6 Flash                                                                           |
+| `assets/images/trees.png`          | Gemini 3.6 Flash                                                                           |
 
 ## References
 
