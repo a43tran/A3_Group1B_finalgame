@@ -85,6 +85,8 @@ let character;
 let characterlvl2;
 let characterlvl3;
 
+let goblinslvl3running;
+
 let startScreen;
 let restartScreen;
 let levelOneComplete;
@@ -175,6 +177,16 @@ const ingredientTypes = [
 let potionbadgeUnlocked = false;
 
 let foodBadgeUnlocked = false;
+
+
+// GOBLINS LVL 3 RUNNING
+const GOBLIN_LVL3_RUNNING = {
+  frameWidth: 160,
+  frameHeight: 180,
+  numFrames: 15,
+  animSpeed: 4,    
+  scale: 0.3,      
+};
 
 
 // FIREFLY BADGE
@@ -310,7 +322,7 @@ const HEAL_FLASH_DECAY = 5;
 
 // COLLECTIBLE COUNTER FLASH
 let collectibleFlashTimer = 0;
-const COLLECTIBLE_FLASH_DURATION = 60; // frames
+const COLLECTIBLE_FLASH_DURATION = 40; // frames
 
 // PLAYER HITBOX
 const HITBOX_RADIUS = 8;
@@ -1125,8 +1137,8 @@ let collectedCount = 0;
 
 let flyingCollectibles = [];
 
-const COUNTER_X = 780;
-const COUNTER_Y = 30;
+const COUNTER_X = 670;
+const COUNTER_Y = 32;
 
 class Player {
   constructor(x, y) {
@@ -1662,52 +1674,58 @@ if (maze === maze2 || maze === maze3) {
   //    1 second, otherwise they take damage and the counter is reset to 60 FRAMES (aka 1 second)
 updateInvincibility();
 
-  
-  pop();
-
-  if (hitFlashAlpha > 0) {
-    hitFlashAlpha = max(0, hitFlashAlpha - HIT_FLASH_DECAY);
-    drawRedFlash(hitFlashAlpha);
-  }
-  
-    if (healFlashAlpha > 0) {
-    drawHealFlash(healFlashAlpha);
-    healFlashAlpha = max(0, healFlashAlpha - HEAL_FLASH_DECAY);
-  }
-
-  drawVignette();
-  drawLaserWarnings();
-  drawLaserWarningLegend();
-
-  updateBadge();
-  drawBadge();
 
 
-  if (socialBattery > 70) {
-    player.speed = 2.5;
-  } else if (socialBattery > 30) {
-    player.speed = 2;
-  } else {
-    player.speed = 1.5;
-  }
+pop();
 
-  // Check if player reached the end tile
-  let playerCol = floor(player.x / tileSize);
-  let playerRow = floor(player.y / tileSize);
+updateFlyingCollectibles();
 
-  if (maze[playerRow][playerCol] === 3) {
+if (hitFlashAlpha > 0) {
+  hitFlashAlpha = max(0, hitFlashAlpha - HIT_FLASH_DECAY);
+  drawRedFlash(hitFlashAlpha);
+}
+
+if (healFlashAlpha > 0) {
+  drawHealFlash(healFlashAlpha);
+  healFlashAlpha = max(0, healFlashAlpha - HEAL_FLASH_DECAY);
+}
+
+drawVignette();
+drawLaserWarnings();
+drawLaserWarningLegend();
+
+updateBadge();
+drawBadge();
+
+if (socialBattery > 70) {
+  player.speed = 2.5;
+} else if (socialBattery > 30) {
+  player.speed = 2;
+} else {
+  player.speed = 1.5;
+}
+
+let playerCol = floor(player.x / tileSize);
+let playerRow = floor(player.y / tileSize);
+
+if (maze[playerRow][playerCol] === 3) {
   if (maze === maze1) {
     firstLevelComplete = true;
   } else if (maze === maze2) {
     secondLevelComplete = true;
-  }  else if (
-  maze === maze3 &&
-  level3CafeteriaMinigameComplete
+  } else if (
+    maze === maze3 &&
+    level3CafeteriaMinigameComplete
   ) {
-  thirdLevelComplete = true;
+    thirdLevelComplete = true;
   }
-  }
-  drawSocialBar();
+}
+
+// HUD first
+drawSocialBar();
+
+// Flying collectible above the wooden HUD
+drawFlyingCollectibles();
 }
 
 
@@ -2317,117 +2335,87 @@ function drawFlyingCollectibles() {
   imageMode(CENTER);
 
   for (let flying of flyingCollectibles) {
-    let img = getCollectibleImage(flying.type);
+    let distanceLeft = dist(
+      flying.x,
+      flying.y,
+      flying.targetX,
+      flying.targetY
+    );
 
-    if (img) {
-      let size = map(
-        dist(flying.x, flying.y, flying.targetX, flying.targetY),
+    let size = 32;
+
+    // Level 1 firefly sprite sheet
+    if (flying.level === maze1) {
+      image(
+        fireflySprite,
+        flying.x,
+        flying.y,
+        size,
+        size,
         0,
-        500,
-        12,
-        30
+        0,
+        FIREFLY.frameWidth,
+        FIREFLY.frameHeight
       );
+    }
 
-      image(img, flying.x, flying.y, size, size);
+    // Level 2 and Level 3 images
+    else {
+      let img = getCollectibleImage(flying.type);
+
+      if (img) {
+        image(
+          img,
+          flying.x,
+          flying.y,
+          size,
+          size
+        );
+      }
     }
   }
 }
 
 function checkCollectibles() {
   for (let item of collectibles) {
-    if (!item.collected) {
-      let x = item.col * tileSize + tileSize / 2;
-      let y = item.row * tileSize + tileSize / 2;
+    if (item.collected) continue;
 
-      let d = dist(
-       player.x,
-       player.y + HITBOX_OFFSET_Y,
-       x,
-       y
-      );
+    let worldX = item.col * tileSize + tileSize / 2;
+    let worldY = item.row * tileSize + tileSize / 2;
 
-      if (d < 20) {
-        item.collected = true;
-        collect.play();
+    let d = dist(
+      player.x,
+      player.y + HITBOX_OFFSET_Y,
+      worldX,
+      worldY
+    );
 
-        flyingCollectibles.push({
-        x: x,
-        y: y,
+    if (d < 30) {
+      item.collected = true;
+      collect.play();
+
+      // Convert the collectible's maze position into a screen position.
+      // Normal gameplay currently uses ZOOM = 3.5.
+      let screenX =
+        width / 2 + (worldX - player.x) * ZOOM;
+
+      let screenY =
+        height / 2 + (worldY - player.y) * ZOOM;
+
+      flyingCollectibles.push({
+        x: screenX,
+        y: screenY,
         targetX: COUNTER_X,
         targetY: COUNTER_Y,
         type: item.type,
+        level: maze,
         progress: 0
       });
 
-        // Flash the HUD counter green
-        collectibleFlashTimer = COLLECTIBLE_FLASH_DURATION;
-
-        // Only heal and show the glow if the player isn't already at full health
-        if (socialBattery < 100) {
+      // Heal once
+      if (socialBattery < 100) {
         socialBattery = min(100, socialBattery + 5);
         healFlashAlpha = HEAL_FLASH_MAX;
-        }
-
-        // Only heal and show the glow if the player isn't already at full health
-        if (socialBattery < 100) {
-        socialBattery = min(100, socialBattery + 5);
-        healFlashAlpha = HEAL_FLASH_MAX;
-        }
-        // LEVEL 1 BADGE
-        if (
-          maze === maze1 &&
-          collectedCount === collectibles.length &&
-          !badgeUnlocked
-        ) {
-          badgeUnlocked = true;
-
-          badgeX = width / 2;
-          badgeY = height / 2 - 80;
-
-          badgeScale = 1.3;
-          badgeMessageTimer = 180;
-        }
-
-        // LEVEL 2 BADGE
-        if (
-          maze === maze2 &&
-          collectedCount === collectibles.length &&
-          !potionbadgeUnlocked
-        ) {
-          potionbadgeUnlocked = true;
-
-          badgeX = width / 2;
-          badgeY = height / 2 - 80;
-
-          badgeScale = 1.3;
-          badgeMessageTimer = 180;
-        }
-
-        if (
-          maze === maze3 &&
-          collectedCount === collectibles.length &&
-          !level3AllFoodCollected
-        ) {
-          level3AllFoodCollected = true;
-          level3FoodCollectedDialogueActive = true;
-          level3FoodCollectedDialogueIndex = 0;
-        }
-
-        // LEVEL 3 BADGE
-if (
-  maze === maze3 &&
-  collectedCount === collectibles.length &&
-  !foodBadgeUnlocked
-) {
-
-  foodBadgeUnlocked = true;
-
-  badgeX = width / 2;
-  badgeY = height / 2 - 80;
-
-  badgeScale = 1.3;
-  badgeMessageTimer = 50;
-}
       }
     }
   }
@@ -2438,16 +2426,22 @@ function updateFlyingCollectibles() {
 
     flying.progress += 0.06;
 
-    flying.x = lerp(flying.x, flying.targetX, 0.12);
-    flying.y = lerp(flying.y, flying.targetY, 0.12);
+    flying.x = lerp(flying.x, flying.targetX, 0.14);
+    flying.y = lerp(flying.y, flying.targetY, 0.14);
 
     let reachedCounter =
-      dist(flying.x, flying.y, flying.targetX, flying.targetY) < 10;
+      dist(
+        flying.x,
+        flying.y,
+        flying.targetX,
+        flying.targetY
+      ) < 8;
 
     if (reachedCounter) {
       collectedCount++;
 
-      collectibleFlashTimer = 60;
+      // Counter glows when the number changes
+      collectibleFlashTimer = COLLECTIBLE_FLASH_DURATION;
 
       flyingCollectibles.splice(i, 1);
 
@@ -3066,9 +3060,7 @@ function updateBadge() {
     badgeMessageTimer--;
   } else {
     badgeX = lerp(badgeX, width - 120, 0.08);
-
-    badgeY = lerp(badgeY, 100, 0.08);
-
+    badgeY = lerp(badgeY, 120, 0.08);   // was 100 — now clears the banner
     badgeScale = lerp(badgeScale, 0.25, 0.08);
   }
 }
@@ -3190,9 +3182,25 @@ function drawMaze() {
 
 // HEADS-UP DISPLAY (HUD)
 function drawSocialBar() {
+  push();
+  imageMode(CORNER);
+  rectMode(CORNER);
+   // Solid navy backing spans the entire HUD — this is the real background
   fill(5, 8, 65);
   rect(0, 0, width, 70);
-  image(banner, 0, 0, width, 70);
+
+  // Banner art used only as decorative corner framing, at its native
+  // aspect ratio — NOT stretched to fill the whole bar.
+  let bannerAspect = banner.width / banner.height;
+  let bannerDrawWidth = 70 * bannerAspect;
+
+  imageMode(CORNER);
+  image(banner, 0, 0, bannerDrawWidth, 70);           // left corner
+  push();
+  translate(width, 0);
+  scale(-1, 1);                                        // mirror horizontally
+  image(banner, 0, 0, bannerDrawWidth, 70);            // right corner
+  pop();
 
   // Objective
   fill(255);
@@ -3256,6 +3264,7 @@ function drawSocialBar() {
   textSize(19);
   textStyle(BOLD);
   text("?", 1225, 34);
+  
 }
 
 // LASERS
@@ -3505,6 +3514,7 @@ function restartGame() {
   collectibleFlashTimer = 0;
 
   collectedCount = 0;
+  flyingCollectibles = [];
 
   // Reload the correct collectibles for the current level
   if (maze === maze1) {
@@ -3736,6 +3746,7 @@ function loadSecondLevel() {
   // Reset systems tied to the old maze
   initWallExpansion();
 collectedCount = 0;
+flyingCollectibles = [];
   setupPotionIngredients();
 
   badgeUnlocked = false;
@@ -3803,6 +3814,7 @@ function loadThirdLevel() {
   resetBeakers();
 
   collectedCount = 0;
+  flyingCollectibles = [];
   badgeUnlocked = false;
 potionBadgeUnlocked = false;
 foodBadgeUnlocked = false;
