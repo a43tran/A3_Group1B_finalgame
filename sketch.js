@@ -2519,9 +2519,9 @@ function keyPressed() {
     if (gameOver) restartGame();
   }
 
-  if (key === "m" || key === "M") {
-    loadThirdLevel();
-  }
+  //if (key === "m" || key === "M") {
+    //loadThirdLevel();
+  //}
 
   if (key === "n" || key === "N") {
     if (firstLevelComplete) {
