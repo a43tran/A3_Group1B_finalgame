@@ -422,9 +422,17 @@ const LEVEL3_CHASE_CLICK_RADIUS = 32;
 
 const LEVEL3_CHASE_MIN_SPAWN_DISTANCE = 5; // in tiles, from the player
 
+const LEVEL3_CHASE_WAVE_SIZE = 2;
+
+const LEVEL3_CHASE_WAVE_DELAY = 300; // five seconds at 60 FPS
+
+const LEVEL3_CHASE_MAX_GOBLINS = 6;
+
 let level3ChaseActive = false;
 
 let level3ChaseGoblins = [];
+
+let level3ChaseWaveTimer = 0;
 
 let level3ExitRevealed = false;
 
@@ -3595,7 +3603,17 @@ function pickLevel3ChaseSpawnPoints(count) {
 function startLevel3Chase() {
   level3ChaseGoblins = [];
 
-  let spots = pickLevel3ChaseSpawnPoints(LEVEL3_CHASE_GOBLIN_COUNT);
+  level3ChaseWaveTimer = 0;
+
+  spawnLevel3ChaseGoblins(LEVEL3_CHASE_GOBLIN_COUNT);
+
+  level3ExitRevealed = true;
+
+  level3ChaseActive = true;
+}
+
+function spawnLevel3ChaseGoblins(count) {
+  let spots = pickLevel3ChaseSpawnPoints(count);
 
   for (let spot of spots) {
     level3ChaseGoblins.push({
@@ -3606,51 +3624,100 @@ function startLevel3Chase() {
       speed: LEVEL3_CHASE_GOBLIN_SPEED,
 
       facingLeft: false,
+
+      nextTile: null,
     });
   }
+}
 
-  level3ExitRevealed = true;
+function isLevel3ChaseWalkable(col, row) {
+  if (row < 0 || row >= ROWS || col < 0 || col >= COLS) return false;
 
-  level3ChaseActive = true;
+  let tile = maze3[row][col];
+  return tile === 0 || tile === 2 || tile === 3;
+}
+
+function findLevel3ChaseNextTile(startCol, startRow, targetCol, targetRow) {
+  if (startCol === targetCol && startRow === targetRow) return null;
+
+  let queue = [{ col: startCol, row: startRow }];
+  let queueIndex = 0;
+  let cameFrom = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+  let directions = [
+    { col: 1, row: 0 },
+    { col: -1, row: 0 },
+    { col: 0, row: 1 },
+    { col: 0, row: -1 },
+  ];
+
+  cameFrom[startRow][startCol] = { col: startCol, row: startRow };
+
+  while (queueIndex < queue.length) {
+    let current = queue[queueIndex++];
+
+    if (current.col === targetCol && current.row === targetRow) break;
+
+    for (let direction of directions) {
+      let nextCol = current.col + direction.col;
+      let nextRow = current.row + direction.row;
+
+      if (
+        !isLevel3ChaseWalkable(nextCol, nextRow) ||
+        cameFrom[nextRow][nextCol]
+      ) {
+        continue;
+      }
+
+      cameFrom[nextRow][nextCol] = current;
+      queue.push({ col: nextCol, row: nextRow });
+    }
+  }
+
+  if (!cameFrom[targetRow][targetCol]) return null;
+
+  let step = { col: targetCol, row: targetRow };
+  let previous = cameFrom[step.row][step.col];
+
+  while (previous.col !== startCol || previous.row !== startRow) {
+    step = previous;
+    previous = cameFrom[step.row][step.col];
+  }
+
+  return step;
 }
 
 function updateLevel3ChaseGoblin(g) {
-  let dx = player.x - g.x;
+  // Keep moving to the chosen tile center before looking for another route.
+  // This prevents a goblin from changing its mind halfway around a table corner.
+  if (!g.nextTile) {
+    let startCol = floor(g.x / tileSize);
+    let startRow = floor(g.y / tileSize);
+    let targetCol = floor(player.x / tileSize);
+    let targetRow = floor(player.y / tileSize);
 
-  let dy = player.y - g.y;
-
-  let d = sqrt(dx * dx + dy * dy);
-
-  if (d === 0) return;
-
-  let nextX = g.x + (dx / d) * g.speed;
-
-  let nextY = g.y + (dy / d) * g.speed;
-
-  const SLIDE_AMOUNT = 3;
-
-  if (canMoveTo(nextX, g.y)) {
-    g.x = nextX;
-  } else if (canMoveTo(nextX, g.y - SLIDE_AMOUNT)) {
-    g.x = nextX;
-
-    g.y -= SLIDE_AMOUNT;
-  } else if (canMoveTo(nextX, g.y + SLIDE_AMOUNT)) {
-    g.x = nextX;
-
-    g.y += SLIDE_AMOUNT;
+    g.nextTile = findLevel3ChaseNextTile(
+      startCol,
+      startRow,
+      targetCol,
+      targetRow,
+    );
   }
 
-  if (canMoveTo(g.x, nextY)) {
-    g.y = nextY;
-  } else if (canMoveTo(g.x - SLIDE_AMOUNT, nextY)) {
-    g.x -= SLIDE_AMOUNT;
+  if (!g.nextTile) return;
 
-    g.y = nextY;
-  } else if (canMoveTo(g.x + SLIDE_AMOUNT, nextY)) {
-    g.x += SLIDE_AMOUNT;
+  let targetX = g.nextTile.col * tileSize + tileSize / 2;
+  let targetY = g.nextTile.row * tileSize + tileSize / 2;
+  let dx = targetX - g.x;
+  let dy = targetY - g.y;
+  let distanceToTile = sqrt(dx * dx + dy * dy);
 
-    g.y = nextY;
+  if (distanceToTile <= g.speed) {
+    g.x = targetX;
+    g.y = targetY;
+    g.nextTile = null;
+  } else {
+    g.x += (dx / distanceToTile) * g.speed;
+    g.y += (dy / distanceToTile) * g.speed;
   }
 
   g.facingLeft = dx < 0;
@@ -3661,6 +3728,18 @@ function updateLevel3Chase() {
 
   for (let g of level3ChaseGoblins) {
     updateLevel3ChaseGoblin(g);
+  }
+
+  level3ChaseWaveTimer++;
+
+  if (level3ChaseWaveTimer >= LEVEL3_CHASE_WAVE_DELAY) {
+    if (level3ChaseGoblins.length < LEVEL3_CHASE_MAX_GOBLINS) {
+      let missingGoblins = LEVEL3_CHASE_MAX_GOBLINS - level3ChaseGoblins.length;
+
+      spawnLevel3ChaseGoblins(min(LEVEL3_CHASE_WAVE_SIZE, missingGoblins));
+    }
+
+    level3ChaseWaveTimer = 0;
   }
 }
 
@@ -3780,6 +3859,8 @@ function resetLevel3Chase() {
   level3ChaseActive = false;
 
   level3ChaseGoblins = [];
+
+  level3ChaseWaveTimer = 0;
 
   level3ExitRevealed = false;
 
