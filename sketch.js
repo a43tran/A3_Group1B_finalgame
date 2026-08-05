@@ -760,10 +760,10 @@ let laserBeams3 = [
 ];
 
 // LEVEL 3 CAFETERIA BAR DIRECTION ARROW
-// GOAL DIRECTION ARROWS (orbit around the player, distinct from laser warnings)
-const GOAL_ARROW_ORBIT_RADIUS = 55;
+// GOAL DIRECTION ARROWS (orbit near the screen edge, distinct from laser warnings)
+const GOAL_ARROW_ORBIT_RADIUS = 95; // pushed out closer to the visible edge
 
-function drawGoalArrow(targetX, targetY, colorArr) {
+function drawGoalArrow(targetX, targetY, colorArr, label) {
   let angle = atan2(targetY - player.y, targetX - player.x);
 
   let ax = player.x + cos(angle) * GOAL_ARROW_ORBIT_RADIUS;
@@ -789,8 +789,28 @@ function drawGoalArrow(targetX, targetY, colorArr) {
     -10 * pulse, -11 * pulse,
     -10 * pulse, 11 * pulse
   );
-
   pop();
+
+  // Objective label — drawn upright and screen-sized, centered under the arrow
+  if (label) {
+    push();
+    translate(ax, ay + 26);
+    scale(1 / ZOOM); // counteract the camera zoom so text stays a fixed screen size
+
+    noStroke();
+    fill(0, 0, 0, 180);
+    rectMode(CENTER);
+    textFont("Monospace");
+    textStyle(BOLD);
+    textSize(15);
+    let labelW = textWidth(label) + 20;
+    rect(0, 0, labelW, 24, 6);
+
+    fill(255);
+    textAlign(CENTER, CENTER);
+    text(label, 0, 1);
+    pop();
+  }
 }
 
 // LEVEL 3 CAFETERIA BAR DIRECTION ARROW
@@ -801,7 +821,7 @@ function drawCafeteriaBarArrow() {
       tileSize +
     tileSize / 2;
 
-  drawGoalArrow(targetX, targetY, [64, 224, 255]); // cyan
+  drawGoalArrow(targetX, targetY, [64, 224, 255], "Go to the Cafeteria Bar"); // cyan
 }
 
 // Finds the {row, col} of the maze's exit tile (value 3)
@@ -824,7 +844,7 @@ function drawExitArrow() {
   let targetX = exitTile.col * tileSize + tileSize / 2;
   let targetY = exitTile.row * tileSize + tileSize / 2;
 
-  drawGoalArrow(targetX, targetY, [220, 90, 255]); // magenta
+  drawGoalArrow(targetX, targetY, [220, 90, 255], "Go to the Exit"); // magenta
 }
 
 
@@ -1103,6 +1123,11 @@ let player;
 let collectibles = [];
 let collectedCount = 0;
 
+let flyingCollectibles = [];
+
+const COUNTER_X = 780;
+const COUNTER_Y = 30;
+
 class Player {
   constructor(x, y) {
     this.x = x;
@@ -1335,6 +1360,7 @@ function preload() {
   goblins = loadImage("assets/images/goblins.png");
   goblinslvl2 = loadImage("assets/images/goblinslvl2.png");
   goblinslvl3 = loadImage("assets/images/goblinslvl3.png");
+  goblinslvl3running = loadImage("assets/images/goblinslvl3-running.png");
   goblin = loadImage("assets/images/goblin.png");
 
   classroomdoor = loadImage("assets/images/classroomdoor.png");
@@ -1463,6 +1489,7 @@ function draw() {
     player.draw();
 
     pop();
+    
 
     drawSocialBar();
     drawIntroDialogueBox();
@@ -1859,16 +1886,7 @@ function canMoveTo(x, y) {
 
     let tile = maze[row][col];
     if (tile !== 0 && tile !== 2 && tile !== 3) return false;
-
-    // Level 3 exit stays locked until the cafeteria minigame is complete
-    if (
-      maze === maze3 &&
-      tile === 3 &&
-      !level3CafeteriaMinigameComplete
-    ) {
-      return false;
-    }
-
+    
     // NEW: also block if this point falls inside a nearby wall's expanded footprint
     for (let dr = -1; dr <= 1; dr++) {
       for (let dc = -1; dc <= 1; dc++) {
@@ -2241,6 +2259,79 @@ else if (maze === maze3) {
 }
   }
 }
+function checkCollectibleCompletion() {
+  if (
+    maze === maze1 &&
+    collectedCount === collectibles.length &&
+    !badgeUnlocked
+  ) {
+    badgeUnlocked = true;
+    badgeX = width / 2;
+    badgeY = height / 2 - 80;
+    badgeScale = 1.3;
+    badgeMessageTimer = 180;
+  }
+
+  if (
+    maze === maze2 &&
+    collectedCount === collectibles.length &&
+    !potionBadgeUnlocked
+  ) {
+    potionBadgeUnlocked = true;
+    badgeX = width / 2;
+    badgeY = height / 2 - 80;
+    badgeScale = 1.3;
+    badgeMessageTimer = 180;
+  }
+
+  if (
+    maze === maze3 &&
+    collectedCount === collectibles.length
+  ) {
+    level3FoodCollectedDialogueActive = true;
+    level3FoodCollectedDialogueIndex = 0;
+  }
+}
+
+function getCollectibleImage(type) {
+  if (maze === maze1) return fireflySprite;
+
+  if (type === "Feather") return feather;
+  if (type === "Eyeballs") return eyeballs;
+  if (type === "Kraken Ink") return krakenInk;
+  if (type === "Stardust") return stardust;
+  if (type === "Bone") return bone;
+
+  if (type === "apple") return apple;
+  if (type === "watermelon") return watermelon;
+  if (type === "chicken") return chicken;
+  if (type === "burger") return burger;
+  if (type === "sandwich") return sandwich;
+  if (type === "cookie") return cookie;
+  if (type === "corn") return corn;
+
+  return null;
+}
+
+function drawFlyingCollectibles() {
+  imageMode(CENTER);
+
+  for (let flying of flyingCollectibles) {
+    let img = getCollectibleImage(flying.type);
+
+    if (img) {
+      let size = map(
+        dist(flying.x, flying.y, flying.targetX, flying.targetY),
+        0,
+        500,
+        12,
+        30
+      );
+
+      image(img, flying.x, flying.y, size, size);
+    }
+  }
+}
 
 function checkCollectibles() {
   for (let item of collectibles) {
@@ -2257,8 +2348,16 @@ function checkCollectibles() {
 
       if (d < 20) {
         item.collected = true;
-        collectedCount++;
         collect.play();
+
+        flyingCollectibles.push({
+        x: x,
+        y: y,
+        targetX: COUNTER_X,
+        targetY: COUNTER_Y,
+        type: item.type,
+        progress: 0
+      });
 
         // Flash the HUD counter green
         collectibleFlashTimer = COLLECTIBLE_FLASH_DURATION;
@@ -2333,6 +2432,30 @@ if (
     }
   }
 }
+function updateFlyingCollectibles() {
+  for (let i = flyingCollectibles.length - 1; i >= 0; i--) {
+    let flying = flyingCollectibles[i];
+
+    flying.progress += 0.06;
+
+    flying.x = lerp(flying.x, flying.targetX, 0.12);
+    flying.y = lerp(flying.y, flying.targetY, 0.12);
+
+    let reachedCounter =
+      dist(flying.x, flying.y, flying.targetX, flying.targetY) < 10;
+
+    if (reachedCounter) {
+      collectedCount++;
+
+      collectibleFlashTimer = 60;
+
+      flyingCollectibles.splice(i, 1);
+
+      checkCollectibleCompletion();
+    }
+  }
+}
+
 
 function checkLevel3FoodDelivery() {
   if (!level3AllFoodCollected || level3FoodDelivered) return;
@@ -3068,6 +3191,7 @@ function drawMaze() {
 // HEADS-UP DISPLAY (HUD)
 function drawSocialBar() {
   fill(5, 8, 65);
+  rect(0, 0, width, 70);
   image(banner, 0, 0, width, 70);
 
   // Objective
