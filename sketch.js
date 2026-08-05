@@ -443,7 +443,7 @@ const GOBLIN_COLLISION_RADIUS = 14;
 const GOBLIN_LVL3_RUNNING = {
   frameWidth: 130,
 
-  frameHeight: 180,
+  frameHeight: 170,
 
   numFrames: 15,
 
