@@ -3918,7 +3918,7 @@ function drawLaserWarningLegend() {
 
   // Background panel
   fill(10, 12, 20, 170);
-  rect(LASER_LEGEND_X - 12, LASER_LEGEND_Y - 16, 190, 100, 8);
+  rect(LASER_LEGEND_X - 12, LASER_LEGEND_Y - 26, 220, 150, 8);
 
   fill(255);
   textStyle(BOLD);
