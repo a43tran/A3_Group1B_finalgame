@@ -1439,6 +1439,10 @@ function preload() {
   collect = loadSound("assets/sounds/collect.mp3");
   walking = loadSound("assets/sounds/walking.mp3");
   bgMusic = loadSound("assets/sounds/bgmusic.mp3");
+  lvl2Music = loadSound("assets/sounds/lvl2Music.mp3");
+  lvl3Music = loadSound("assets/sounds/lvl3Music.mp3");
+  miniGameWin = loadSound("assets/sounds/miniGameWin.mp3");
+  pop = loadSound("assets/sounds/pop.mp3");
 }
 
 function setup() {
@@ -2349,12 +2353,12 @@ function checkCollectibleCompletion() {
   }
 
   if (
-    maze === maze3 &&
-    collectedCount === collectibles.length
-  ) {
-    level3FoodCollectedDialogueActive = true;
-    level3FoodCollectedDialogueIndex = 0;
-  }
+  maze === maze3 &&
+  collectedCount === collectibles.length
+) {
+  level3FoodCollectedDialogueActive = true;
+  level3FoodCollectedDialogueIndex = 0;
+}
 }
 
 function getCollectibleImage(type) {
