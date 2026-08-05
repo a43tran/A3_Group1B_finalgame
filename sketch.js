@@ -8,6 +8,8 @@ const ROWS = 14;
 // 2 = start
 // 3 = end
 
+
+const ZOOM = 3.5;
 // MAZE MAP
 let maze1 = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -781,6 +783,48 @@ function drawCafeteriaBarArrow() {
 
   // Thin outline for visibility against any background
   stroke(20, 60, 30);
+  strokeWeight(1.5);
+  noFill();
+  triangle(14, 0, -8, -9, -8, 9);
+
+  pop();
+}
+
+// Finds the {row, col} of the maze's exit tile (value 3)
+function findExitTile() {
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      if (maze[r][c] === 3) {
+        return { row: r, col: c };
+      }
+    }
+  }
+  return null;
+}
+
+// LEVEL 3 EXIT DIRECTION ARROW
+function drawExitArrow() {
+  let exitTile = findExitTile();
+  if (!exitTile) return;
+
+  let targetX = exitTile.col * tileSize + tileSize / 2;
+  let targetY = exitTile.row * tileSize + tileSize / 2;
+
+  let angle = atan2(targetY - player.y, targetX - player.x);
+
+  push();
+  translate(player.x, player.y - 45);
+  rotate(angle);
+
+  // Bob the arrow gently up and down
+  let bob = sin(frameCount * 0.15) * 3;
+  translate(0, bob);
+
+  noStroke();
+  fill(255, 210, 90);
+  triangle(14, 0, -8, -9, -8, 9);
+
+  stroke(90, 60, 10);
   strokeWeight(1.5);
   noFill();
   triangle(14, 0, -8, -9, -8, 9);
@@ -1579,8 +1623,9 @@ if (maze === maze3 && level3AllFoodCollected && !level3FoodDelivered) {
   drawCafeteriaBarArrow();
 }
 
-if (maze === maze1 || maze === maze2 || maze === maze3) {
-  checkLaserPlayerCollision();
+// LEVEL 3: point toward the exit once the minigame is complete
+if (maze === maze3 && level3CafeteriaMinigameComplete) {
+  drawExitArrow();
 }
 
 if (maze === maze1 || maze === maze2 || maze === maze3) {
@@ -1609,6 +1654,7 @@ updateInvincibility();
   }
 
   drawVignette();
+  drawLaserWarnings();
 
   updateBadge();
   drawBadge();
@@ -3214,13 +3260,80 @@ function drawLaserBeams() {
     }
   }
 }
+
+let currentGoblinFrame = 0;
+
 function updateLasers() {
-  let frame = floor(frameCount / GOBLIN.animSpeed) % GOBLIN.numFrames;
+  currentGoblinFrame = floor(frameCount / GOBLIN.animSpeed) % GOBLIN.numFrames;
 
   for (let i = 0; i < lasers.length; i++) {
     let goblin = lasers[i];
-    goblin.on = frame >= GOBLIN.redEyeStart && frame <= GOBLIN.redEyeEnd;
+    goblin.on = currentGoblinFrame >= GOBLIN.redEyeStart && currentGoblinFrame <= GOBLIN.redEyeEnd;
     laserBeams[i].on = goblin.on;
+  }
+}
+
+// How many "goblin frames" until it fires. 0 = firing right now.
+function framesUntilLaserFires() {
+  let start = GOBLIN.redEyeStart;
+  let cycle = GOBLIN.numFrames;
+
+  if (currentGoblinFrame >= start && currentGoblinFrame <= GOBLIN.redEyeEnd) return 0;
+
+  let diff = start - currentGoblinFrame;
+  if (diff < 0) diff += cycle;
+  return diff;
+}
+
+const LASER_WARNING_RANGE = 420;      // world-units — start showing an arrow at this distance
+const LASER_ARROW_EDGE_RADIUS = 250;  // how far from screen center the arrow sits
+const LASER_ARROW_SIZE = 18;
+
+function drawLaserWarnings() {
+  if (maze !== maze1 && maze !== maze2 && maze !== maze3) return;
+
+  let framesLeft = framesUntilLaserFires();
+  let firing = framesLeft === 0;
+  let soon = framesLeft > 0 && framesLeft <= 2;
+
+  let halfW = (width / 2) / ZOOM;
+  let halfH = (height / 2) / ZOOM;
+
+  for (let l of lasers) {
+    let lx = l.col * tileSize + tileSize / 2;
+    let ly = l.row * tileSize + tileSize / 2;
+
+    let dx = lx - player.x;
+    let dy = ly - player.y;
+    let d = sqrt(dx * dx + dy * dy);
+
+    if (d > LASER_WARNING_RANGE) continue;
+    // Already visible on screen — skip the arrow, the goblin itself is the warning
+    if (abs(dx) < halfW && abs(dy) < halfH) continue;
+
+    let angle = atan2(dy, dx);
+    let ax = width / 2 + cos(angle) * LASER_ARROW_EDGE_RADIUS;
+    let ay = height / 2 + sin(angle) * LASER_ARROW_EDGE_RADIUS;
+
+    push();
+    translate(ax, ay);
+    rotate(angle);
+    noStroke();
+
+    if (firing) {
+      fill(255, 40, 40, 210 + sin(frameCount * 0.6) * 30);
+    } else if (soon) {
+      fill(255, 190, 40, 220);
+    } else {
+      fill(255, 220, 120, 130);
+    }
+
+    triangle(
+      LASER_ARROW_SIZE, 0,
+      -LASER_ARROW_SIZE * 0.6, LASER_ARROW_SIZE * 0.6,
+      -LASER_ARROW_SIZE * 0.6, -LASER_ARROW_SIZE * 0.6
+    );
+    pop();
   }
 }
 
