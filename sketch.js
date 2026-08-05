@@ -306,6 +306,10 @@ let healFlashAlpha = 0;
 const HEAL_FLASH_MAX = 120;
 const HEAL_FLASH_DECAY = 5;
 
+// COLLECTIBLE COUNTER FLASH
+let collectibleFlashTimer = 0;
+const COLLECTIBLE_FLASH_DURATION = 20; // frames
+
 // PLAYER HITBOX
 const HITBOX_RADIUS = 8;
 const HITBOX_OFFSET_Y = 10;
@@ -892,7 +896,6 @@ let beakers = [
   },
 ];
 function drawBeakers() {
-  // Only draw in Level 2 and Level 3
   if (maze !== maze2 && maze !== maze3) return;
 
   imageMode(CENTER);
@@ -907,15 +910,28 @@ function drawBeakers() {
       shakeX = sin(frameCount * 1.5) * 3;
     }
 
-    if (maze === maze2) {
-      stroke(100);
-      strokeWeight(3);
-      line(b.x, b.topY - 40, b.x, b.y);
+    let hazardSize = b.radius * 2.2;
+
+    stroke(100);
+    strokeWeight(3);
+
+    if (maze === maze3) {
+      line(
+        b.x,
+        b.anchorY,
+        b.x + shakeX,
+        b.y - hazardSize / 2
+      );
+    } else {
+      line(
+        b.x,
+        b.topY - 40,
+        b.x + shakeX,
+        b.y - hazardSize / 2
+      );
     }
 
     noStroke();
-
-    let hazardSize = b.radius * 2.2;
 
     image(
       hazardImg,
@@ -928,85 +944,87 @@ function drawBeakers() {
 }
 
 let beakers3 = [
-
-  // Top left
+  // Fork 1 — attached to top wall/table
   {
-    x: 4 * tileSize + tileSize / 2,
-    anchorY: 1 * tileSize,
-    topY: 80,
-    bottomY: 200,
-    y: 80,
+    x: 9 * tileSize + tileSize / 2,
+    anchorY: 2 * tileSize,
+    topY: 3 * tileSize,
+    bottomY: 6 * tileSize,
+    y: 3 * tileSize,
     radius: 18,
     state: "waiting",
     timer: 0,
     hasHitPlayer: false,
   },
 
-  // Top middle
-  {
-    x: 11 * tileSize + tileSize / 2,
-    anchorY: 2 * tileSize,
-    topY: 120,
-    bottomY: 240,
-    y: 120,
-    radius: 18,
-    state: "waiting",
-    timer: 30,
-    hasHitPlayer: false,
-  },
 
-  // Top right
+
+  // Top-right fork — attached to the table above
+{
+  x: 18 * tileSize + tileSize / 2,
+
+  anchorY: 2 * tileSize,                  // bottom edge of top table
+  topY: 2 * tileSize + tileSize / 2,      // fork starts below table
+  bottomY: 6 * tileSize + tileSize / 2,   // how far it drops
+  y: 2 * tileSize + tileSize / 2,
+
+  radius: 18,
+  state: "waiting",
+  timer: 60,
+  hasHitPlayer: false,
+},
+
+  // Fork 3 — attached under middle table
   {
-    x: 18 * tileSize + tileSize / 2,
-    anchorY: 2 * tileSize,
-    topY: 120,
-    bottomY: 240,
-    y: 120,
+    x: 13 * tileSize + tileSize / 2,
+    anchorY: 5 * tileSize,
+    topY: 6 * tileSize,
+    bottomY: 9 * tileSize,
+    y: 6 * tileSize,
     radius: 18,
     state: "waiting",
     timer: 60,
     hasHitPlayer: false,
   },
 
-  // Bottom left
+  // Fork 4 — attached under middle-left table
   {
-    x: 5 * tileSize + tileSize / 2,
-    anchorY: 6 * tileSize,
-    topY: 280,
-    bottomY: 400,
-    y: 280,
+    x: 7 * tileSize + tileSize / 2,
+    anchorY: 7 * tileSize,
+    topY: 8 * tileSize,
+    bottomY: 11 * tileSize,
+    y: 8 * tileSize,
     radius: 18,
     state: "waiting",
     timer: 90,
     hasHitPlayer: false,
   },
 
-  // Bottom middle
+  // Fork 5 — attached under lower-middle table
   {
-    x: 13 * tileSize + tileSize / 2,
-    anchorY: 6 * tileSize,
-    topY: 280,
-    bottomY: 400,
-    y: 280,
+    x: 15 * tileSize + tileSize / 2,
+    anchorY: 8 * tileSize,
+    topY: 9 * tileSize,
+    bottomY: 12 * tileSize,
+    y: 9 * tileSize,
     radius: 18,
     state: "waiting",
     timer: 15,
     hasHitPlayer: false,
   },
 
-  // Bottom right
+  // Fork 6 — attached under lower-right table
   {
-    x: 22 * tileSize + tileSize / 2,
-    anchorY: 6 * tileSize,
-    topY: 280,
-    bottomY: 400,
-    y: 280,
+    x: 20 * tileSize + tileSize / 2,
+    anchorY: 8 * tileSize,
+    topY: 9 * tileSize,
+    bottomY: 12 * tileSize,
+    y: 9 * tileSize,
     radius: 18,
     state: "waiting",
     timer: 45,
     hasHitPlayer: false,
   }
-
 ];
 
 
@@ -1485,7 +1503,7 @@ function draw() {
 
   push();
 
-  let zoom = 3.5 ;
+  let zoom = 1 ;
 
   translate(width / 2, height / 2);
   scale(zoom);
@@ -2154,6 +2172,15 @@ function checkCollectibles() {
         item.collected = true;
         collectedCount++;
         collect.play();
+
+        // Flash the HUD counter green
+        collectibleFlashTimer = COLLECTIBLE_FLASH_DURATION;
+
+        // Only heal and show the glow if the player isn't already at full health
+        if (socialBattery < 100) {
+        socialBattery = min(100, socialBattery + 5);
+        healFlashAlpha = HEAL_FLASH_MAX;
+        }
 
         // Only heal and show the glow if the player isn't already at full health
         if (socialBattery < 100) {
@@ -2968,7 +2995,13 @@ function drawSocialBar() {
   text(objective, 50, 22);
 
   // Collectible Count
-  fill(255);
+  if (collectibleFlashTimer > 0) {
+    fill(90, 255, 120);
+    collectibleFlashTimer--;
+  } else {
+    fill(255);
+  }
+
   textAlign(CENTER, TOP);
   textFont("Monospace");
   textStyle(BOLD);
@@ -3191,6 +3224,7 @@ function restartGame() {
 
   hitFlashAlpha = 0;
   healFlashAlpha = 0;
+  collectibleFlashTimer = 0;
 
   collectedCount = 0;
 
@@ -3274,7 +3308,7 @@ function drawTutorialOverlay() {
   textStyle(NORMAL);
   textSize(15);
   text(
-    " Help Faith find and collect every firefly as she makes her way through the maze!\n Use WASD to move Faith.",
+    " Help Faith find and collect every item as she makes her way through the maze!\n Use WASD to move Faith.",
     width / 2,
     panelY + 80,
   );
@@ -3357,7 +3391,7 @@ function drawTutorialOverlay() {
   );
 
   text(
-    "Collect fireflies\nalong the way!",
+    "Collect items\nalong the way!",
     startX + boxW + gap + boxW / 2,
     boxY + boxH + 18,
   );
@@ -3473,6 +3507,7 @@ function loadThirdLevel() {
   forest = cafeteria;
 
   home = cafeentrance;
+  
   school = blackhole;
 
   // Spawn at the tile marked 2
