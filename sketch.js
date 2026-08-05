@@ -310,7 +310,7 @@ const HEAL_FLASH_DECAY = 5;
 
 // COLLECTIBLE COUNTER FLASH
 let collectibleFlashTimer = 0;
-const COLLECTIBLE_FLASH_DURATION = 20; // frames
+const COLLECTIBLE_FLASH_DURATION = 60; // frames
 
 // PLAYER HITBOX
 const HITBOX_RADIUS = 8;
@@ -760,6 +760,40 @@ let laserBeams3 = [
 ];
 
 // LEVEL 3 CAFETERIA BAR DIRECTION ARROW
+// GOAL DIRECTION ARROWS (orbit around the player, distinct from laser warnings)
+const GOAL_ARROW_ORBIT_RADIUS = 55;
+
+function drawGoalArrow(targetX, targetY, colorArr) {
+  let angle = atan2(targetY - player.y, targetX - player.x);
+
+  let ax = player.x + cos(angle) * GOAL_ARROW_ORBIT_RADIUS;
+  let ay = player.y + sin(angle) * GOAL_ARROW_ORBIT_RADIUS;
+
+  let pulse = 1 + sin(frameCount * 0.12) * 0.15;
+
+  push();
+  translate(ax, ay);
+  rotate(angle);
+
+  // Glowing ring behind the arrow for visibility
+  noStroke();
+  fill(colorArr[0], colorArr[1], colorArr[2], 70);
+  circle(0, 0, 36 * pulse);
+
+  // White-outlined chevron arrow
+  stroke(255);
+  strokeWeight(2.5);
+  fill(colorArr[0], colorArr[1], colorArr[2], 255);
+  triangle(
+    16 * pulse, 0,
+    -10 * pulse, -11 * pulse,
+    -10 * pulse, 11 * pulse
+  );
+
+  pop();
+}
+
+// LEVEL 3 CAFETERIA BAR DIRECTION ARROW
 function drawCafeteriaBarArrow() {
   let targetX = LEVEL3_CAFETERIA_BAR_COL * tileSize + tileSize / 2;
   let targetY =
@@ -767,27 +801,7 @@ function drawCafeteriaBarArrow() {
       tileSize +
     tileSize / 2;
 
-  let angle = atan2(targetY - player.y, targetX - player.x);
-
-  push();
-  translate(player.x, player.y - 45);
-  rotate(angle);
-
-  // Bob the arrow gently up and down
-  let bob = sin(frameCount * 0.15) * 3;
-  translate(0, bob);
-
-  noStroke();
-  fill(90, 255, 120);
-  triangle(14, 0, -8, -9, -8, 9);
-
-  // Thin outline for visibility against any background
-  stroke(20, 60, 30);
-  strokeWeight(1.5);
-  noFill();
-  triangle(14, 0, -8, -9, -8, 9);
-
-  pop();
+  drawGoalArrow(targetX, targetY, [64, 224, 255]); // cyan
 }
 
 // Finds the {row, col} of the maze's exit tile (value 3)
@@ -810,26 +824,7 @@ function drawExitArrow() {
   let targetX = exitTile.col * tileSize + tileSize / 2;
   let targetY = exitTile.row * tileSize + tileSize / 2;
 
-  let angle = atan2(targetY - player.y, targetX - player.x);
-
-  push();
-  translate(player.x, player.y - 45);
-  rotate(angle);
-
-  // Bob the arrow gently up and down
-  let bob = sin(frameCount * 0.15) * 3;
-  translate(0, bob);
-
-  noStroke();
-  fill(255, 210, 90);
-  triangle(14, 0, -8, -9, -8, 9);
-
-  stroke(90, 60, 10);
-  strokeWeight(1.5);
-  noFill();
-  triangle(14, 0, -8, -9, -8, 9);
-
-  pop();
+  drawGoalArrow(targetX, targetY, [220, 90, 255]); // magenta
 }
 
 
@@ -1655,6 +1650,7 @@ updateInvincibility();
 
   drawVignette();
   drawLaserWarnings();
+  drawLaserWarningLegend();
 
   updateBadge();
   drawBadge();
@@ -3704,4 +3700,50 @@ function resetLevel3FoodDelivery() {
   level3FoodDeliveredDialogueActive = false;
   level3FoodDeliveredDialogueIndex = 0;
   resetLevel3CafeteriaMinigame();
+}
+
+const LASER_LEGEND_X = 20;
+const LASER_LEGEND_Y = 480; // lower-left, clear of the top HUD banner
+
+function drawLaserWarningLegend() {
+  if (maze !== maze1 && maze !== maze2 && maze !== maze3) return;
+
+  push();
+  textFont("Monospace");
+  textAlign(LEFT, CENTER);
+  noStroke();
+
+  // Background panel
+  fill(10, 12, 20, 170);
+  rect(LASER_LEGEND_X - 12, LASER_LEGEND_Y - 16, 190, 100, 8);
+
+  fill(255);
+  textStyle(BOLD);
+  textSize(20);
+  text("Laser Warning", LASER_LEGEND_X, LASER_LEGEND_Y);
+  textStyle(NORMAL);
+  textSize(20);
+
+  const rows = [
+    { color: [255, 220, 120, 200], label: "Detected nearby" },
+    { color: [255, 190, 40, 255],  label: "About to fire" },
+    { color: [255, 40, 40, 255],   label: "Firing now!" },
+  ];
+
+  let rowY = LASER_LEGEND_Y + 30;
+  for (let r of rows) {
+    // Small triangle swatch matching the arrow shape/rotation
+    push();
+    translate(LASER_LEGEND_X + 8, rowY);
+    rotate(HALF_PI); // point it "up" to read naturally in a legend
+    fill(...r.color);
+    triangle(10, 0, -6, -6, -6, 6);
+    pop();
+
+    fill(255);
+    text(r.label, LASER_LEGEND_X + 24, rowY);
+    rowY += 30;
+  }
+
+  pop();
 }
