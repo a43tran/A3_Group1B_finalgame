@@ -1364,7 +1364,7 @@ function preload() {
 
   startScreen = loadImage("assets/images/homescreen.png");
   restartScreen = loadImage("assets/images/restartscreen.png");
-  levelOneComplete = loadImage("assets/images/level1complete.png");
+  levelOneComplete = loadImage("assets/images/completelvl1.png");
   fireflySprite = loadImage("assets/images/firefly.png");
   fireflyBadge = loadImage("assets/images/fireflybadge.png");
   potionbadge = loadImage("assets/images/potionbadge.png");
