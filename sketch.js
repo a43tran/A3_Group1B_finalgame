@@ -471,6 +471,8 @@ const GOBLIN_LVL3_RUNNING = {
   animSpeed: 5,
 
   scale: 0.3,
+
+  insetX: 6,
 };
 
 // LASER DAMAGE
@@ -3761,7 +3763,6 @@ function updateLevel3Chase() {
     level3ChaseWaveTimer = 0;
   }
 }
-
 function drawLevel3ChaseGoblins() {
   if (!level3ChaseActive) return;
 
@@ -3771,9 +3772,11 @@ function drawLevel3ChaseGoblins() {
     floor(frameCount / GOBLIN_LVL3_RUNNING.animSpeed) %
     GOBLIN_LVL3_RUNNING.numFrames;
 
-  let srcX = frame * GOBLIN_LVL3_RUNNING.frameWidth;
+  let inset = GOBLIN_LVL3_RUNNING.insetX;
+  let srcW = GOBLIN_LVL3_RUNNING.frameWidth - inset * 2;
+  let srcX = frame * GOBLIN_LVL3_RUNNING.frameWidth + inset;
 
-  let drawW = GOBLIN_LVL3_RUNNING.frameWidth * GOBLIN_LVL3_RUNNING.scale;
+  let drawW = srcW * GOBLIN_LVL3_RUNNING.scale;
 
   let drawH = GOBLIN_LVL3_RUNNING.frameHeight * GOBLIN_LVL3_RUNNING.scale;
 
@@ -3796,7 +3799,7 @@ function drawLevel3ChaseGoblins() {
       srcX,
       0,
 
-      GOBLIN_LVL3_RUNNING.frameWidth,
+      srcW,
       GOBLIN_LVL3_RUNNING.frameHeight,
     );
 
