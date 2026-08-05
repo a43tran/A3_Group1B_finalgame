@@ -1924,7 +1924,7 @@ function preload() {
 
   completelvl2 = loadImage("assets/images/completelvl2.png");
 
-  gamecompleted = loadImage("assets/images/gamecompleted.png");
+  gamecompleted = loadImage("assets/images/completelvl3.png");
 
   faillvl2 = loadImage("assets/images/faillvl2.png");
 
