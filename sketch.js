@@ -141,7 +141,6 @@ let goblinslvl2;
 let goblinslvl3;
 let goblin;
 
-
 let startScreen;
 
 let restartScreen;
@@ -273,10 +272,9 @@ let click;
 
 let punch;
 
-
 let legendTimer = 0;
 
-const LEGEND_VISIBLE_FRAMES = 900; 
+const LEGEND_VISIBLE_FRAMES = 900;
 
 const LEGEND_FADE_FRAMES = 60;
 
@@ -418,6 +416,10 @@ const LEVEL3_CHASE_GOBLIN_SPEED = 1.1;
 
 const LEVEL3_CHASE_CATCH_RADIUS = 16;
 
+const LEVEL3_CHASE_DAMAGE = 30;
+
+const LEVEL3_CHASE_CLICK_RADIUS = 32;
+
 const LEVEL3_CHASE_MIN_SPAWN_DISTANCE = 5; // in tiles, from the player
 
 let level3ChaseActive = false;
@@ -441,7 +443,7 @@ const level3ChaseCompleteDialogue = [
 const GOBLIN_COLLISION_RADIUS = 14;
 
 const GOBLIN_LVL3_RUNNING = {
-  frameWidth: 160,
+  frameWidth: 158.6,
 
   frameHeight: 180,
 
@@ -2041,7 +2043,7 @@ function setup() {
     }
   }
 
-  legendTimer = 0
+  legendTimer = 0;
 
   initWallExpansion();
 
@@ -2103,7 +2105,6 @@ function draw() {
 
   if (introDialogueActive) {
     updateCamera();
-
 
     push();
 
@@ -2234,9 +2235,14 @@ function draw() {
     return;
   }
 
-  if (!gameOver && !introDialogueActive && !level2DialogueActive && !level3DialogueActive) {
-  legendTimer++;
-}
+  if (
+    !gameOver &&
+    !introDialogueActive &&
+    !level2DialogueActive &&
+    !level3DialogueActive
+  ) {
+    legendTimer++;
+  }
 
   push();
 
@@ -2382,6 +2388,8 @@ function draw() {
 
   drawSocialBar();
 
+  drawLevel3ChaseTip();
+
   // Flying collectible above the wooden HUD
 
   drawFlyingCollectibles();
@@ -2396,6 +2404,13 @@ function completeLevel3() {
 }
 
 function keyPressed() {
+  // The Level 3 end screen already tells the player to press E.
+  // Reloading returns the game to its initial main-menu state.
+  if (thirdLevelComplete && (key === "e" || key === "E")) {
+    window.location.reload();
+    return;
+  }
+
   if (introDialogueActive && (key === " " || keyCode === ENTER)) {
     click.play();
 
@@ -2479,7 +2494,7 @@ function keyPressed() {
     loadThirdLevel();
   }
 
-if (key === "n" || key === "N") {
+  if (key === "n" || key === "N") {
     if (firstLevelComplete) {
       loadSecondLevel();
     } else if (secondLevelComplete) {
@@ -2550,9 +2565,12 @@ function mousePressed() {
       if (lvl3Music.isPlaying()) lvl3Music.stop();
       lvlComplete.play();
       completeLevel3();
-      
     }
 
+    return;
+  }
+
+  if (clickLevel3ChaseGoblin()) {
     return;
   }
 
@@ -2640,8 +2658,8 @@ function canMoveTo(x, y) {
         if (px > left && px < right && py > top && py < bottom) return false;
       }
     }
-  
-      for (let g of lasers) {
+
+    for (let g of lasers) {
       let gx = g.col * tileSize + tileSize / 2;
       let gy = g.row * tileSize + tileSize / 2;
 
@@ -2649,7 +2667,6 @@ function canMoveTo(x, y) {
       if (d < GOBLIN_COLLISION_RADIUS) return false;
     }
   }
-
 
   return true;
 }
@@ -3689,18 +3706,70 @@ function drawLevel3ChaseGoblins() {
   }
 }
 
-function checkLevel3ChaseCatch() {
+function drawLevel3ChaseTip() {
   if (!level3ChaseActive) return;
+
+  push();
+
+  rectMode(CENTER);
+  noStroke();
+  fill(10, 12, 20, 210);
+  rect(width / 2, 100, 390, 42, 8);
+
+  fill(255, 230, 120);
+  textAlign(CENTER, CENTER);
+  textFont("Monospace");
+  textStyle(BOLD);
+  textSize(18);
+  text("TIP: Click goblins to defeat them!", width / 2, 100);
+
+  pop();
+}
+
+function clickLevel3ChaseGoblin() {
+  if (!level3ChaseActive) return false;
+
+  // Convert the mouse position from screen coordinates to maze coordinates.
+  let worldMouseX = player.x + (mouseX - width / 2) / ZOOM;
+  let worldMouseY = player.y + (mouseY - height / 2) / ZOOM;
+
+  for (let i = level3ChaseGoblins.length - 1; i >= 0; i--) {
+    let goblin = level3ChaseGoblins[i];
+
+    if (
+      dist(worldMouseX, worldMouseY, goblin.x, goblin.y) <=
+      LEVEL3_CHASE_CLICK_RADIUS
+    ) {
+      level3ChaseGoblins.splice(i, 1);
+      punch.play();
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function checkLevel3ChaseCatch() {
+  if (!level3ChaseActive || playerInvincible) return;
 
   for (let g of level3ChaseGoblins) {
     let d = dist(player.x, player.y + HITBOX_OFFSET_Y, g.x, g.y);
 
     if (d < LEVEL3_CHASE_CATCH_RADIUS) {
-      level3ChaseActive = false;
+      socialBattery = max(0, socialBattery - LEVEL3_CHASE_DAMAGE);
 
-      gameOver = true;
+      playerInvincible = true;
+      invincibleTimer = INVINCIBLE_FRAMES;
 
-      fail.play();
+      punch.play();
+      hitFlashAlpha = HIT_FLASH_MAX;
+
+      // A goblin hit only ends the game when it drains the final battery.
+      if (socialBattery <= 0) {
+        level3ChaseActive = false;
+        gameOver = true;
+        fail.play();
+      }
 
       return;
     }
@@ -4393,7 +4462,9 @@ function drawLoseScreen() {
 
 function restartGame() {
   // Preserve whether level 3 had all food collected before resetting
-  let hadAllFoodBeforeRestart = maze === maze3 && (level3AllFoodCollected || collectedCount === collectibles.length);
+  let hadAllFoodBeforeRestart =
+    maze === maze3 &&
+    (level3AllFoodCollected || collectedCount === collectibles.length);
 
   socialBattery = 100;
 
@@ -4439,7 +4510,7 @@ function restartGame() {
 
   flyingCollectibles = [];
 
-  legendTimer = 0
+  legendTimer = 0;
 
   // Reload the correct collectibles for the current level
 
@@ -4750,7 +4821,7 @@ function loadSecondLevel() {
 
   forest = library;
 
-  legendTimer = 0
+  legendTimer = 0;
 
   // --- MUSIC SWAP ---
 
@@ -4844,7 +4915,7 @@ function loadThirdLevel() {
 
   school = blackhole;
 
-  legendTimer = 0
+  legendTimer = 0;
 
   // --- MUSIC SWAP ---
 
@@ -4915,7 +4986,8 @@ function drawLaserWarningLegend() {
 
   let alpha = 1;
   if (legendTimer > LEGEND_VISIBLE_FRAMES) {
-    let fadeProgress = (legendTimer - LEGEND_VISIBLE_FRAMES) / LEGEND_FADE_FRAMES;
+    let fadeProgress =
+      (legendTimer - LEGEND_VISIBLE_FRAMES) / LEGEND_FADE_FRAMES;
     alpha = 1 - constrain(fadeProgress, 0, 1);
   }
 
