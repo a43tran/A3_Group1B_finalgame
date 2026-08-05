@@ -110,7 +110,6 @@ let home;
 let school;
 let banner;
 
-
 let classroomdoor;
 let cafedoor;
 
@@ -161,6 +160,10 @@ let win;
 let collect;
 let walking;
 let bgMusic;
+let lvl2Music;
+let lvl3Music;
+let click;
+let miniGameWin;
 
 // SOCIAL BATTERY
 let socialBattery = 100;
@@ -187,6 +190,7 @@ const GOBLIN_LVL3_RUNNING = {
   animSpeed: 4,    
   scale: 0.3,      
 };
+
 
 
 // FIREFLY BADGE
@@ -1367,6 +1371,7 @@ function preload() {
   foodBadge = loadImage("assets/images/foodBadge.png");
 
   completelvl2 = loadImage("assets/images/completelvl2.png");
+  completelvl3 = loadImage("assets/images/completelvl3.png");
   gamecompleted = loadImage("assets/images/gamecompleted.png");
   faillvl2 = loadImage("assets/images/faillvl2.png");
   faillvl3 = loadImage("assets/images/faillvl3.png");
@@ -1442,7 +1447,7 @@ function preload() {
   lvl2Music = loadSound("assets/sounds/lvl2Music.mp3");
   lvl3Music = loadSound("assets/sounds/lvl3Music.mp3");
   miniGameWin = loadSound("assets/sounds/miniGameWin.mp3");
-  pop = loadSound("assets/sounds/pop.mp3");
+  click = loadSound("assets/sounds/pop.mp3");
 }
 
 function setup() {
@@ -2354,8 +2359,18 @@ function checkCollectibleCompletion() {
 
   if (
   maze === maze3 &&
-  collectedCount === collectibles.length
+  collectedCount === collectibles.length &&
+  !foodBadgeUnlocked
 ) {
+  foodBadgeUnlocked = true;
+
+  badgeX = width / 2;
+  badgeY = height / 2 - 80;
+  badgeScale = 1.3;
+  badgeMessageTimer = 180;
+
+  level3AllFoodCollected = true;
+
   level3FoodCollectedDialogueActive = true;
   level3FoodCollectedDialogueIndex = 0;
 }
@@ -3047,7 +3062,7 @@ if (foodBadgeUnlocked) {
 }
 
   // Level 2 badge
-else if (potionBadgeUnlocked) {
+else if (potionbadgeUnlocked) {
 
   textSize(26);
   text(
@@ -3315,6 +3330,7 @@ function drawSocialBar() {
   textStyle(BOLD);
   text("?", 1225, 34);
   
+  pop();
 }
 
 // LASERS
@@ -3801,7 +3817,7 @@ flyingCollectibles = [];
   setupPotionIngredients();
 
   badgeUnlocked = false;
-potionbadgeunlocked = false;
+potionbadgeUnlocked = false;
 foodBadgeUnlocked = false;
 
   // Reset Level 2 beakers
@@ -3867,7 +3883,7 @@ function loadThirdLevel() {
   collectedCount = 0;
   flyingCollectibles = [];
   badgeUnlocked = false;
-potionBadgeUnlocked = false;
+potionbadgeUnlocked = false;
 foodBadgeUnlocked = false;
 
   // Load Level 3 food
