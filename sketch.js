@@ -443,8 +443,14 @@ let level3ChaseCompleteDialogueIndex = 0;
 const level3ChaseCompleteDialogue = [
   "That was way too close!",
 
-  "Okay, Faith... you made it out.",
+  "Okay, phew... I made it out. I did it!",
 ];
+
+let level1TipTimer = 0;
+
+const TIP_VISIBLE_FRAMES = 240; // ~4 seconds
+
+const TIP_FADE_FRAMES = 60
 
 // GOBLIN CHASE SPRITE SHEET (running animation)
 
@@ -2250,6 +2256,7 @@ function draw() {
     !level3DialogueActive
   ) {
     legendTimer++;
+    level1TipTimer++;
   }
 
   push();
@@ -2395,6 +2402,8 @@ function draw() {
   // HUD first
 
   drawSocialBar();
+
+  drawLevel1Tip();
 
   drawLevel3ChaseTip();
 
@@ -3785,6 +3794,35 @@ function drawLevel3ChaseGoblins() {
   }
 }
 
+function drawLevel1Tip() {
+  if (maze !== maze1) return;
+
+  if (level1TipTimer >= TIP_VISIBLE_FRAMES + TIP_FADE_FRAMES) return;
+
+  let alpha = 255;
+
+  if (level1TipTimer > TIP_VISIBLE_FRAMES) {
+    let fadeProgress = (level1TipTimer - TIP_VISIBLE_FRAMES) / TIP_FADE_FRAMES;
+    alpha = 255 * (1 - constrain(fadeProgress, 0, 1));
+  }
+
+  push();
+
+  rectMode(CENTER);
+  noStroke();
+  fill(10, 12, 20, alpha * (210 / 255));
+  rect(width / 2, 100, 600, 42, 8);
+
+  fill(255, 230, 120, alpha);
+  textAlign(CENTER, CENTER);
+  textFont("Monospace");
+  textStyle(BOLD);
+  textSize(18);
+  text("TIP: Collect items to boost your health & gain a badge", width / 2, 100);
+
+  pop();
+}
+
 function drawLevel3ChaseTip() {
   if (!level3ChaseActive) return;
 
@@ -4587,6 +4625,8 @@ function restartGame() {
   flyingCollectibles = [];
 
   legendTimer = 0;
+
+  level1TipTimer = 0;
 
   // Reload the correct collectibles for the current level
 
