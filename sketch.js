@@ -6,7 +6,7 @@ const COLS = 25;
 
 const ROWS = 14;
 
-// 0 = path 
+// 0 = path
 
 // 1 = wall
 
@@ -267,6 +267,13 @@ let lvl2Music;
 let lvl3Music;
 
 let click;
+
+
+let legendTimer = 0;
+
+const LEGEND_VISIBLE_FRAMES = 900; 
+
+const LEGEND_FADE_FRAMES = 60;
 
 // SOCIAL BATTERY
 
@@ -2023,6 +2030,8 @@ function setup() {
     }
   }
 
+  legendTimer = 0
+
   initWallExpansion();
 
   setupCollectibles();
@@ -2083,6 +2092,7 @@ function draw() {
 
   if (introDialogueActive) {
     updateCamera();
+
 
     push();
 
@@ -2212,6 +2222,10 @@ function draw() {
 
     return;
   }
+
+  if (!gameOver && !introDialogueActive && !level2DialogueActive && !level3DialogueActive) {
+  legendTimer++;
+}
 
   push();
 
@@ -4392,6 +4406,8 @@ function restartGame() {
 
   flyingCollectibles = [];
 
+  legendTimer = 0
+
   // Reload the correct collectibles for the current level
 
   if (maze === maze1) {
@@ -4694,6 +4710,8 @@ function loadSecondLevel() {
 
   forest = library;
 
+  legendTimer = 0
+
   // --- MUSIC SWAP ---
 
   if (bgMusic.isPlaying()) bgMusic.stop();
@@ -4786,6 +4804,8 @@ function loadThirdLevel() {
 
   school = blackhole;
 
+  legendTimer = 0
+
   // --- MUSIC SWAP ---
 
   if (bgMusic.isPlaying()) bgMusic.stop();
@@ -4849,6 +4869,15 @@ const LASER_LEGEND_Y = 480; // lower-left, clear of the top HUD banner
 
 function drawLaserWarningLegend() {
   if (maze !== maze1 && maze !== maze2 && maze !== maze3) return;
+
+  // Fully gone after the visible window + fade window
+  if (legendTimer >= LEGEND_VISIBLE_FRAMES + LEGEND_FADE_FRAMES) return;
+
+  let alpha = 1;
+  if (legendTimer > LEGEND_VISIBLE_FRAMES) {
+    let fadeProgress = (legendTimer - LEGEND_VISIBLE_FRAMES) / LEGEND_FADE_FRAMES;
+    alpha = 1 - constrain(fadeProgress, 0, 1);
+  }
 
   push();
 
