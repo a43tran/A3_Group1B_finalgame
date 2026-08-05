@@ -1417,23 +1417,7 @@ function draw() {
   } 
 
   if (level3FoodCollectedDialogueActive) {
-    updateCamera();
-    push();
-    let zoom = 3.5;
-    translate(width / 2, height / 2);
-    scale(zoom);
-    translate(-player.x, -player.y);
-
-    drawMaze();
-    drawFoodCounters();
-    drawGarbage();
-    player.draw();
-
-    pop();
-
-    drawSocialBar();
-    drawLevel3FoodCollectedDialogueBox();
-    return;
+  level3FoodCollectedDialogueActive = false;
   }
 
   if (level3FoodDeliveredDialogueActive) {
@@ -1475,7 +1459,7 @@ function draw() {
 
   push();
 
-  let zoom = 3.5;
+  let zoom = 3.5 ;
 
   translate(width / 2, height / 2);
   scale(zoom);
@@ -2231,7 +2215,7 @@ function checkLevel3FoodDelivery() {
 // DIALOGUE BOX (INTRO)
 function drawIntroDialogueBox() {
   const boxW = 900;
-  const boxH = 140;
+  const boxH = 160;
   const boxX = (width - boxW) / 2;
   const boxY = height - boxH - 60;
 
@@ -2245,29 +2229,29 @@ function drawIntroDialogueBox() {
   textAlign(LEFT, TOP);
   textFont("Monospace");
   textStyle(BOLD);
-  textSize(18);
+  textSize(25);
   text("Faith", boxX + 30, boxY + 18);
 
   fill(255);
   textStyle(NORMAL);
-  textSize(16);
+  textSize(23);
   text(
     introDialogue[introDialogueIndex],
     boxX + 30,
-    boxY + 55,
+    boxY + 58,
     boxW - 60,
-    boxH - 80,
+    boxH - 90,
   );
 
   fill(200);
   textAlign(RIGHT, BOTTOM);
-  textSize(13);
+  textSize(14);
   text("click or press SPACE to continue", boxX + boxW - 20, boxY + boxH - 12);
 }
 
 function drawLevel2DialogueBox() {
   const boxW = 900;
-  const boxH = 140;
+  const boxH = 160;
   const boxX = (width - boxW) / 2;
   const boxY = height - boxH - 60;
 
@@ -2281,29 +2265,29 @@ function drawLevel2DialogueBox() {
   textAlign(LEFT, TOP);
   textFont("Monospace");
   textStyle(BOLD);
-  textSize(18);
+  textSize(25);
   text("Faith", boxX + 30, boxY + 18);
 
   fill(255);
   textStyle(NORMAL);
-  textSize(16);
+  textSize(23);
   text(
     level2Dialogue[level2DialogueIndex],
     boxX + 30,
-    boxY + 55,
+    boxY + 58,
     boxW - 60,
-    boxH - 80,
+    boxH - 90,
   );
 
   fill(200);
   textAlign(RIGHT, BOTTOM);
-  textSize(13);
+  textSize(14);
   text("click or press SPACE to continue", boxX + boxW - 20, boxY + boxH - 12);
 }
 
 function drawLevel3DialogueBox() {
   const boxW = 900;
-  const boxH = 140;
+  const boxH = 160;
   const boxX = (width - boxW) / 2;
   const boxY = height - boxH - 60;
 
@@ -2317,31 +2301,54 @@ function drawLevel3DialogueBox() {
   textAlign(LEFT, TOP);
   textFont("Monospace");
   textStyle(BOLD);
-  textSize(18);
+  textSize(25);
   text("Faith", boxX + 30, boxY + 18);
 
   fill(255);
   textStyle(NORMAL);
-  textSize(16);
+  textSize(23);
   text(
     level3Dialogue[level3DialogueIndex],
     boxX + 30,
-    boxY + 55,
+    boxY + 58,
     boxW - 60,
-    boxH - 80,
+    boxH - 90,
   );
 
   fill(200);
   textAlign(RIGHT, BOTTOM);
-  textSize(13);
+  textSize(14);
   text("click or press SPACE to continue", boxX + boxW - 20, boxY + boxH - 12);
 }
 
-function drawLevel3FoodCollectedDialogueBox() {
-  drawLevel3FoodDialogueBox(
-    level3FoodCollectedDialogue,
-    level3FoodCollectedDialogueIndex
-  );
+function drawLevel3FoodDialogueBox(dialogue, dialogueIndex) {
+  const boxW = 900;
+  const boxH = 160;
+  const boxX = (width - boxW) / 2;
+  const boxY = height - boxH - 60;
+
+  fill(20, 20, 30, 230);
+  stroke(255);
+  strokeWeight(2);
+  rect(boxX, boxY, boxW, boxH, 12);
+
+  noStroke();
+  fill(255, 220, 120);
+  textAlign(LEFT, TOP);
+  textFont("Monospace");
+  textStyle(BOLD);
+  textSize(25);
+  text("Faith", boxX + 30, boxY + 18);
+
+  fill(255);
+  textStyle(NORMAL);
+  textSize(23);
+  text(dialogue[dialogueIndex], boxX + 30, boxY + 58, boxW - 60, boxH - 90);
+
+  fill(200);
+  textAlign(RIGHT, BOTTOM);
+  textSize(14);
+  text("click or press SPACE to continue", boxX + boxW - 20, boxY + boxH - 12);
 }
 
 function drawLevel3FoodDeliveredDialogueBox() {
@@ -2420,7 +2427,7 @@ function drawLevel3CafeteriaMinigameHUD() {
   textAlign(LEFT, CENTER);
   textFont("Monospace");
   textStyle(BOLD);
-  textSize(22);
+  textSize(25);
   text("Goblin Whack-a-Mole", 35, 32);
 
   fill(255);
@@ -2921,63 +2928,64 @@ function drawMaze() {
 // HEADS-UP DISPLAY (HUD)
 function drawSocialBar() {
   fill(5, 8, 65);
-  image(banner, 0, 0, width, 60);
+  image(banner, 0, 0, width, 70);
 
   // Objective
   fill(255);
   textAlign(LEFT, TOP);
   textFont("Monospace");
-  textSize(15);
+  textStyle(BOLD);
+  textSize(19);
   let objective = "LVL 1: Make your way to school!";
   if (maze === maze2) objective = "LVL 2: Reach the cafe!";
   if (maze === maze3) objective = "LVL 3: Collect food and reach the exit!";
-  text(objective, 50, 24);
+  text(objective, 50, 22);
 
- // Collectible Count
+  // Collectible Count
+  fill(255);
+  textAlign(CENTER, TOP);
+  textFont("Monospace");
+  textStyle(BOLD);
+  textSize(19);
 
-fill(255);
-textAlign(CENTER, TOP);
-textFont("Monospace");
-textStyle(BOLD);
-textSize(15);
+  let collectibleText = "";
 
-let collectibleText = "";
+  if (maze === maze1) {
+    collectibleText =
+      "Fireflies: " + collectedCount + " / " + collectibles.length;
+  }
 
-if (maze === maze1) {
-  collectibleText =
-    "Fireflies: " + collectedCount + " / " + collectibles.length;
-}
+  else if (maze === maze2) {
+    collectibleText =
+      "Ingredients: " + collectedCount + " / 5";
+  }
 
-else if (maze === maze2) {
-  collectibleText =
-    "Ingredients: " + collectedCount + " / 5";
-}
+  else if (maze === maze3) {
+    collectibleText =
+      "Food: " + collectedCount + " / " + collectibles.length;
+  }
 
-else if (maze === maze3) {
-  collectibleText =
-    "Food: " + collectedCount + " / " + collectibles.length;
-}
-
-text(collectibleText, 670, 24);
+  text(collectibleText, 670, 22);
 
   // Social Battery Bar
   textAlign(RIGHT, TOP);
+  textStyle(BOLD);
   fill(255);
-  textSize(15);
-  text("Social Battery", 980, 25);
+  textSize(19);
+  text("Social Battery", 980, 24);
   fill(80);
-  rect(1000, 20, 190, 20);
+  rect(1000, 22, 190, 24);
   fill(100, 220, 120);
-  rect(1000, 20, socialBattery * 1.9, 20);
+  rect(1000, 22, socialBattery * 1.9, 24);
 
   // Help button at the end of social battery bar
   fill(255, 220, 120);
-  circle(1225, 30, 30);
+  circle(1225, 34, 34);
   fill(0);
   textAlign(CENTER, CENTER);
-  textSize(15);
+  textSize(19);
   textStyle(BOLD);
-  text("?", 1225, 30);
+  text("?", 1225, 34);
 }
 
 // LASERS
@@ -3130,33 +3138,73 @@ function drawLoseScreen() {
   image(loseImg, 0, 0, width, height);
 }
 
-// RESTART SCREEN
 function restartGame() {
   socialBattery = 100;
   gameOver = false;
   trappedTimer = 0;
+  // Clear all dialogue states
+  introDialogueActive = false;
+  level2DialogueActive = false;
+  level3DialogueActive = false;
 
-  initWallExpansion();
+  level3FoodCollectedDialogueActive = false;
+  level3FoodDeliveredDialogueActive = false;
+  level3CafeteriaMinigameDialogueActive = false;
+  level3CafeteriaMinigameActive = false;
 
-  // Reset collectible progress
+  // Reset dialogue indexes
+  introDialogueIndex = 0;
+  level2DialogueIndex = 0;
+  level3DialogueIndex = 0;
+  level3FoodCollectedDialogueIndex = 0;
+  level3FoodDeliveredDialogueIndex = 0;
+  level3CafeteriaMinigameDialogueIndex = 0;
+
+  playerInvincible = false;
+  invincibleTimer = 0;
+
+  hitFlashAlpha = 0;
+  healFlashAlpha = 0;
+
   collectedCount = 0;
-  if (maze === maze3) {
-    resetLevel3FoodDelivery();
-    setupFoodCollectibles();
-  } else {
+
+  // Reload the correct collectibles for the current level
+  if (maze === maze1) {
     setupCollectibles();
   }
 
+  else if (maze === maze2) {
+    setupPotionIngredients();
+    resetBeakers();
+  }
+
+  else if (maze === maze3) {
+    setupFoodCollectibles();
+    resetBeakers();
+  }
+
+  // Return player to the current level's start tile
   outer: for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
       if (maze[r][c] === 2) {
         player.x = c * tileSize + tileSize / 2;
         player.y = r * tileSize + tileSize / 2;
-
         break outer;
       }
     }
   }
+
+  // Stop old movement
+  player.vx = 0;
+  player.vy = 0;
+
+  if (walking.isPlaying()) {
+    walking.stop();
+  }
+camX = 0;
+camY = 0;
+
+  initWallExpansion();
 }
 
 
