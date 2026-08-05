@@ -2498,6 +2498,10 @@ function keyPressed() {
     if (gameOver) restartGame();
   }
 
+  if (key === "m" || key === "M") {
+    loadThirdLevel();
+  }
+
   if (key === "n" || key === "N") {
     if (firstLevelComplete) {
       loadSecondLevel();
@@ -4538,11 +4542,6 @@ function drawLoseScreen() {
 }
 
 function restartGame() {
-  // Preserve whether level 3 had all food collected before resetting
-  let hadAllFoodBeforeRestart =
-    maze === maze3 &&
-    (level3AllFoodCollected || collectedCount === collectibles.length);
-
   socialBattery = 100;
 
   gameOver = false;
@@ -4603,13 +4602,6 @@ function restartGame() {
     resetBeakers();
 
     resetLevel3State();
-    // If the player had already collected all food before dying, restart the chase immediately
-    if (hadAllFoodBeforeRestart) {
-      level3AllFoodCollected = true;
-      startLevel3Chase();
-      level3FoodCollectedDialogueActive = true;
-      level3FoodCollectedDialogueIndex = 0;
-    }
   }
 
   // Return player to the current level's start tile
