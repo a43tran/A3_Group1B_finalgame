@@ -94,7 +94,6 @@ After conducting playtesting for our final game, we implemented a triangular las
 | `assets/images/foodcounter3.png`        | Gemini 3.6 Flash                                                                           |
 | `assets/images/forest.png`              | Gemini 3.6 Flash                                                                           |
 | `assets/images/fork.png`                | Gemini 3.6 Flash                                                                           |
-| `assets/images/gamecompleted.png`       | Gemini 3.6 Flash                                                                           |
 | `assets/images/garbage.png`             | Gemini 3.6 Flash                                                                           |
 | `assets/images/goblin.png`              | Gemini 3.6 Flash                                                                           |
 | `assets/images/goblins.png`             | Gemini 3.6 Flash                                                                           |
