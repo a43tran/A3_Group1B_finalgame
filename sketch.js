@@ -32,8 +32,8 @@ let maze2 = [
   [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
   [1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1],
   [1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1],
-  [1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1],
-  [1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1],
+  [1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1],
+  [1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1],
   [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1],
   [1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1],
   [1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1],
@@ -756,6 +756,37 @@ let laserBeams3 = [
     timer: 0,
   },
 ];
+
+// LEVEL 3 CAFETERIA BAR DIRECTION ARROW
+function drawCafeteriaBarArrow() {
+  let targetX = LEVEL3_CAFETERIA_BAR_COL * tileSize + tileSize / 2;
+  let targetY =
+    ((LEVEL3_CAFETERIA_BAR_TOP_ROW + LEVEL3_CAFETERIA_BAR_BOTTOM_ROW) / 2) *
+      tileSize +
+    tileSize / 2;
+
+  let angle = atan2(targetY - player.y, targetX - player.x);
+
+  push();
+  translate(player.x, player.y - 45);
+  rotate(angle);
+
+  // Bob the arrow gently up and down
+  let bob = sin(frameCount * 0.15) * 3;
+  translate(0, bob);
+
+  noStroke();
+  fill(90, 255, 120);
+  triangle(14, 0, -8, -9, -8, 9);
+
+  // Thin outline for visibility against any background
+  stroke(20, 60, 30);
+  strokeWeight(1.5);
+  noFill();
+  triangle(14, 0, -8, -9, -8, 9);
+
+  pop();
+}
 
 
 // PATHWAY TILE VARIATION (LEVEL 2)
@@ -1503,7 +1534,7 @@ function draw() {
 
   push();
 
-  let zoom = 1 ;
+  let zoom = 3.5 ;
 
   translate(width / 2, height / 2);
   scale(zoom);
@@ -1542,6 +1573,15 @@ drawCollectibles();
 checkCollectibles();
 checkLevel3FoodDelivery();
 player.draw();
+
+// LEVEL 3: point toward the cafeteria bar once all food is collected
+if (maze === maze3 && level3AllFoodCollected && !level3FoodDelivered) {
+  drawCafeteriaBarArrow();
+}
+
+if (maze === maze1 || maze === maze2 || maze === maze3) {
+  checkLaserPlayerCollision();
+}
 
 if (maze === maze1 || maze === maze2 || maze === maze3) {
   checkLaserPlayerCollision();
@@ -2166,7 +2206,12 @@ function checkCollectibles() {
       let x = item.col * tileSize + tileSize / 2;
       let y = item.row * tileSize + tileSize / 2;
 
-      let d = dist(player.x, player.y, x, y);
+      let d = dist(
+       player.x,
+       player.y + HITBOX_OFFSET_Y,
+       x,
+       y
+      );
 
       if (d < 20) {
         item.collected = true;
