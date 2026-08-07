@@ -274,15 +274,9 @@ let click;
 
 let punch;
 
-let legendTimer = 0;
-
 let level1TipTimer = 0;
 
 let level2TipTimer = 0;
-
-const LEGEND_VISIBLE_FRAMES = 900;
-
-const LEGEND_FADE_FRAMES = 60;
 
 // SOCIAL BATTERY
 
@@ -2066,8 +2060,6 @@ function setup() {
     }
   }
 
-  legendTimer = 0;
-
   initWallExpansion();
 
   setupCollectibles();
@@ -2264,7 +2256,6 @@ function draw() {
     !level2DialogueActive &&
     !level3DialogueActive
   ) {
-    legendTimer++;
     level1TipTimer++;
     level2TipTimer++; 
   }
@@ -2368,10 +2359,6 @@ function draw() {
   }
 
   drawVignette();
-
-  drawLaserWarnings();
-
-  drawLaserWarningLegend();
 
   updateBadge();
 
@@ -4513,99 +4500,6 @@ function updateLasers() {
   }
 }
 
-// How many "goblin frames" until it fires. 0 = firing right now.
-
-function framesUntilLaserFires() {
-  let start = GOBLIN.redEyeStart;
-
-  let cycle = GOBLIN.numFrames;
-
-  if (currentGoblinFrame >= start && currentGoblinFrame <= GOBLIN.redEyeEnd)
-    return 0;
-
-  let diff = start - currentGoblinFrame;
-
-  if (diff < 0) diff += cycle;
-
-  return diff;
-}
-
-const LASER_WARNING_RANGE = 420; // world-units â€” start showing an arrow at this distance
-
-const LASER_ARROW_EDGE_RADIUS = 250; // how far from screen center the arrow sits
-
-const LASER_ARROW_SIZE = 18;
-
-function drawLaserWarnings() {
-  if (maze !== maze1 && maze !== maze2 && maze !== maze3) return;
-
-  let framesLeft = framesUntilLaserFires();
-
-  let firing = framesLeft === 0;
-
-  let soon = framesLeft > 0 && framesLeft <= 2;
-
-  let halfW = width / 2 / ZOOM;
-
-  let halfH = height / 2 / ZOOM;
-
-  for (let l of lasers) {
-    let lx = l.col * tileSize + tileSize / 2;
-
-    let ly = l.row * tileSize + tileSize / 2;
-
-    let dx = lx - player.x;
-
-    let dy = ly - player.y;
-
-    let d = sqrt(dx * dx + dy * dy);
-
-    if (d > LASER_WARNING_RANGE) continue;
-
-    // Already visible on screen â€” skip the arrow, the goblin itself is the warning
-
-    if (abs(dx) < halfW && abs(dy) < halfH) continue;
-
-    let angle = atan2(dy, dx);
-
-    let ax = width / 2 + cos(angle) * LASER_ARROW_EDGE_RADIUS;
-
-    let ay = height / 2 + sin(angle) * LASER_ARROW_EDGE_RADIUS;
-
-    push();
-
-    translate(ax, ay);
-
-    rotate(angle);
-
-    noStroke();
-
-    if (firing) {
-      fill(255, 40, 40, 210 + sin(frameCount * 0.6) * 30);
-    } else if (soon) {
-      fill(255, 190, 40, 220);
-    } else {
-      fill(255, 220, 120, 130);
-    }
-
-    triangle(
-      LASER_ARROW_SIZE,
-
-      0,
-
-      -LASER_ARROW_SIZE * 0.6,
-
-      LASER_ARROW_SIZE * 0.6,
-
-      -LASER_ARROW_SIZE * 0.6,
-
-      -LASER_ARROW_SIZE * 0.6,
-    );
-
-    pop();
-  }
-}
-
 // START SCREEN
 
 function drawStartScreen() {
@@ -4670,8 +4564,6 @@ function restartGame() {
   collectedCount = 0;
 
   flyingCollectibles = [];
-
-  legendTimer = 0;
 
   level1TipTimer = 0;
 
@@ -4979,8 +4871,6 @@ function loadSecondLevel() {
 
   forest = library;
 
-  legendTimer = 0;
-
   level2TipTimer = 0;
 
   // --- MUSIC SWAP ---
@@ -5075,8 +4965,6 @@ function loadThirdLevel() {
 
   school = blackhole;
 
-  legendTimer = 0;
-
   // --- MUSIC SWAP ---
 
   if (bgMusic.isPlaying()) bgMusic.stop();
@@ -5134,81 +5022,4 @@ function resetLevel3State() {
   level3FoodCollectedDialogueIndex = 0;
 
   resetLevel3Chase();
-}
-
-const LASER_LEGEND_X = 20;
-
-const LASER_LEGEND_Y = 480; // lower-left, clear of the top HUD banner
-
-function drawLaserWarningLegend() {
-  if (maze !== maze1 && maze !== maze2 && maze !== maze3) return;
-
-  // Fully gone after the visible window + fade window
-  if (legendTimer >= LEGEND_VISIBLE_FRAMES + LEGEND_FADE_FRAMES) return;
-
-  let alpha = 1;
-  if (legendTimer > LEGEND_VISIBLE_FRAMES) {
-    let fadeProgress =
-      (legendTimer - LEGEND_VISIBLE_FRAMES) / LEGEND_FADE_FRAMES;
-    alpha = 1 - constrain(fadeProgress, 0, 1);
-  }
-
-  push();
-
-  textFont("Monospace");
-
-  textAlign(LEFT, CENTER);
-
-  noStroke();
-
-  // Background panel
-
-  fill(10, 12, 20, 170);
-
-  rect(LASER_LEGEND_X - 12, LASER_LEGEND_Y - 26, 220, 150, 8);
-
-  fill(255);
-
-  textStyle(BOLD);
-
-  textSize(20);
-
-  text("Laser Warning", LASER_LEGEND_X, LASER_LEGEND_Y);
-
-  textStyle(NORMAL);
-
-  textSize(20);
-
-  const rows = [
-    { color: [255, 220, 120, 200], label: "Detected nearby" },
-
-    { color: [255, 190, 40, 255], label: "About to fire" },
-
-    { color: [255, 40, 40, 255], label: "Firing now!" },
-  ];
-
-  let rowY = LASER_LEGEND_Y + 30;
-
-  for (let r of rows) {
-    // Small triangle swatch matching the arrow shape/rotation
-
-    push();
-
-    translate(LASER_LEGEND_X + 8, rowY);
-
-    rotate(HALF_PI); // point it "up" to read naturally in a legend
-
-    fill(...r.color);
-
-    triangle(10, 0, -6, -6, -6, 6);
-
-    pop();
-
-    fill(255);
-
-    text(r.label, LASER_LEGEND_X + 24, rowY);
-
-    rowY += 30;
-  }
-  pop();
 }
