@@ -5003,6 +5003,7 @@ function debugGoToStart() {
 }
 
 function debugGoToLevelComplete(num) {
+  gameStarted = true;
   gameOver = false;
   firstLevelComplete = num === 1;
   secondLevelComplete = num === 2;

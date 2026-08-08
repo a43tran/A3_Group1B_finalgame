@@ -31,8 +31,8 @@ Debug Panel
 - 1: Jump to Level 1
 - 2: Jump to Level 2
 - 3: Jump to Level 3
-- Q/q: Jump to Start Screen
-- R/r: Jump to Finish/End Screen
+- O/o: Jump to Start Screen
+- P/p: Jump to Finish/End Screen
 
 
 ## Iteration Notes
