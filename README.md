@@ -23,11 +23,11 @@ WASD to move.
 - D move/walk to the right
 - Spacebar to start game, progress through introduction dialogue
 - Mouse1 to click through the menu, access the ? (controls), progress through introduction dialogue
-- R restart the game after full social battery depletion
-- N progress to next level
+- R/r restart the game after full social battery depletion
+- N/n progress to next level
 
 **Debug Panel**
-- D/d: Toggle debug panel on screen
+- T/t: Toggle debug panel on screen
 - 1: Jump to Level 1
 - 2: Jump to Level 2
 - 3: Jump to Level 3
