@@ -141,6 +141,10 @@ let goblinslvl2;
 let goblinslvl3;
 let goblin;
 
+let debugMode = false;
+let character1, goblins1, forest1, home1, school1;
+let lasers1, laserBeams1;
+
 let startScreen;
 
 let restartScreen;
@@ -446,10 +450,9 @@ const level3ChaseCompleteDialogue = [
   "Okay, phew... I made it out. I did it!",
 ];
 
-
 const TIP_VISIBLE_FRAMES = 240; // ~4 seconds
 
-const TIP_FADE_FRAMES = 60
+const TIP_FADE_FRAMES = 60;
 
 // GOBLIN CHASE SPRITE SHEET (running animation)
 
@@ -2041,6 +2044,14 @@ function preload() {
   click = loadSound("assets/sounds/pop.mp3");
 
   punch = loadSound("assets/sounds/punch.mp3");
+
+  character1 = character;
+  goblins1 = goblins;
+  forest1 = forest;
+  home1 = home;
+  school1 = school;
+  lasers1 = lasers;
+  laserBeams1 = laserBeams;
 }
 
 function setup() {
@@ -2090,35 +2101,41 @@ function draw() {
 
   if (!gameStarted && !showTutorial) {
     drawStartScreen();
+    if (debugMode) drawDebugPanel();
 
     return;
   }
 
   if (showTutorial) {
     drawTutorialOverlay();
+    if (debugMode) drawDebugPanel();
 
     return;
   }
 
   if (firstLevelComplete) {
     drawFirstLevelCompleteScreen();
+    if (debugMode) drawDebugPanel();
 
     return;
   }
 
   if (secondLevelComplete) {
     drawSecondLevelCompleteScreen();
+    if (debugMode) drawDebugPanel();
 
     return;
   }
 
   if (thirdLevelComplete) {
     drawThirdLevelCompleteScreen();
+    if (debugMode) drawDebugPanel();
 
     return;
   }
 
   if (introDialogueActive) {
+    if (debugMode) drawDebugPanel();
     updateCamera();
 
     push();
@@ -2145,6 +2162,7 @@ function draw() {
   }
 
   if (level2DialogueActive) {
+    if (debugMode) drawDebugPanel();
     updateCamera();
 
     push();
@@ -2171,6 +2189,7 @@ function draw() {
   }
 
   if (level3DialogueActive) {
+    if (debugMode) drawDebugPanel();
     updateCamera();
 
     push();
@@ -2197,6 +2216,7 @@ function draw() {
   }
 
   if (level3FoodCollectedDialogueActive) {
+    if (debugMode) drawDebugPanel();
     updateCamera();
 
     push();
@@ -2231,6 +2251,7 @@ function draw() {
   }
 
   if (level3ChaseCompleteDialogueActive) {
+    if (debugMode) drawDebugPanel();
     background(endfairy);
 
     drawLevel3FoodDialogueBox(
@@ -2245,6 +2266,7 @@ function draw() {
   updateCamera();
 
   if (gameOver) {
+    if (debugMode) drawDebugPanel();
     drawLoseScreen();
 
     return;
@@ -2257,7 +2279,7 @@ function draw() {
     !level3DialogueActive
   ) {
     level1TipTimer++;
-    level2TipTimer++; 
+    level2TipTimer++;
   }
 
   push();
@@ -2409,6 +2431,8 @@ function draw() {
   // Flying collectible above the wooden HUD
 
   drawFlyingCollectibles();
+
+  if (debugMode) drawDebugPanel();
 }
 
 function completeLevel3() {
@@ -2420,6 +2444,34 @@ function completeLevel3() {
 }
 
 function keyPressed() {
+  if (key === "t" || key === "T") {
+    debugMode = !debugMode;
+    return;
+  }
+
+  if (debugMode) {
+    if (key === "1") {
+      debugGoToLevel(1);
+      return;
+    }
+    if (key === "2") {
+      debugGoToLevel(2);
+      return;
+    }
+    if (key === "3") {
+      debugGoToLevel(3);
+      return;
+    }
+    if (key === "O" || key === "o") {
+      debugGoToStart();
+      return;
+    }
+    if (key === "P" || key === "p") {
+      debugGoToLevelComplete(3);
+      return;
+    }
+  }
+
   // The Level 3 end screen already tells the player to press E.
   // Reloading returns the game to its initial main-menu state.
   if (thirdLevelComplete && (key === "e" || key === "E")) {
@@ -2507,7 +2559,7 @@ function keyPressed() {
   }
 
   //if (key === "m" || key === "M") {
-    //loadThirdLevel();
+  //loadThirdLevel();
   //}
 
   if (key === "n" || key === "N") {
@@ -3198,7 +3250,6 @@ function checkCollectibleCompletion() {
 
     playerInvincible = false;
     invincibleTimer = 0;
-
 
     startLevel3Chase();
 
@@ -4846,6 +4897,163 @@ function drawTutorialOverlay() {
   text("Continue", width / 2, tutorialButton.y + tutorialButton.h / 2);
 }
 
+function debugGoToLevel(num) {
+  gameOver = false;
+  firstLevelComplete = false;
+  secondLevelComplete = false;
+  thirdLevelComplete = false;
+  showTutorial = false;
+  gameStarted = true;
+
+  introDialogueActive = false;
+  level2DialogueActive = false;
+  level3DialogueActive = false;
+  level3FoodCollectedDialogueActive = false;
+  level3ChaseCompleteDialogueActive = false;
+
+  if (bgMusic.isPlaying()) bgMusic.stop();
+  if (lvl2Music.isPlaying()) lvl2Music.stop();
+  if (lvl3Music.isPlaying()) lvl3Music.stop();
+
+  if (num === 1) {
+    maze = maze1;
+    lasers = lasers1;
+    laserBeams = laserBeams1;
+    character = character1;
+    goblins = goblins1;
+    GOBLIN = GOBLIN_LVL1;
+    forest = forest1;
+    home = home1;
+    school = school1;
+    setupCollectibles();
+    if (!bgMusic.isPlaying()) bgMusic.loop();
+  } else if (num === 2) {
+    maze = maze2;
+    lasers = lasers2;
+    laserBeams = laserBeams2;
+    character = characterlvl2;
+    goblins = goblinslvl2;
+    GOBLIN = GOBLIN_LVL2;
+    forest = library;
+    home = classroomdoor;
+    school = cafedoor;
+    setupPotionIngredients();
+    resetBeakers();
+    if (!lvl2Music.isPlaying()) lvl2Music.loop();
+  } else if (num === 3) {
+    maze = maze3;
+    lasers = lasers3;
+    laserBeams = laserBeams3;
+    character = characterlvl3;
+    goblins = goblinslvl3;
+    GOBLIN = GOBLIN_LVL3;
+    forest = cafeteria;
+    home = cafeentrance;
+    school = blackhole;
+    setupFoodCollectibles();
+    resetBeakers();
+    resetLevel3State();
+    if (!lvl3Music.isPlaying()) lvl3Music.loop();
+  }
+
+  socialBattery = 100;
+  badgeUnlocked = false;
+  potionbadgeUnlocked = false;
+  foodBadgeUnlocked = false;
+  badgeMessageTimer = 0;
+  collectedCount = 0;
+  flyingCollectibles = [];
+  playerInvincible = false;
+  invincibleTimer = 0;
+  hitFlashAlpha = 0;
+  healFlashAlpha = 0;
+  level1TipTimer = 0;
+  level2TipTimer = 0;
+
+  initWallExpansion();
+
+  outer: for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      if (maze[r][c] === 2) {
+        player.x = c * tileSize + tileSize / 2;
+        player.y = r * tileSize + tileSize / 2;
+        break outer;
+      }
+    }
+  }
+
+  player.vx = 0;
+  player.vy = 0;
+  if (walking.isPlaying()) walking.stop();
+
+  camX = player.x - width / 2;
+  camY = player.y - height / 2;
+}
+
+function debugGoToStart() {
+  gameStarted = false;
+  showTutorial = false;
+  gameOver = false;
+  firstLevelComplete = false;
+  secondLevelComplete = false;
+  thirdLevelComplete = false;
+  if (bgMusic.isPlaying()) bgMusic.stop();
+  if (lvl2Music.isPlaying()) lvl2Music.stop();
+  if (lvl3Music.isPlaying()) lvl3Music.stop();
+}
+
+function debugGoToLevelComplete(num) {
+  gameOver = false;
+  firstLevelComplete = num === 1;
+  secondLevelComplete = num === 2;
+  thirdLevelComplete = num === 3;
+}
+
+function drawDebugPanel() {
+  push();
+  imageMode(CORNER);
+  rectMode(CORNER);
+
+  fill(0, 0, 0, 200);
+  noStroke();
+  rect(0, height - 80, width, 80);
+
+  fill(0, 234, 255);
+  textFont("Monospace");
+  textSize(12);
+  textAlign(LEFT, TOP);
+  text("DEBUG MODE (T to close)", 12, height - 62);
+
+  let buttons = [
+    "1: Level 1",
+    "2: Level 2",
+    "3: Level 3",
+    "O/o: Start",
+    "P/p: Finish",
+  ];
+
+  let btnW = 108;
+  let gap = 8;
+  let startX = 10;
+
+  for (let i = 0; i < buttons.length; i++) {
+    let x = startX + i * (btnW + gap);
+
+    fill(60, 60, 90);
+    stroke(100, 100, 140);
+    strokeWeight(1);
+    rect(x, height - 50, btnW, 34, 4);
+
+    fill(200);
+    noStroke();
+    textSize(10);
+    textAlign(LEFT, TOP);
+    text(buttons[i], x + 6, height - 28);
+  }
+
+  pop();
+}
+
 function loadSecondLevel() {
   maze = maze2;
 
@@ -5015,8 +5223,8 @@ function resetLevel3State() {
 
   level3AllFoodCollected = false;
 
-  foodBadgeUnlocked = false; 
-  
+  foodBadgeUnlocked = false;
+
   level3FoodCollectedDialogueActive = false;
 
   level3FoodCollectedDialogueIndex = 0;

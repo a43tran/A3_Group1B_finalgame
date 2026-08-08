@@ -26,6 +26,13 @@ WASD to move.
 - R restart the game after full social battery depletion
 - N progress to next level
 
+Debug Panel
+- D/d: Toggle debug panel on screen
+- 1: Jump to Level 1
+- 2: Jump to Level 2
+- 3: Jump to Level 3
+- Q/q: Jump to Start Screen
+- R/r: Jump to Finish/End Screen
 
 
 ## Iteration Notes
