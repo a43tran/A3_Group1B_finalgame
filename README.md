@@ -45,14 +45,16 @@ After conducting playtesting for our final game, we implemented a “tip” pop-
 |                  File                   |                                          Source                                            |
 |-----------------------------------------|--------------------------------------------------------------------------------------------|
 | `assets/sounds/walking.mp3`[1]          | Abdalrahman_bm, 8-bit gravel footsteps 1 - Pixabay.com                                     |
-| `assets/sounds/collect.mp3`[5]          | floraphonic, 90s Game UI 6 - Pixabay.com                                                   |
-| `assets/sounds/lvl2Music.mp3`[4]        | kaazoom, The Happy Whistler (30 sec edit) - Pixabay.com                                                   |
+| `assets/sounds/collect.mp3`[3]          | floraphonic, 90s Game UI 6 - Pixabay.com                                                   |
+| `assets/sounds/lvl2Music.mp3`[4]        | kaazoom, The Happy Whistler (30 sec edit) - Pixabay.com                                    |
 | `assets/sounds/win.mp3`[6]              | Latent-Rick, Retro Arcade Level Up - Pixabay.com                                           |
 | `assets/sounds/fail.mp3`[7]             | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
 | `assets/sounds/bgmusic.mp3`[9]          | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay.com  |
-| `assets/sounds/hit.mp3`[10]             | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
-| `assets/sounds/hit.mp3`[10]             | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
-
+| `assets/sounds/lvl3Music.mp3`[10]       | nakaradaalexander, Winning Loop - Pixabay.com                                              |
+| `assets/sounds/hit.mp3`[11]             | Pixabay, Retro Hurt Sound 01 - Pixabay.com                                                 |
+| `assets/sounds/pop.mp3`[12]             | SoundReality, Pop Sound - Pixabay.com                                                      |
+| `assets/sounds/punch.mp3`[13]           | soraatwood, Punch - Pixabay.com                                                            |
+| `assets/sounds/miniGameWin.mp3`[14]     | Vadim_Makes_Sound, Fantasy Healing Spell Cast #1 - Pixabaycom                              |
 |                                         |                                                                                            |
 | `assets/images/apple.png`               | Gemini 3.6 Flash                                                                           |
 | `assets/images/blackhole.png`           | Gemini 3.6 Flash                                                                           |
