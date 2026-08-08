@@ -6,7 +6,7 @@
 ## Game Description
 Illuminate is a 2D maze adventure that explores the experience of social anxiety disorder through a fantasy-styled gameplay. Players must help Faith overcome challenges she faces without her social battery bar dropping to zero, representing mental and emotional energy required when handling overwhelming social situations. 
 
-Players control Faith through the maze using the WASD keys while collecting items scattered throughout three levels. In Level 1, players collect fireflies while avoiding laser-firing goblins and navigating increasingly restrictive maze walls that expand as Faith’s Social battery decreases. In Level 2, players explore a classroom-themed maze, collecting randomized potion ingredients while avoiding swinging beakers and lasers. In Level 3, players collect food items throughout a cafeteria maze, deliver them to the cafeteria bar before progressing, complete a goblin-themed Whack-a-Mole minigame, and then locate the final exit
+Players control Faith through the maze using the WASD keys while collecting items scattered throughout three levels. In Level 1, players collect fireflies while avoiding laser-firing goblins and navigating increasingly restrictive maze walls that expand as Faith’s Social battery decreases. In Level 2, players explore a classroom-themed maze, collecting randomized potion ingredients while avoiding swinging beakers and lasers. In Level 3, players collect food items throughout a cafeteria maze, dodge the goblins throwing laser-filled food and descending forks. Once all food items are collected, they must successfully avoid the chasing goblins to locate the final exit. 
 
 Throughout the game, collecting items helps restore Faith's Social Battery while contributing toward earning a badge for completing each collection. Players are guided through the maze using dialogue, visual indicators, and level objectives while overcoming obstacles that challenge their Social Battery management. The game combines exploration, resource management, and storytelling to create an engaging game experience, showcasing the challenges faced by individuals with social anxiety disorder.
 
@@ -26,7 +26,7 @@ WASD to move.
 - R restart the game after full social battery depletion
 - N progress to next level
 
-Debug Panel
+**Debug Panel**
 - D/d: Toggle debug panel on screen
 - 1: Jump to Level 1
 - 2: Jump to Level 2
